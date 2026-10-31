@@ -38,7 +38,7 @@
 - **폰트**: 상단 메뉴 로고는 Cove.ai의 COVE 글자(assets/cove-logo.svg, 높이 20px), About 섹션 본문(큰 문장·Concept·Philosophy·Close/Calm/Kind)과 Design의 Form·Material·Motion 제목과 규격(Height·Width·Finish)은 Jost(Futura 계열, 기울임 없음), 푸터 로고도 같은 COVE 글자(assets/cove-logo.svg), 그 밖의 제목은 Instrument Serif, 본문·UI Manrope, 한글 Noto Sans KR. 인트로는 Jost(HI, I'm cove)와 Cove.ai 로고의 COVE 글자 모양(배경의 큰 COVE, 글자마다 SVG, 크림→샌드 세로 그라디언트, js/intro.js의 GLYPHS). 한국어 강조 문구(`em.ko`)는 기울이지 않음.
 - **글자 크기**: 인트로 HI·I'm cove `clamp(36px, 4.8vw, 84px)`, 배경의 큰 COVE `24vw`, 섹션 제목 `clamp(34px, 5.4vw, 72px)`, About 문장 `clamp(28px, 4.4vw, 60px)`, 섹션 라벨(01 — About Cove 등) `clamp(15px, 1.35vw, 20px)` 대문자, 본문 14~16px.
 - **레이아웃·비율**: 좌우 여백 `clamp(16px, 5vw, 72px)`, 섹션 위아래 여백 `clamp(96px, 14vw, 180px)`, 모서리 둥글기 28px, Design 대표 이미지 4:5, 디테일 컷 16:10, 갤러리 3열 그리드.
-- **푸터(프로젝트 크레딧 통합, 별도 아웃트로 섹션은 없음)**: 큰 COVE 로고 아래 모노스페이스 명세(ROBOTWORLD 2026, Project·Team·Period·Members·Advisor), 메뉴, 저작권. Members 순서는 김채영 · 박소연 · 이서연 · 김동수 · 고은결 · 송상훈 · 신승혁(사용자 지정). HIDE LAB 은 http://www.hidelab.co.kr/ 링크. 이름은 직책 구분 없이 표기.
+- **푸터(프로젝트 크레딧 통합, 별도 아웃트로 섹션은 없음; PC·모바일 모두 왼쪽 정렬로 위에서 아래로 쌓음 — 로고, 크레딧(라벨 위·값 아래), 메뉴, 저작권)**: 큰 COVE 로고 아래 모노스페이스 명세(ROBOTWORLD 2026, Project·Team·Period·Members·Advisor), 메뉴, 저작권. Members 순서는 김채영 · 박소연 · 이서연 · 김동수 · 고은결 · 송상훈 · 신승혁(사용자 지정). HIDE LAB 은 http://www.hidelab.co.kr/ 링크. 이름은 직책 구분 없이 표기.
 - **Hero 섹션은 삭제됨**: 인트로의 큰 COVE 글자 + Cove 렌더 장면이 그 자리를 대신함(사용자 요청).
 - **반응형 기준**: 1024px 이하 기능 카드 2열, 760px 이하 1열 구성과 메뉴 숨김, 520px 이하 기능 카드 1열.
 - **섹션 순서**: 인트로(HI → I'm cove → 큰 COVE 글자 + Cove 렌더, 스크롤로 이어짐) → About → Key Features → Design & Detail → Gallery → Footer(크레딧 포함).

@@ -421,23 +421,16 @@ em.ko { font-family: var(--font-ui); font-style: normal; font-weight: 400; font-
 .gallery__expand i { display: none; }
 .gallery__film[controls], .gallery__film:has(video[controls]) .gallery__expand { top: 16px; }
 
-/* 푸터 정리: 왼쪽 로고 · 오른쪽 크레딧(한 줄 맞춤) · 아래 한 줄(메뉴 / 저작권) */
-.footer { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: start; column-gap: clamp(32px, 6vw, 96px); row-gap: clamp(40px, 5vw, 64px); }
-.footer__brand { grid-column: 1; grid-row: 1; }
-.footer__credits { grid-column: 2; grid-row: 1; padding-top: 6px; }
-.footer__event { margin: 0 0 14px; padding-bottom: 14px; border-bottom: 1px solid var(--line); letter-spacing: .14em; }
-.footer__credits dl { gap: 8px; }
-.footer__credits dl > div { grid-template-columns: clamp(84px, 8vw, 112px) 1fr; align-items: baseline; }
+/* 푸터: 웹도 모바일처럼 모두 왼쪽 정렬로 위에서 아래로 쌓는다 (로고 → 크레딧 → 메뉴 → 저작권) */
+.footer { grid-template-columns: minmax(0, 1fr); align-items: start; row-gap: clamp(32px, 4vw, 52px); }
+.footer__brand, .footer__credits, .footer__links, .footer__copy { grid-column: 1; grid-row: auto; text-align: left; }
+.footer__credits { padding-top: 0; }
+.footer__event { margin: 0 0 18px; padding-bottom: 0; border-bottom: 0; letter-spacing: .14em; }
+.footer__credits dl { gap: 16px; }
+.footer__credits dl > div { grid-template-columns: 1fr; row-gap: 2px; }
 .footer__credits dt { text-align: left; }
-.footer__links { grid-column: 1; grid-row: 2; align-self: center; padding-top: 24px; border-top: 1px solid var(--line); }
-.footer__copy { grid-column: 2; grid-row: 2; align-self: center; text-align: right; padding-top: 24px; border-top: 1px solid var(--line); }
-@media (max-width: 900px) {
-  .footer { grid-template-columns: 1fr; }
-  .footer__brand, .footer__credits, .footer__links, .footer__copy { grid-column: 1; grid-row: auto; }
-  .footer__copy { text-align: left; border-top: 0; padding-top: 0; }
-}
-.footer__links { margin-right: calc(-1 * clamp(32px, 6vw, 96px)); }
-@media (max-width: 900px) { .footer__links { margin-right: 0; } }
+.footer__links { margin-right: 0; padding-top: 24px; border-top: 1px solid var(--line); }
+.footer__copy { padding-top: 0; border-top: 0; }
 
 /* About 하단 Close · Calm · Kind 아래 렌더 이미지 (투명 배경 → 카드 배경이 비침) */
 .principles__img { position: relative; margin: 28px 0 0; aspect-ratio: 4 / 5; overflow: hidden; }

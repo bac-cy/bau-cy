@@ -101,7 +101,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     const msg = document.createElement('span'); msg.className = 'slot__msg'; msg.setAttribute('aria-live', 'off');
     slot.append(cv, msg);
     const camera = new THREE.PerspectiveCamera(28, 1.6, 0.01, 10);
-    return { slot, kind: slot.dataset.scene, scene, camera, cv, msg, ctx: cv.getContext('2d'), setPose, eyes, FRONT, RIGHT, center, sphere, seam,
+    return { slot, kind: slot.dataset.scene, scene, root3, camera, cv, msg, ctx: cv.getContext('2d'), setPose, eyes, FRONT, RIGHT, center, sphere, seam,
       cam: { az: 35, el: 14, zoom: 1, tx: 0, ty: 0, tz: 0 }, cvel: { az: { v: 0 }, el: { v: 0 }, zoom: { v: 0 }, tx: { v: 0 }, ty: { v: 0 }, tz: { v: 0 } },
       t: 0, rest: 0, visible: false, text: '', w: 0, h: 0 };
   });
@@ -122,7 +122,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
       say(c, '소재가 만나는 이음선');
     } else {
       const cyc = TOUR_LEN + TOUR_REST, p = t % cyc, q = Math.min(p, TOUR_LEN);
-      pose = tourAt(q); eye = last(TOUR_EYES, q)[1]; g = { az: 24, el: 10, zoom: 0.9, tx: 0, ty: 0, tz: 0 };
+      pose = tourAt(q); eye = last(TOUR_EYES, q)[1]; g = { az: 24, el: 10, zoom: 0.85, tx: 0, ty: 0, tz: 0 };
       say(c, last(TOUR_MSG, q)[1]);
     }
     return { g, pose, eye };
@@ -145,7 +145,12 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
       const vf = c.camera.fov * D2R, hf = 2 * Math.atan(Math.tan(vf / 2) * c.camera.aspect);
       const dist = (c.sphere.radius * 0.95) / Math.sin(Math.min(vf * 0.98, hf * 1.0) / 2) / c.cam.zoom;
       const az = c.cam.az * D2R, el = c.cam.el * D2R, dir = c.FRONT.clone().multiplyScalar(Math.cos(az)).addScaledVector(c.RIGHT, Math.sin(az));
-      const target = c.center.clone().add(new THREE.Vector3(c.cam.tx, c.cam.ty, c.cam.tz));
+      let base = c.center;
+      if (c.kind === 'motion') {                                          // Motion: 지금 자세의 Cove 중심을 따라가서 카드 한가운데에 놓는다 (머리가 옆으로 가도 잘리지 않음)
+        const bb = new THREE.Box3().setFromObject(c.root3), cc = bb.getCenter(new THREE.Vector3()); cc.y = bb.min.y + (bb.max.y - bb.min.y) * 0.5;
+        c.live = c.live ? c.live.lerp(cc, reduced ? 1 : 0.12) : cc; base = c.live;
+      }
+      const target = base.clone().add(new THREE.Vector3(c.cam.tx, c.cam.ty, c.cam.tz));
       c.camera.position.copy(target).addScaledVector(dir, dist * Math.cos(el)); c.camera.position.y += dist * Math.sin(el); c.camera.lookAt(target);
       renderer.setSize(c.cv.width, c.cv.height, false); renderer.render(c.scene, c.camera);
       c.ctx.clearRect(0, 0, c.cv.width, c.cv.height); c.ctx.drawImage(renderer.domElement, 0, 0);
