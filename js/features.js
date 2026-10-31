@@ -71,19 +71,17 @@ function drawPressure(c, w, h, t) {
   const s = Math.min(w / 300, h / 150); c.save(); c.translate(w / 2 - 150 * s, h / 2 - 75 * s); c.scale(s, s);
   const p = t < 1.1 ? ease(t / 1.1) : t < 2.5 ? 1 : ease(1 - (t - 2.5) / 1.5);
   c.beginPath(); c.moveTo(30, 140); c.lineTo(270, 140); c.lineWidth = 1.2; c.strokeStyle = 'rgba(125,106,168,.35)'; c.stroke();
-  // 압력 파동
-  if (p > 0.02) for (let k = 0; k < 3; k++) {
-    const ph = ((t * 0.9 + k / 3) % 1), r = 56 + ph * 70;
-    c.beginPath(); c.ellipse(150, 112, r, r * 0.46, 0, 0, 7); c.lineWidth = 1.3; c.strokeStyle = `rgba(125,106,168,${(0.5 * (1 - ph) * p).toFixed(3)})`; c.stroke();
+  // 머리와 몸통 사이의 라벤더 패드를 Cove가 지그시 눌러 준다 (패드는 납작해지며 살짝 퍼짐)
+  const bodyTop = 100, padH = 24 - 13 * p, padY = bodyTop - padH, padW = 124 + 12 * p;
+  if (p > 0.02) for (let k = 0; k < 3; k++) {            // 눌림이 퍼지는 파동
+    const ph = ((t * 0.9 + k / 3) % 1), r = 70 + ph * 58;
+    c.beginPath(); c.ellipse(150, padY + padH / 2, r, r * 0.3, 0, 0, 7); c.lineWidth = 1.3; c.strokeStyle = `rgba(125,106,168,${(0.45 * (1 - ph) * p).toFixed(3)})`; c.stroke();
   }
   c.fillStyle = 'rgba(125,106,168,.14)'; c.beginPath(); c.ellipse(150, 140, 66 + p * 6, 5, 0, 0, 7); c.fill();
-  // 몸통은 눌리며 살짝 납작해지고, 머리도 함께 내려간다
-  const sq = 1 - 0.12 * p, bh = 40 * sq, by = 138 - bh;
-  pebble(c, 86 - 3 * p, by, 128 + 6 * p, bh, 20);
-  const hy = by - 28 - 2; pebble(c, 100, hy, 100, 32, 16); eyeDots(c, 150, hy + 16, 15, 2.7);
-  // 위에서 내려와 기대는 팔
-  const ay = hy - 26 - (1 - p) * 24;
-  rr(c, 56, ay, 188, 24, 12); c.fillStyle = 'rgba(184,166,224,.32)'; c.fill(); c.lineWidth = 1.4; c.setLineDash([4, 4]); c.strokeStyle = 'rgba(125,106,168,.8)'; c.stroke(); c.setLineDash([]);
+  pebble(c, 86, bodyTop, 128, 38, 19);                                        // 몸통
+  rr(c, 150 - padW / 2, padY, padW, padH, Math.min(11, padH / 2 + 2));       // 라벤더 패드 (머리와 몸통 사이)
+  c.fillStyle = 'rgba(184,166,224,.55)'; c.fill(); c.lineWidth = 1.4; c.strokeStyle = 'rgba(125,106,168,.85)'; c.stroke();
+  const hy = padY - 32 + 1; pebble(c, 100, hy, 100, 32, 16); eyeDots(c, 150, hy + 16, 15, 2.7);   // 머리가 내려와 패드를 누른다
   c.restore();
 }
 
