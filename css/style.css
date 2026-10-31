@@ -404,3 +404,17 @@ em.ko { font-family: var(--font-ui); font-style: normal; font-weight: 400; font-
 .feature__art canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .feature h3 { padding-top: 24px; }
 @media (max-width: 520px) { .feature__art { height: 130px; } }
+
+/* 푸터: 프로젝트 크레딧을 하나로 합침 (모노스페이스 명세) */
+.footer { grid-template-columns: 1fr auto; row-gap: 40px; padding-top: clamp(72px, 10vw, 130px);
+  background: radial-gradient(60% 70% at 18% 20%, rgba(217, 205, 242, .45), transparent 70%), radial-gradient(50% 60% at 80% 90%, rgba(255, 217, 184, .4), transparent 70%), var(--bg); }
+.footer__credits { grid-column: 1 / -1; font-family: "JetBrains Mono", "Noto Sans KR", ui-monospace, monospace; font-size: clamp(11px, .85vw, 13px);
+  letter-spacing: .06em; line-height: 1.6; text-transform: uppercase; text-align: left; }
+.footer__event { margin: 0 0 16px; color: var(--ink); }
+.footer__credits dl { margin: 0; display: grid; gap: 2px; }
+.footer__credits dl > div { display: grid; grid-template-columns: clamp(78px, 8.5vw, 124px) 1fr; column-gap: clamp(14px, 1.6vw, 22px); }
+.footer__credits dt { text-align: right; color: var(--ink-faint); font-weight: 300; }
+.footer__credits dd { margin: 0; color: var(--ink); }
+.footer__credits a { color: inherit; text-decoration: underline; text-decoration-color: rgba(43, 39, 49, .3); text-underline-offset: .3em; transition: color .3s ease; }
+.footer__credits a:hover, .footer__credits a:focus-visible { color: #5b43a6; text-decoration-color: currentColor; }
+@media (max-width: 700px) { .footer__credits dl > div { grid-template-columns: 1fr; margin-bottom: 8px; } .footer__credits dt { text-align: left; } }

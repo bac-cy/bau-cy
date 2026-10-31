@@ -11,7 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600&family=Noto+Sans+KR:wght@300;400;500&family=Jost:wght@200;300;400;500&family=JetBrains+Mono:wght@300;400&family=Fredoka:wdth,wght@125,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/intro.css">
-  <link rel="stylesheet" href="css/outro.css">
   <link rel="stylesheet" href="css/sim.css">
 </head>
 <body>
@@ -201,35 +200,26 @@
       </figure>
     </section>
 
-    <!-- ───────────── Outro: 프로젝트 명세 (한 줄씩) ───────────── -->
-    <section class="closing outro" id="outro" aria-label="Outro — Project info">
-      <div class="outro__sheet">
-        <img class="outro__logo" src="assets/cove-logo.svg" alt="COVE">
-        <p class="outro__event">ROBOTWORLD 2026</p>
-
-        <dl class="outro__group">
-          <div class="r"><dt>Project</dt><dd>COVE — PHYSICAL AI COMPANION</dd></div>
-          <div class="r"><dt>Team</dt><dd><a href="http://www.hidelab.co.kr/" target="_blank" rel="noopener">HIDE LAB</a> · HONGIK UNIVERSITY</dd></div>
-          <div class="r"><dt>Period</dt><dd>2026.09.01 → 2026.10.31</dd></div>
-          <div class="r"><dt aria-hidden="true"></dt><dd>60 DAYS</dd></div>
-        </dl>
-
-        <dl class="outro__group">
-          <div class="r"><dt>Members</dt><dd>고은결 · 김동수 · 김채영 · 박소연 · 송상훈 · 신승혁 · 이서연</dd></div>
-          <div class="r"><dt>Advisor</dt><dd>박기철</dd></div>
-        </dl>
-
-        <p class="outro__end r"><span aria-hidden="true">✳</span><a href="http://www.hidelab.co.kr/" target="_blank" rel="noopener">HIDE LAB</a> — 2026</p>
-      </div>
-    </section>
   </main>
 
-  <!-- ───────────── 7. Footer ───────────── -->
+  <!-- ───────────── 7. Footer (프로젝트 크레딧을 한 곳에 합침) ───────────── -->
   <footer class="footer">
     <div class="footer__brand">
       <span class="footer__logo" role="img" aria-label="COVE"></span>
       <p>Desktop Home Robot Project</p>
     </div>
+
+    <div class="footer__credits">
+      <p class="footer__event">ROBOTWORLD 2026</p>
+      <dl>
+        <div><dt>Project</dt><dd>COVE — PHYSICAL AI COMPANION</dd></div>
+        <div><dt>Team</dt><dd><a href="http://www.hidelab.co.kr/" target="_blank" rel="noopener">HIDE LAB</a> · HONGIK UNIVERSITY</dd></div>
+        <div><dt>Period</dt><dd>2026.09.01 → 2026.10.31 · 60 DAYS</dd></div>
+        <div><dt>Members</dt><dd>김채영 · 박소연 · 이서연 · 김동수 · 고은결 · 송상훈 · 신승혁</dd></div>
+        <div><dt>Advisor</dt><dd>박기철</dd></div>
+      </dl>
+    </div>
+
     <nav class="footer__links" aria-label="하단 메뉴">
       <a href="#about">About</a>
       <a href="#features">Features</a>
@@ -246,7 +236,6 @@
 
   <script src="js/main.js"></script>
   <script src="js/intro.js"></script>
-  <script src="js/outro.js"></script>
   <script type="importmap">
     { "imports": {
         "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",

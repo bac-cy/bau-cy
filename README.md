@@ -9,7 +9,7 @@
 - `css/style.css` — 디자인 (색상은 맨 위 `:root`에서 한 번에 바꿀 수 있음)
 - `js/main.js` — 스크롤 효과, Experience 상태 전환, 임시 로봇 일러스트
 - `css/intro.css`, `js/intro.js` — 맨 앞 인트로 (HI → I'm cove → Cove 렌더)
-- `css/outro.css`, `js/outro.js` — 맨 뒤 아웃트로(프로젝트 명세, 줄이 차례로 나타남). 내용은 `index.html`의 `#outro` 안에서 바로 고침
+- 푸터(`index.html` 맨 아래): 프로젝트 크레딧(멤버 등)은 여기서 고침
 - `js/sim.js`, `css/sim.css` — Design 섹션의 **Cove 시뮬레이터** (머리·몸통 끌기, Top/Front/Perspective/Side, 인사·쓰다듬음·간지럼·간식 동작)
 - `js/cards.js` — Design 카드(Form·Material·Motion) 안에서 재생되는 Cove 장면
 - `js/cove-eyes.js` — 눈 LED(8×8 도트) 표정과 눈 위치 계산 (시뮬레이터 look.js 에서 가져옴)
