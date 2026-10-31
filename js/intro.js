@@ -56,17 +56,16 @@
     return target + (d + tmp) * e;
   }
 
-  // HI ↔ I'm cove 전환: 살짝만 스크롤해도 장면이 딱 넘어가고(스냅), 되돌리면 딱 돌아옵니다.
-  const TRIGGER_ON = 0.10, TRIGGER_OFF = 0.05;    // 넘어가는 / 돌아오는 스크롤 위치 (히스테리시스)
-  const SNAP_TIME = 0.17;                          // HI ↔ I'm cove 전환에 걸리는 시간(초) — 작을수록 쫀쫀
+  // HI ↔ I'm cove 전환: 스크롤을 따라 처음부터 끝까지 연속으로 이어집니다 (끊기는 지점 없음).
+  const STEP1 = 0.10;                              // 이만큼 스크롤하면 I'm cove 장면 완성 (약 1.5칸)
   // I'm cove → Cove 렌더 구간
   // 휠 1칸 ≈ 0.067 (HI → I'm cove 가 1.5칸 = 0.10). 구간 길이를 칸 수로 환산해 잡았습니다.
   const OUT_START = 0.17, OUT_SPAN = 0.06;         // I'm cove 사라지기
   const RISE_START = 0.20, RISE_SPAN = 0.14;       // 큰 COVE 글자 + 렌더 올라오기 (약 2칸)
   const GLIDE_TIME = 0.2;                          // 스크롤을 따라오는 시간(초) — 작을수록 쫀쫀, 클수록 부드러움
 
-  let on = false, t = 0, ss = 0, last = performance.now();
-  const vt = { v: 0 }, vss = { v: 0 };
+  let ss = 0, last = performance.now();
+  const vss = { v: 0 };
 
   function frame(now) {
     requestAnimationFrame(frame);
@@ -76,22 +75,18 @@
     const W = window.innerWidth, H = window.innerHeight;
     const s = clamp(-r.top / H, 0, (r.height - H) / H);
 
-    if (!on && s > TRIGGER_ON) on = true;
-    else if (on && s < TRIGGER_OFF) on = false;
-    const goal = on ? 1 : 0;
-    t = reduced ? goal : smoothDamp(t, goal, vt, SNAP_TIME, dt);
-    if (Math.abs(goal - t) < 0.002 && Math.abs(vt.v) < 0.01) { t = goal; vt.v = 0; }
-
-    // HI는 앞쪽 절반에 빠르게 빠지고, I'm cove는 뒤이어 들어옵니다 (겹쳐 섞이지 않음)
-    const hiA = smooth(clamp(t / 0.55));
-    const imA = smooth(clamp((t - 0.35) / 0.65));
     // 휠이 한 칸씩 끊겨 움직여도 화면은 미끄러지듯 따라오게 함 (되감기도 동일)
     ss = reduced ? s : smoothDamp(ss, s, vss, GLIDE_TIME, dt);
     if (Math.abs(s - ss) < 0.0003 && Math.abs(vss.v) < 0.005) { ss = s; vss.v = 0; }
+    const p1 = clamp(ss / STEP1);                      // HI → I'm cove 진행도 (0 → 1, 스크롤과 연속 연동)
+
+    // HI가 위로 사라지는 동안 I'm cove가 아래에서 올라와 자연스럽게 겹쳐 바뀝니다
+    const hiA = smooth(clamp(p1 / 0.6));
+    const imA = smooth(clamp((p1 - 0.4) / 0.6));
     const out = clamp((ss - OUT_START) / OUT_SPAN);
     const b = smooth(clamp((ss - RISE_START) / RISE_SPAN));
 
-    if (t > 0.3) startIm();
+    if (p1 > 0.5) startIm();
     if (ss >= RISE_START && imStarted && !imDone) {      // 타이핑이 끝나기 전에 넘어가면 바로 완성
       lineIm.querySelector('.intro__typed').textContent = lineIm.dataset.type;
       lineIm.querySelector('.intro__caret').classList.add('is-done'); imDone = true;

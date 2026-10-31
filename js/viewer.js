@@ -3,15 +3,25 @@
    마우스/터치로 좌우로 돌려볼 수 있습니다. (확대·이동은 막아 두어 스크롤을 방해하지 않음)
    3D를 불러오지 못하면 기존 임시 이미지가 그대로 남습니다.
    ========================================================== */
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-
+/* 3D 라이브러리와 모델은 Design 섹션이 가까워졌을 때에만 불러옵니다.
+   (페이지를 열자마자 불러오면 인트로 스크롤이 버벅일 수 있음) */
 const host = document.querySelector('.cove-3d');
-if (host) init(host).catch(err => console.warn('Cove 3D viewer unavailable:', err));
+if (host) {
+  const io = new IntersectionObserver(([en]) => {
+    if (!en.isIntersecting) return;
+    io.disconnect();
+    init(host).catch(err => console.warn('Cove 3D viewer unavailable:', err));
+  }, { rootMargin: '900px 0px' });
+  io.observe(host);
+}
 
 async function init(host) {
+  const [THREE, { GLTFLoader }, { OrbitControls }, { RoomEnvironment }] = await Promise.all([
+    import('three'),
+    import('three/addons/loaders/GLTFLoader.js'),
+    import('three/addons/controls/OrbitControls.js'),
+    import('three/addons/environments/RoomEnvironment.js'),
+  ]);
   const figure = host.closest('figure');
   const startAz = +(host.dataset.az ?? 35);   // 시작 가로 각도(도)
   const startEl = +(host.dataset.el ?? 14);   // 시작 높이 각도(도)
