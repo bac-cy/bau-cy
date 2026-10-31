@@ -177,6 +177,21 @@
       </div>
 
       <!-- 스펙 수치는 확정되면 바꿔 주세요 -->
+      <!-- Engineering: 스크롤하면 안쪽 부품이 펼쳐져요 -->
+      <div class="eng" id="engineering">
+        <div class="eng__stage">
+          <div class="eng__copy">
+            <h3>Engineering</h3>
+            <p>모터 4개와 센서, 눈 LED, 제어 보드가 머리와 몸통 안에 층층이 들어 있어요.</p>
+            <p class="eng__hint">펼쳐진 부품에 마우스를 올려 보세요</p>
+          </div>
+          <div class="eng__view">
+            <canvas role="img" aria-label="Cove 안쪽 부품이 펼쳐지는 분해 이미지"></canvas>
+            <div class="eng__tip" role="status"></div>
+          </div>
+        </div>
+      </div>
+
       <dl class="specs reveal">
         <div><dt>Height</dt><dd>160 – 237 mm</dd></div>
         <div><dt>Width</dt><dd>222 – 251 mm</dd></div>
@@ -246,5 +261,6 @@
   <script type="module" src="js/cards.js"></script>
   <script type="module" src="js/intro-cove.js"></script>
   <script type="module" src="js/features.js"></script>
+  <script src="js/engineering.js"></script>
 </body>
 </html>

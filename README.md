@@ -12,6 +12,7 @@
 - 푸터(`index.html` 맨 아래): 프로젝트 크레딧(멤버 등)은 여기서 고침
 - `js/sim.js`, `css/sim.css` — Design 섹션의 **Cove 시뮬레이터** (머리·몸통 끌기, Top/Front/Perspective/Side, 인사·쓰다듬음·간지럼·간식 동작)
 - `js/cards.js` — Design 카드(Form·Material·Motion) 안에서 재생되는 Cove 장면
+- `js/engineering.js`, `assets/eng/` — Design 끝 Engineering(스크롤로 펼쳐지는 분해 이미지 + 부품 설명)
 - `js/cove-eyes.js` — 눈 LED(8×8 도트) 표정과 눈 위치 계산 (시뮬레이터 look.js 에서 가져옴)
 - `js/cove-presets.js` — 동작 데이터 (시뮬레이터 presets.js 그대로)
 - `assets/intro-cove.png` — 인트로 3번 장면의 Cove 렌더 (지금은 임시 이미지, 같은 이름으로 바꿔 끼우면 됨)
