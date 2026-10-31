@@ -30,7 +30,7 @@
   }
   let hiStarted = false, imStarted = false, imDone = false;
   const startHi = () => { if (hiStarted) return; hiStarted = true; setTimeout(() => typeInto(lineHi, 220), 500); };
-  const startIm = () => { if (imStarted) return; imStarted = true; typeInto(lineIm, 150, () => { imDone = true; }); };
+  const startIm = () => { if (imStarted) return; imStarted = true; typeInto(lineIm, 110, () => { imDone = true; }); };
   // 글꼴이 준비된 뒤에 시작해야 깜빡임 없이 타이핑됩니다.
   (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(startHi);
   setTimeout(startHi, 1500);
@@ -43,36 +43,51 @@
     pointer.active = true; pointer.t = performance.now();
   }, { passive: true });
 
-  /* ---------- 스크롤 진행도 ---------- */
+  /* ---------- 스크롤 진행도 ----------
+     단위는 "화면 높이(svh)"입니다. s = 1 이면 화면 한 장만큼 스크롤한 상태. */
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const easeOut = t => 1 - Math.pow(1 - t, 3);
-  let p = 0;
-  function readScroll() {
-    const r = intro.getBoundingClientRect();
-    p = clamp(-r.top / Math.max(1, r.height - window.innerHeight));
-  }
+
+  // HI ↔ I'm cove 전환: 살짝만 스크롤해도 장면이 딱 넘어가고(스냅), 되돌리면 딱 돌아옵니다.
+  const TRIGGER_ON = 0.10, TRIGGER_OFF = 0.05;    // 넘어가는 / 돌아오는 스크롤 위치 (히스테리시스)
+  const SNAP_SPEED = 9;                            // 클수록 더 빠르고 쫀쫀하게 전환
+  // I'm cove → Cove 렌더 구간
+  const OUT_START = 0.50, OUT_SPAN = 0.28;         // I'm cove 사라지기
+  const RISE_START = 0.56, RISE_SPAN = 1.26;       // 큰 COVE 글자 + 렌더 올라오기
+  const FADE_START = 2.35, FADE_SPAN = 0.17;       // 끝에서 기본 배경으로 이어짐
+
+  let on = false, t = 0, last = performance.now();
 
   function frame(now) {
     requestAnimationFrame(frame);
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
     const r = intro.getBoundingClientRect();
     if (r.bottom < -50 || r.top > window.innerHeight + 50) return;   // 화면 밖이면 쉼
-    readScroll();
     const W = window.innerWidth, H = window.innerHeight;
+    const s = clamp(-r.top / H, 0, (r.height - H) / H);
 
-    const a = easeOut(clamp((p - 0.04) / 0.06));       // 1 → 2 장면 전환
-    const b = easeOut(clamp((p - 0.30) / 0.45));       // 3 장면 올라오기
-    const out = clamp((p - 0.28) / 0.10);              // I'm cove 사라짐
-    const f = clamp((p - 0.94) / 0.06);                // 끝에서 기본 배경색으로 이어짐
+    if (!on && s > TRIGGER_ON) on = true;
+    else if (on && s < TRIGGER_OFF) on = false;
+    const goal = on ? 1 : 0;
+    t = reduced ? goal : t + (goal - t) * (1 - Math.exp(-dt * SNAP_SPEED));
+    if (Math.abs(goal - t) < 0.002) t = goal;
 
-    if (p >= 0.06) startIm();
-    if (p >= 0.30 && !imDone && imStarted) {           // 타이핑이 끝나기 전에 넘어가면 바로 완성
+    // HI는 앞쪽 절반에 빠르게 빠지고, I'm cove는 뒤이어 들어옵니다 (겹쳐 섞이지 않음)
+    const hiA = easeOut(clamp(t / 0.55));
+    const imA = easeOut(clamp((t - 0.35) / 0.65));
+    const out = clamp((s - OUT_START) / OUT_SPAN);
+    const b = easeOut(clamp((s - RISE_START) / RISE_SPAN));
+    const f = clamp((s - FADE_START) / FADE_SPAN);
+
+    if (t > 0.3) startIm();
+    if (s >= RISE_START && imStarted && !imDone) {      // 타이핑이 끝나기 전에 넘어가면 바로 완성
       lineIm.querySelector('.intro__typed').textContent = lineIm.dataset.type;
       lineIm.querySelector('.intro__caret').classList.add('is-done'); imDone = true;
     }
 
     // Scene 1
-    lineHi.style.opacity = 1 - a;
-    lineHi.style.transform = `translate3d(0, ${-a * 24}px, 0)`;
+    lineHi.style.opacity = 1 - hiA;
+    lineHi.style.transform = `translate3d(0, ${-hiA * 28}px, 0)`;
 
     // Scene 2 — 그라디언트 위치 계산
     const idle = !pointer.active || now - pointer.t > 2500;
@@ -82,13 +97,13 @@
     const ax = cur.x * W, ay = cur.y * H;
     blobA.style.transform = `translate3d(${ax}px, ${ay}px, 0)`;
     blobB.style.transform = `translate3d(${W - ax * .8}px, ${H - ay * .7}px, 0)`;
-    const glow = a * (1 - .55 * b);
+    const glow = imA * (1 - .55 * b);
     blobA.style.opacity = glow; blobB.style.opacity = glow;
-    dots.style.opacity = a * .55;
+    dots.style.opacity = imA * .55;
     peach.style.opacity = b;
 
-    lineIm.style.opacity = a * (1 - out);
-    lineIm.style.transform = `translate3d(0, ${-out * 40}px, 0)`;
+    lineIm.style.opacity = imA * (1 - out);
+    lineIm.style.transform = `translate3d(0, ${(1 - imA) * 18 - out * 40}px, 0)`;
 
     // Scene 3
     word.style.opacity = clamp(b * 2.4);

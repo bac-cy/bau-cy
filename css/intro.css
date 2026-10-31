@@ -7,7 +7,7 @@
   --intro-peach: #fbe3cf;
   --intro-word: #f2ead8;          /* 배경 속 큰 COVE 글자색 */
   position: relative;
-  height: 380svh;                 /* 한 화면 + 스크롤 거리 280svh */
+  height: 352svh;                 /* 한 화면 + 스크롤 거리 252svh */
   background: #fff;
 }
 .intro__stage {
