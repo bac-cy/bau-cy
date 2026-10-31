@@ -3,17 +3,17 @@
    모노스페이스 글씨로 한 줄씩 차분하게. 은은한 회색 그라데이션 위에서 줄이 차례로 나타납니다.
    ========================================================== */
 .closing.outro {
-  position: relative; min-height: 88svh; overflow: hidden; color: #1b1b1e;
+  position: relative; min-height: 88svh; overflow: hidden; color: var(--ink);
   padding: clamp(110px, 17svh, 190px) var(--gutter) clamp(90px, 14svh, 150px);
-  background: linear-gradient(180deg, #a7a8ac 0%, #bcbdc0 30%, #d1d1d3 70%, #dcdcde 100%);
+  background:
+    radial-gradient(60% 50% at 50% 92%, rgba(255, 217, 184, .55), transparent 70%),
+    radial-gradient(45% 40% at 22% 26%, rgba(217, 205, 242, .55), transparent 70%),
+    radial-gradient(40% 40% at 82% 20%, rgba(232, 221, 207, .9), transparent 70%),
+    var(--bg);
 }
-/* 위: Gallery 의 크림색에서 부드럽게 이어짐 / 아래: 푸터의 크림색으로 이어짐 */
-.closing.outro::before, .closing.outro::after { content: ""; position: absolute; left: 0; right: 0; pointer-events: none; z-index: 0; }
-.closing.outro::before { top: 0; height: clamp(120px, 20svh, 220px); background: linear-gradient(180deg, var(--bg), rgba(246, 241, 234, 0)); }
-.closing.outro::after { bottom: 0; height: clamp(70px, 11svh, 120px); background: linear-gradient(0deg, var(--bg), rgba(246, 241, 234, 0)); }
-/* 고운 필름 질감 */
-.closing.outro { --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 .closing.outro > .outro__sheet { position: relative; z-index: 1; }
+
+.outro__sheet { position: relative; z-index: 1; }
 .closing.outro { background-image: var(--grain), linear-gradient(180deg, #a7a8ac 0%, #bcbdc0 30%, #d1d1d3 70%, #dcdcde 100%); background-blend-mode: soft-light, normal; }
 
 .outro__sheet {
@@ -26,8 +26,8 @@
 .outro__event { margin-top: 0; margin-bottom: clamp(18px, 3svh, 28px); }
 .outro__group { margin: 0 0 clamp(18px, 3svh, 30px); }
 .outro__group .r { display: grid; grid-template-columns: clamp(78px, 8.5vw, 124px) 1fr; column-gap: clamp(14px, 1.6vw, 22px); }
-.outro__group dt { text-align: right; color: rgba(255, 255, 255, .82); font-weight: 300; }
-.outro__group dd { margin: 0; color: #1b1b1e; }
+.outro__group dt { text-align: right; color: #a49ca8; font-weight: 300; }
+.outro__group dd { margin: 0; color: var(--ink); }
 .outro__end { margin: clamp(26px, 4svh, 40px) 0 0; padding-left: clamp(92px, 10.1vw, 146px); }
 .outro__end span { display: inline-block; width: 1.6em; }
 
