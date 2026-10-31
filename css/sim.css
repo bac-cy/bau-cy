@@ -49,8 +49,7 @@
 @media (max-width: 760px) { .slot__msg { right: 10px; bottom: 10px; font-size: 11.5px; } }
 
 /* Material 카드: 재질 클로즈업 사진 (어두운 사진 위에서도 라벨이 읽히도록) */
-.slot--photo > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.slot--photo::after { color: rgba(240, 235, 245, .82); }
+.slot--photo > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }   /* 배경이 투명한 사진 → 카드의 크림·라벤더·복숭아 배경이 비침 */
 
 /* 확대·축소 버튼 (오른쪽 가운데) */
 .sim__zoom { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); display: grid; gap: 8px; pointer-events: none; }
