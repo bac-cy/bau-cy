@@ -52,10 +52,11 @@
   const TRIGGER_ON = 0.10, TRIGGER_OFF = 0.05;    // 넘어가는 / 돌아오는 스크롤 위치 (히스테리시스)
   const SNAP_SPEED = 9;                            // 클수록 더 빠르고 쫀쫀하게 전환
   // I'm cove → Cove 렌더 구간
-  const OUT_START = 0.50, OUT_SPAN = 0.28;         // I'm cove 사라지기
-  const RISE_START = 0.56, RISE_SPAN = 1.26;       // 큰 COVE 글자 + 렌더 올라오기
+  const OUT_START = 0.32, OUT_SPAN = 0.14;         // I'm cove 사라지기
+  const RISE_START = 0.36, RISE_SPAN = 0.55;       // 큰 COVE 글자 + 렌더 올라오기 (전체 스크롤 약 1화면)
+  const GLIDE_SPEED = 11;                          // 휠 한 칸의 움직임이 부드럽게 이어지는 정도
 
-  let on = false, t = 0, last = performance.now();
+  let on = false, t = 0, ss = 0, last = performance.now();
 
   function frame(now) {
     requestAnimationFrame(frame);
@@ -74,11 +75,14 @@
     // HI는 앞쪽 절반에 빠르게 빠지고, I'm cove는 뒤이어 들어옵니다 (겹쳐 섞이지 않음)
     const hiA = easeOut(clamp(t / 0.55));
     const imA = easeOut(clamp((t - 0.35) / 0.65));
-    const out = clamp((s - OUT_START) / OUT_SPAN);
-    const b = easeOut(clamp((s - RISE_START) / RISE_SPAN));
+    // 휠이 한 칸씩 끊겨 움직여도 화면은 미끄러지듯 따라오게 함 (되감기도 동일)
+    ss = reduced ? s : ss + (s - ss) * (1 - Math.exp(-dt * GLIDE_SPEED));
+    if (Math.abs(s - ss) < 0.0005) ss = s;
+    const out = clamp((ss - OUT_START) / OUT_SPAN);
+    const b = easeOut(clamp((ss - RISE_START) / RISE_SPAN));
 
     if (t > 0.3) startIm();
-    if (s >= RISE_START && imStarted && !imDone) {      // 타이핑이 끝나기 전에 넘어가면 바로 완성
+    if (ss >= RISE_START && imStarted && !imDone) {      // 타이핑이 끝나기 전에 넘어가면 바로 완성
       lineIm.querySelector('.intro__typed').textContent = lineIm.dataset.type;
       lineIm.querySelector('.intro__caret').classList.add('is-done'); imDone = true;
     }
