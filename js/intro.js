@@ -68,12 +68,13 @@
   const STEP1 = 0.10;                              // 이만큼 스크롤하면 I'm cove 장면 완성 (약 1.5칸)
   // I'm cove → Cove 렌더 구간
   // 휠 1칸 ≈ 0.067 (HI → I'm cove 가 1.5칸 = 0.10). 구간 길이를 칸 수로 환산해 잡았습니다.
-  const TYPE_START = 0.08, TYPE_END = 0.22;       // 이 구간을 스크롤하는 동안 I'm cove 가 한 글자씩 입력됨
-  const OUT_START = 0.32, OUT_SPAN = 0.09;         // I'm cove 사라지기 (I'm cove 가 읽히는 구간을 이전의 약 2배로)
-  const RISE_START = 0.36, RISE_SPAN = 0.17;       // 큰 COVE 글자 + 렌더 올라오기
+  const TYPE_CPS = 7;                              // I'm cove 입력 속도(초당 글자 수)
+  const OUT_START = 0.62, OUT_SPAN = 0.12;         // I'm cove 사라지기 (I'm cove 가 읽히는 구간을 이전의 약 2배로)
+  const RISE_START = 0.67, RISE_SPAN = 0.2;       // 큰 COVE 글자 + 렌더 올라오기
   const P1_TIME = 0.42;                            // HI → I'm cove 가 녹아들듯 넘어가는 시간(초) — 클수록 더 부드럽고 느긋
   const GLIDE_TIME = 0.2;                          // 스크롤을 따라오는 시간(초) — 작을수록 쫀쫀, 클수록 부드러움
 
+  let typedF = 0;
   let ss = 0, last = performance.now();
   const vss = { v: 0 }, vp1 = { v: 0 };
   let pp1 = 0;
@@ -100,9 +101,11 @@
     const out = clamp((ss - OUT_START) / OUT_SPAN);
     const b = smooth(clamp((ss - RISE_START) / RISE_SPAN));
 
-    // I'm cove: 스크롤하는 만큼 한 글자씩 입력된다 (올리면 지워진다)
+    // I'm cove: 나타나면 시간에 맞춰 한 글자씩 입력된다 (스크롤을 되돌리면 빠르게 지워진다)
     if (!reduced) {
-      const tp = smooth(clamp((ss - TYPE_START) / (TYPE_END - TYPE_START))), k = Math.round(tp * IM_TEXT.length);
+      const want = imA > 0.35 && out < 0.2;
+      typedF = want ? Math.min(IM_TEXT.length, typedF + dt * TYPE_CPS) : Math.max(0, typedF - dt * 40);
+      const k = Math.floor(typedF + 0.0001);
       if (k !== imShown) {
         imShown = k; imOut.textContent = IM_TEXT.slice(0, k);
         imCaret.classList.toggle('is-done', k === IM_TEXT.length);
