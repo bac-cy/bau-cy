@@ -385,3 +385,14 @@ em.ko { font-family: var(--font-ui); font-style: normal; font-weight: 400; font-
 .about .statement, .about__text h3, .about__text p, .principles li { font-family: "Jost", "Futura", "Noto Sans KR", system-ui, sans-serif; font-style: normal; }
 .about .statement em, .about .statement em.ko { font-family: inherit; font-style: normal; font-weight: inherit; }
 .principles span { font-family: "Jost", "Futura", "Noto Sans KR", system-ui, sans-serif; font-style: normal; font-weight: 400; letter-spacing: -.005em; }
+
+/* 갤러리 영상: 누르면 전체 화면 */
+.gallery__film { cursor: zoom-in; }
+.gallery__expand { position: absolute; right: 18px; bottom: 16px; z-index: 2; display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink); background: rgba(251, 248, 244, .7); box-shadow: 0 0 0 1px var(--line); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); pointer-events: none; transition: opacity .3s var(--ease); }
+.gallery__expand i { width: 11px; height: 11px; border: 1.5px solid currentColor; border-radius: 2px; }
+.gallery__film:focus-visible { outline: 2px solid var(--lavender); outline-offset: 4px; }
+.gallery__film.is-full .gallery__expand, .gallery__film:fullscreen .gallery__expand { display: none; }
+.gallery__film:fullscreen { width: 100vw; height: 100vh; aspect-ratio: auto; border-radius: 0; background: #000; cursor: default; }
+.gallery__film:fullscreen video { object-fit: contain; }
+.gallery__film:-webkit-full-screen { width: 100vw; height: 100vh; aspect-ratio: auto; border-radius: 0; background: #000; cursor: default; }
+.gallery__film:-webkit-full-screen video { object-fit: contain; }

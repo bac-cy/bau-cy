@@ -147,14 +147,34 @@ window.addEventListener('resize', updateNavSpy);
 updateNavSpy();
 
 /* ---------- 8. Gallery film ----------
-   영상은 화면에 절반 이상 보일 때만 재생하고, 벗어나면 멈춥니다. (소리 없이 반복) */
+   · 화면에 절반 이상 보일 때만 재생하고 벗어나면 멈춘다. (소리 없이 반복)
+   · 영상을 누르면 전체 화면: 처음부터, 소리와 함께, 조작 막대가 보인다. 닫으면(Esc · 다시 누르기) 원래대로 돌아온다. */
 (() => {
-  const v = document.querySelector('.gallery__film video');
+  const fig = document.querySelector('.gallery__film'), v = fig && fig.querySelector('video');
   if (!v) return;
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isFull = () => document.fullscreenElement === fig || document.webkitFullscreenElement === fig || v.webkitDisplayingFullscreen;
   new IntersectionObserver(([en]) => {
-    if (reduce) return;
+    if (reduce || isFull()) return;
     if (en.intersectionRatio >= 0.5) { const p = v.play(); if (p && p.catch) p.catch(() => {}); } else v.pause();
   }, { threshold: [0, 0.5] }).observe(v);
   if (reduce) v.controls = true;
+
+  const enter = () => {
+    v.currentTime = 0; v.muted = false; v.controls = true; fig.classList.add('is-full');
+    const req = fig.requestFullscreen || fig.webkitRequestFullscreen;
+    if (req) { const r = req.call(fig); if (r && r.catch) r.catch(() => exitUI()); }
+    else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen();                  // iPhone Safari
+    const p = v.play(); if (p && p.catch) p.catch(() => {});
+  };
+  const exitUI = () => { fig.classList.remove('is-full'); v.muted = true; v.controls = reduce; const p = v.play(); if (p && p.catch && !reduce) p.catch(() => {}); };
+  fig.addEventListener('click', (e) => {
+    if (isFull()) { if (e.target === fig) (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }   // 전체 화면에서는 영상 조작 막대를 쓴다
+    enter();
+  });
+  fig.tabIndex = 0; fig.setAttribute('role', 'button'); fig.setAttribute('aria-label', '홍보 영상 전체 화면으로 보기');
+  fig.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && !isFull()) { e.preventDefault(); enter(); } });
+  const onChange = () => { if (!isFull()) exitUI(); };
+  document.addEventListener('fullscreenchange', onChange); document.addEventListener('webkitfullscreenchange', onChange);
+  v.addEventListener('webkitendfullscreen', exitUI);
 })();
