@@ -13,8 +13,11 @@ const ptr = { x: 0, y: 0, at: -1e9, seen: false };               // 마우스·�
   window.addEventListener('pointerdown', onMove, { passive: true });
   document.addEventListener('pointerleave', () => { ptr.at = -1e9; });
 }
-if (figure && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  const start = () => init().catch(err => console.warn('Intro Cove unavailable:', err));
+const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;   // 켜져 있어도 커서에 반응하는 3D는 그대로 보여준다(스스로 두리번거리는 연출만 뺀다)
+const mark = (v) => { document.documentElement.dataset.introCove = v; };
+if (figure) {
+  mark('loading');
+  const start = () => init().catch(err => { mark('error: ' + (err && err.message || err)); console.warn('Intro Cove unavailable:', err); });
   if (document.readyState === 'complete') setTimeout(start, 300); else window.addEventListener('load', () => setTimeout(start, 300));
 }
 
@@ -94,7 +97,7 @@ async function init() {
     tNow += dt;
     const op = +getComputedStyle(figure).opacity;
     if (op < 0.3) autoDone = false;                                              // 장면을 벗어났다 돌아오면 다시
-    if (!autoDone && op > 0.97) { autoDone = true; autoFrom = tNow + 0.5; autoUntil = tNow + 6.8; }
+    if (!autoDone && op > 0.97) { autoDone = true; if (!REDUCED) { autoFrom = tNow + 0.5; autoUntil = tNow + 6.8; } }
     const pAwake = ptr.seen && now - ptr.at < IDLE_MS, aAwake = !pAwake && tNow >= autoFrom && tNow < autoUntil;
     const awake = pAwake || aAwake;
     const r = figure.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height * 0.5;
@@ -120,7 +123,7 @@ async function init() {
     const gx = Math.round(clamp((ptr.x - cx) / (innerWidth * 0.5), -1, 1) * (near ? 2 : 0)), gy = Math.round(gaze.y * 1.4);
     eyes.show(awake && Math.abs(gaze.x) + Math.abs(gaze.y) > 0.9 ? '반짝 눈' : '뜬 눈', awake ? Math.round(clamp(gaze.x * 2.6, -2, 2)) : gx, gy, tNow);
     renderer.render(scene, camera);
-    if (!shown) { shown = true; figure.classList.add('is-live'); }
+    if (!shown) { shown = true; figure.classList.add('is-live'); mark('live'); }
   }
   requestAnimationFrame(frame);
   window.COVE_INTRO = { pose, gaze, ptr };
