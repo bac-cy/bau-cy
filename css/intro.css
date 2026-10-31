@@ -22,13 +22,13 @@
   background: linear-gradient(180deg, rgba(255, 255, 255, 0) 28%, var(--intro-peach) 100%);
 }
 .intro__blob { border-radius: 50%; opacity: 0; will-change: transform, opacity; left: 0; top: 0; }
-.intro__blob--a {            /* 따뜻한 노랑 빛 — 마우스를 따라 움직임 */
+.intro__blob--a {            /* 라일락 빛 — 마우스를 따라 움직임 (샌드색 COVE 글자와 또렷하게 대비) */
   width: 85vmax; height: 85vmax; margin: -42.5vmax 0 0 -42.5vmax;
-  background: radial-gradient(closest-side, rgba(255, 224, 160, .95), rgba(255, 238, 196, .55) 45%, rgba(255, 246, 224, 0) 100%);
+  background: radial-gradient(closest-side, rgba(196, 176, 240, .95), rgba(214, 198, 246, .55) 45%, rgba(235, 226, 250, 0) 100%);
 }
 .intro__blob--b {            /* 반대편의 연한 핑크 */
   width: 70vmax; height: 70vmax; margin: -35vmax 0 0 -35vmax;
-  background: radial-gradient(closest-side, rgba(250, 218, 228, .85), rgba(250, 228, 236, .4) 50%, rgba(255, 255, 255, 0) 100%);
+  background: radial-gradient(closest-side, rgba(255, 196, 176, .9), rgba(255, 214, 196, .45) 50%, rgba(255, 240, 230, 0) 100%);
 }
 .intro__dots {
   inset: 0; opacity: 0; will-change: opacity;
