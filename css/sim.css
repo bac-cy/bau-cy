@@ -80,11 +80,10 @@
 .slot--photo::after { top: 14px; bottom: auto; left: 20px; }
 
 /* ───── Design — Engineering 카드 (Form · Material · Motion 과 같은 칸) ───── */
-.slot--eng { aspect-ratio: 5 / 6; }
-.slot--eng > canvas { position: absolute; left: 50%; top: 47%; height: 84%; aspect-ratio: 2 / 3; width: auto; transform: translate(-50%, -50%); display: block; cursor: default; }
-.slot--eng.is-open > canvas { cursor: pointer; }
+.slot--eng { aspect-ratio: 3 / 4; }
+.slot--eng > canvas { position: absolute; left: 50%; top: 48%; height: 90%; aspect-ratio: 1 / 1.6; width: auto; transform: translate(-50%, -50%); display: block; cursor: grab; }
 .eng__hint { position: absolute; left: 0; right: 0; bottom: 14px; z-index: 2; text-align: center; font-size: 12px; letter-spacing: .06em; color: var(--ink-soft); opacity: 0; transition: opacity .6s var(--ease); pointer-events: none; }
-.slot--eng.is-open .eng__hint { opacity: 1; }
+.slot--eng .eng__hint { opacity: 1; }
 .eng__tip { position: absolute; z-index: 3; width: min(250px, 78%); padding: 12px 14px; border-radius: 16px; pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity .2s var(--ease), transform .2s var(--ease);
   background: rgba(251, 248, 244, .9); box-shadow: 0 0 0 1px var(--line), 0 14px 40px -18px rgba(80, 60, 100, .35); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
 .eng__tip.is-on { opacity: 1; transform: none; }

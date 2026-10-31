@@ -1,3 +1,4 @@
+import { printedMaterial, layerUV } from './print-material.js';
 /* ==========================================================
    Design 카드 안의 Cove 장면 (Form / Material / Motion)
    각 카드의 이미지 칸에서 그 항목을 보여주는 장면이 저절로 재생돼요.
@@ -46,7 +47,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   diffuseColor.rgb *= 0.93 + 0.10 * g1 + 0.05 * g2 + 0.04 * g3; }`);
   };
   const piping = new THREE.MeshStandardMaterial({ color: '#f4f2ee', roughness: 0.55, metalness: 0, envMapIntensity: 0.9 });
-  const aluminum = new THREE.MeshStandardMaterial({ color: '#44362e', roughness: 0.92, metalness: 0, envMapIntensity: 0.35 });
+  const aluminum = printedMaterial(THREE);
   const rubber = new THREE.MeshStandardMaterial({ color: '#8d8c8a', roughness: 0.9, metalness: 0 });
   const FABRIC = ['새_헤드_상판', '새_쿠션', '새_하부_폼', '새_하부_쉘'], PIPING = ['새_헤드_하부판', '새_하부_덮개판'], ALU = ['기둥_1', '본체6'], RUBBER = ['새_미끄럼방지_고무링', '하부_회전판'];
 
@@ -71,7 +72,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     const matrices = [], shells = [];
     root3.traverse(o => {
       if (!o.isMesh) return;
-      if (FABRIC.includes(o.name)) o.material = fabric; else if (PIPING.includes(o.name)) o.material = piping; else if (ALU.includes(o.name)) o.material = aluminum; else if (RUBBER.includes(o.name)) o.material = rubber;
+      if (FABRIC.includes(o.name)) o.material = fabric; else if (PIPING.includes(o.name)) o.material = piping; else if (ALU.includes(o.name)) { o.material = aluminum; layerUV(THREE, o); } else if (RUBBER.includes(o.name)) o.material = rubber;
       if (/KeyStudio-HT16K33-8x8-LED-Matrix/.test(o.name)) { matrices.push(o); o.visible = false; return; }
       if (['새_헤드_상판', '새_쿠션', '새_헤드_하부판'].includes(o.name)) shells.push(o);
     });

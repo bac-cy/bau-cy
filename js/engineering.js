@@ -41,11 +41,11 @@ if (root) {
       if (!o.isMesh) return;
       const name = o.name.split('__')[0]; o.userData.layer = name; if (!o.geometry.attributes.normal) o.geometry.computeVertexNormals();
       o.material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.62, metalness: 0.08, envMapIntensity: 0.9, emissive: 0x7d6aa8, emissiveIntensity: 0, side: THREE.DoubleSide });
-      (layers[name] ||= []).push(o); pick.push(o);
+      o.userData.y0 = o.position.y; (layers[name] ||= []).push(o); pick.push(o);
     });
     const order = Object.keys(LAYERS).filter(k => layers[k]);                 // 위 → 아래
     const rank = (k) => order.length - 1 - order.indexOf(k);                   // 아래에서부터 0,1,2…
-    const GAP = 0.06;                                                          // 층 사이를 벌리는 간격(m)
+    const GAP = 0.085;                                                         // 층 사이를 벌리는 간격(m)
     const box = new THREE.Box3().setFromObject(model), size = box.getSize(new THREE.Vector3());
     const center = new THREE.Vector3(0, (size.y + GAP * (order.length - 1)) / 2, 0);
     const radius = Math.hypot(size.x, size.y + GAP * (order.length - 1), size.z) / 2;
@@ -59,14 +59,16 @@ if (root) {
     new ResizeObserver(fit).observe(cv); fit();
     new IntersectionObserver(([e]) => { visible = e.isIntersecting; dirty = true; }).observe(root);
 
-    function progress() { const r = root.getBoundingClientRect(), vh = window.innerHeight, c = r.top + r.height / 2; return clamp((vh * 0.88 - c) / (vh * 0.42), 0, 1); }
+    function progress() { const r = root.getBoundingClientRect(), vh = window.innerHeight, c = r.top + r.height / 2; return 1 - clamp((vh * 1.0 - c) / (vh * 0.55), 0, 1); }   // 1=펼침(카드가 화면 아래에서 막 올라옴) → 0=조립(화면 가운데 도착)
     function place(e) {                                                        // e: 0(조립) ~ 1(펼침)
-      for (const k of order) for (const m of layers[k]) m.position.y = e * rank(k) * GAP;
+      for (const k of order) for (const m of layers[k]) m.position.y = m.userData.y0 + e * rank(k) * GAP;
     }
-    function camPlace() {
-      const fov = camera.fov * Math.PI / 180, d = radius / Math.sin(Math.min(fov, 2 * Math.atan(Math.tan(fov / 2) * camera.aspect)) / 2) * 0.68;
-      const el = 0.2, az = yaw;
-      camera.position.set(center.x + d * Math.sin(az) * Math.cos(el), center.y + d * Math.sin(el), center.z + d * Math.cos(az) * Math.cos(el)); camera.lookAt(center);
+    function camPlace() {                                                      // 펼침 정도에 따라 중심과 거리를 함께 맞춰 항상 화면에 꽉 차게
+      const ext = GAP * (order.length - 1) * openT, hgt = size.y + ext;
+      const r = Math.hypot(size.x, hgt, size.z) / 2;
+      const fov = camera.fov * Math.PI / 180, d = r / Math.sin(Math.min(fov, 2 * Math.atan(Math.tan(fov / 2) * camera.aspect)) / 2) * 0.82;
+      const cy = box.min.y + hgt / 2, el = 0.2, az = yaw;
+      camera.position.set(d * Math.sin(az) * Math.cos(el), cy + d * Math.sin(el), d * Math.cos(az) * Math.cos(el)); camera.lookAt(0, cy, 0);
     }
     const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
     function hit(ev) { const r = cv.getBoundingClientRect(); ndc.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, camera); const i = ray.intersectObjects(pick, false)[0]; return i ? i.object.userData.layer : null; }
@@ -79,12 +81,8 @@ if (root) {
       tip.style.left = clamp(ev.clientX - rr.left + 16, 8, rr.width - tw - 8) + 'px'; tip.style.top = clamp(ev.clientY - rr.top - th / 2, 8, rr.height - th - 8) + 'px';
     }
     cv.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, yaw: yawGoal, moved: false }; try { cv.setPointerCapture(e.pointerId); } catch {} });
-    cv.addEventListener('pointermove', (e) => {
-      if (drag) { const dx = e.clientX - drag.x; if (Math.abs(dx) > 4) drag.moved = true; if (drag.moved) { yawGoal = drag.yaw + dx * 0.008; return; } }
-      if (e.pointerType !== 'touch' && openT > 0.55) setHover(hit(e), e);
-    });
-    cv.addEventListener('pointerup', (e) => { const d = drag; drag = null; if (d && !d.moved && openT > 0.55) { const k = hit(e); setHover(touch && k === hover ? null : k, e); } });
-    cv.addEventListener('pointerleave', () => { if (!drag) setHover(null); });
+    cv.addEventListener('pointermove', (e) => { if (drag) { const dx = e.clientX - drag.x; if (Math.abs(dx) > 4) drag.moved = true; if (drag.moved) yawGoal = drag.yaw + dx * 0.008; } });
+    cv.addEventListener('pointerup', () => { drag = null; });
     cv.style.touchAction = 'pan-y';
 
     let last = performance.now();
@@ -92,11 +90,9 @@ if (root) {
       requestAnimationFrame(loop);
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
       if (!visible) return;
-      const goal = reduced ? 1 : smooth(progress());
-      const nt = openT + (goal - openT) * Math.min(1, dt * 7); if (Math.abs(nt - openT) > 0.0005) { openT = nt; dirty = true; }
+      const goal = reduced ? 0 : smooth(progress());
+      const nt = openT + (goal - openT) * Math.min(1, dt * 10); if (Math.abs(nt - openT) > 0.0005) { openT = nt; dirty = true; }
       const ny = yaw + (yawGoal - yaw) * Math.min(1, dt * 8); if (Math.abs(ny - yaw) > 0.0005) { yaw = ny; dirty = true; }
-      root.classList.toggle('is-open', openT > 0.55);
-      if (openT < 0.55 && hover) setHover(null);
       if (dirty) {
         dirty = false; place(openT); camPlace();
         for (const k of order) for (const m of layers[k]) m.material.emissiveIntensity = k === hover ? 0.32 : 0;

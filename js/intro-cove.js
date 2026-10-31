@@ -1,3 +1,4 @@
+import { printedMaterial, layerUV } from './print-material.js';
 /* ==========================================================
    인트로의 Cove — 마우스를 따라 일어나서 바라봐요
    · 처음에는 조약돌처럼 겹쳐 있고, 마우스를 움직이면 일어나요.
@@ -41,12 +42,12 @@ async function init() {
 
   // 인트로 렌더 이미지와 같은 흰색 무광 재질 + 알루미늄 기둥
   const white = new THREE.MeshStandardMaterial({ color: 0xefe9e1, roughness: 0.55, metalness: 0, envMapIntensity: 1.25 });
-  const aluminum = new THREE.MeshStandardMaterial({ color: '#44362e', roughness: 0.92, metalness: 0, envMapIntensity: 0.35 });
+  const aluminum = printedMaterial(THREE);
   const BODY = ['새_헤드_상판', '새_쿠션', '새_하부_폼', '새_하부_쉘', '새_헤드_하부판', '새_하부_덮개판', '새_미끄럼방지_고무링', '하부_회전판'], ALU = ['기둥_1', '본체6'];
   const by = {}, matrices = [], shells = [];
   model.traverse(o => {
     by[o.name] = o; if (!o.isMesh) return;
-    if (BODY.includes(o.name)) o.material = white; else if (ALU.includes(o.name)) o.material = aluminum;
+    if (BODY.includes(o.name)) o.material = white; else if (ALU.includes(o.name)) { o.material = aluminum; layerUV(THREE, o); }
     if (/KeyStudio-HT16K33-8x8-LED-Matrix/.test(o.name)) { matrices.push(o); o.visible = false; }
     if (['새_헤드_상판', '새_쿠션', '새_헤드_하부판'].includes(o.name)) shells.push(o);
   });
