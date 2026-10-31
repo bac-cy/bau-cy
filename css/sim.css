@@ -32,7 +32,7 @@
 
 /* 화면 높이가 낮은 노트북에서도 아래 동작 버튼이 보이도록, 고정되는 칸의 높이를 화면 안으로 제한 */
 @media (min-width: 761px) {
-  .design__visual { max-height: calc(100svh - 124px); min-height: 520px; }
+  .design__visual { max-height: calc(100svh - 104px); min-height: 520px; }
 }
 
 /* ───── Design 카드 안의 Cove 장면 ───── */

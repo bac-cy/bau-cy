@@ -177,10 +177,10 @@ body::before {
 .feature p { color: var(--ink-soft); font-size: 14px; font-weight: 300; margin-top: 12px; position: relative; }
 
 /* ---------- Design / Detail ---------- */
-.design__layout { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(32px, 6vw, 96px); align-items: start; }
+.design__layout { display: grid; grid-template-columns: 1.45fr 1fr; gap: clamp(28px, 5vw, 80px); align-items: start; }
 .design__visual {
-  position: sticky; top: 100px;
-  aspect-ratio: 4 / 5; border-radius: var(--radius); overflow: hidden;
+  position: sticky; top: 88px; width: 100%;
+  aspect-ratio: 9 / 10; border-radius: var(--radius); overflow: hidden;
   background:
     radial-gradient(70% 55% at 50% 60%, rgba(255, 224, 196, .8), transparent 70%),
     radial-gradient(60% 50% at 30% 20%, rgba(217, 205, 242, .7), transparent 70%),
