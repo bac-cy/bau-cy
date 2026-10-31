@@ -8,8 +8,9 @@
   <meta name="theme-color" content="#f6f1ea">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600&family=Noto+Sans+KR:wght@300;400;500&family=Jost:wght@200;300&family=Fredoka:wdth,wght@125,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/intro.css">
 </head>
 <body>
 
@@ -26,6 +27,27 @@
   </header>
 
   <main id="top">
+
+    <!-- ───────────── 0. Intro (HI → I'm cove → Cove render) ─────────────
+         3번 장면 이미지는 assets/intro-cove.png 를 같은 이름으로 바꿔 끼우면 됩니다. -->
+    <section class="intro" id="intro" aria-label="Cove 인트로">
+      <div class="intro__stage">
+        <div class="intro__peach" aria-hidden="true"></div>
+        <div class="intro__blob intro__blob--a" aria-hidden="true"></div>
+        <div class="intro__blob intro__blob--b" aria-hidden="true"></div>
+        <div class="intro__dots" aria-hidden="true"></div>
+
+        <p class="intro__line intro__line--hi" data-type="HI" aria-label="HI"><span class="intro__typed" aria-hidden="true">HI</span><i class="intro__caret" aria-hidden="true"></i></p>
+        <p class="intro__line intro__line--im" data-type="I'm cove" aria-label="I'm cove"><span class="intro__typed" aria-hidden="true">I'm cove</span><i class="intro__caret" aria-hidden="true"></i></p>
+
+        <div class="intro__finale">
+          <div class="intro__bigword" aria-hidden="true">COVE</div>
+          <figure class="intro__render"><img src="assets/intro-cove.png" alt="Cove 렌더 이미지" width="1470" height="921"></figure>
+        </div>
+
+        <div class="intro__fade" aria-hidden="true"></div>
+      </div>
+    </section>
 
     <!-- ───────────── 1. Hero ───────────── -->
     <section class="hero">
@@ -247,6 +269,7 @@
   </div>
 
   <script src="js/main.js"></script>
+  <script src="js/intro.js"></script>
   <script type="importmap">
     { "imports": {
         "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",

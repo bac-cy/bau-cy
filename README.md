@@ -8,7 +8,9 @@
 - `index.html` — 페이지 내용 (Hero · About · Features · Design · Experience · Gallery · Footer)
 - `css/style.css` — 디자인 (색상은 맨 위 `:root`에서 한 번에 바꿀 수 있음)
 - `js/main.js` — 스크롤 효과, Experience 상태 전환, 임시 로봇 일러스트
+- `css/intro.css`, `js/intro.js` — 맨 앞 인트로 (HI → I'm cove → Cove 렌더)
 - `js/viewer.js` — Design 섹션의 돌려볼 수 있는 3D 뷰어
+- `assets/intro-cove.png` — 인트로 3번 장면의 Cove 렌더 (지금은 임시 이미지, 같은 이름으로 바꿔 끼우면 됨)
 - `assets/cove.glb` — Cove 3D 모델 (겉모습만 담은 가벼운 버전)
 - `assets/` — 렌더 이미지·영상을 넣을 폴더
 

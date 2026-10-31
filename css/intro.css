@@ -1,0 +1,82 @@
+/* ==========================================================
+   Cove — Intro (HI → I'm cove → Cove render)
+   스크롤에 따라 장면이 이어지는 맨 앞 구간입니다.
+   ========================================================== */
+
+.intro {
+  --intro-peach: #fbe3cf;
+  --intro-word: #f2ead8;          /* 배경 속 큰 COVE 글자색 */
+  position: relative;
+  height: 380svh;                 /* 한 화면 + 스크롤 거리 280svh */
+  background: #fff;
+}
+.intro__stage {
+  position: sticky; top: 0; height: 100svh; overflow: hidden;
+  background: #fff; isolation: isolate;
+}
+
+/* ---------- Background layers ---------- */
+.intro__peach, .intro__blob, .intro__dots, .intro__fade { position: absolute; pointer-events: none; }
+.intro__peach {
+  inset: 0; opacity: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 28%, var(--intro-peach) 100%);
+}
+.intro__blob { border-radius: 50%; opacity: 0; will-change: transform, opacity; left: 0; top: 0; }
+.intro__blob--a {            /* 따뜻한 노랑 빛 — 마우스를 따라 움직임 */
+  width: 85vmax; height: 85vmax; margin: -42.5vmax 0 0 -42.5vmax;
+  background: radial-gradient(closest-side, rgba(255, 224, 160, .95), rgba(255, 238, 196, .55) 45%, rgba(255, 246, 224, 0) 100%);
+}
+.intro__blob--b {            /* 반대편의 연한 핑크 */
+  width: 70vmax; height: 70vmax; margin: -35vmax 0 0 -35vmax;
+  background: radial-gradient(closest-side, rgba(250, 218, 228, .85), rgba(250, 228, 236, .4) 50%, rgba(255, 255, 255, 0) 100%);
+}
+.intro__dots {
+  inset: 0; opacity: 0;
+  background-image: radial-gradient(circle, rgba(60, 40, 30, .28) 0.8px, transparent 1.3px);
+  background-size: 14px 14px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 65% at 50% 50%, transparent 40%, #000 100%);
+          mask-image: radial-gradient(ellipse 70% 65% at 50% 50%, transparent 40%, #000 100%);
+}
+.intro__fade { inset: 0; background: var(--bg); opacity: 0; z-index: 9; }
+
+/* ---------- Typography ---------- */
+.intro__line {
+  position: absolute; left: 0; right: 0; margin: 0; text-align: center;
+  font-family: "Jost", "Noto Sans KR", system-ui, sans-serif;
+  font-size: clamp(36px, 4.8vw, 84px); line-height: 1; letter-spacing: .01em;
+  white-space: nowrap; z-index: 3; will-change: opacity, transform;
+}
+.intro__line--hi { top: 50%; translate: 0 -50%; font-weight: 200; color: #111; }
+.intro__line--im { top: 54%; translate: 0 -50%; font-weight: 300; color: #c2bab0; opacity: 0; }
+.intro__caret {
+  display: inline-block; width: 1px; height: .95em; margin-left: 3px; vertical-align: -0.12em;
+  background: currentColor; animation: caret .9s steps(1) infinite; transition: opacity .6s;
+}
+.intro__caret.is-done { opacity: 0; animation: none; }
+@keyframes caret { 50% { opacity: 0; } }
+
+/* ---------- Finale: big COVE word + render ---------- */
+.intro__finale { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.intro__bigword {
+  position: absolute; left: 0; right: 0; top: 48%; translate: 0 -50%;
+  text-align: center; line-height: .8; user-select: none;
+  font-family: "Fredoka", "Nunito", system-ui, sans-serif; font-weight: 600; font-stretch: 125%;
+  font-size: 24vw; letter-spacing: .02em; color: var(--intro-word);
+  opacity: 0; will-change: transform, opacity;
+}
+.intro__render {
+  position: absolute; left: 50%; bottom: 4svh; margin: 0;
+  width: min(92vw, 118svh); translate: -50% 0; opacity: 0; will-change: transform, opacity;
+}
+.intro__render img { width: 100%; height: auto; display: block; }
+
+/* ---------- Mobile ---------- */
+@media (max-width: 760px) {
+  .intro__bigword { font-size: 24vw; top: 42%; }
+  .intro__render { width: min(104vw, 100svh); bottom: 10svh; }
+}
+
+/* ---------- Reduced motion: 타이핑·움직임 없이 장면만 전환 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .intro__caret { display: none; }
+}
