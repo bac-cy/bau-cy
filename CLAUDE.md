@@ -55,7 +55,7 @@
 - 보기 각도(Top/Front/Perspective/Side)와 동작(인사·쓰다듬음·간지럼·간식)은 시뮬레이터 폴더의 presets.js 데이터를 그대로 쓴다. 로봇이 실제로 움직일 수 있는 범위(robotexport.js)를 지킨다.
 - 눈 LED는 머리 안쪽 8×8 LED 매트릭스 위치 기준으로 머리 겉면에 그린다. 재질은 패브릭 외피 + 흰 파이핑 + 알루미늄 기둥 + 고무링.
 - 모델은 assets/cove-rig.glb (원본 시뮬레이터 모델에서 안쪽 전자부품을 빼고 줄인 것). 로봇 실물 연결(MQTT) 기능은 웹사이트에 넣지 않는다.
-- **Design 카드 안의 Cove 장면**(js/cards.js): Form·Material·Motion 각 카드의 이미지 칸에서 그 항목 장면이 스스로 재생된다. Form은 옆모습→앞모습→3/4, Material은 이음선 확대, Motion은 숙임→몸통 회전·갸웃→눈 표정(반짝·신난 눈) 반복. 왼쪽 시뮬레이터는 카드와 연동하지 않고 독립적으로 동작한다(사용자 요청). 화면에 보이는 카드만 그린다.
+- **Design 카드 안의 Cove 장면**(js/cards.js): Form·Motion 카드의 이미지 칸에서 그 항목 장면이 스스로 재생된다(Form은 옆모습→앞모습→3/4, Motion은 숙임→몸통 회전·갸웃→눈 표정(반짝·신난 눈) 반복). Material 칸은 3D 대신 재질 클로즈업 사진(assets/material.webp: 패브릭·흰 이음선·알루미늄 바닥판). 왼쪽 시뮬레이터는 카드와 연동하지 않고 독립적으로 동작한다(사용자 요청). 화면에 보이는 카드만 그린다.
 - **인트로 Cove**(js/intro-cove.js): 인트로 마지막 장면의 Cove는 처음엔 겹쳐진(앉은) 상태이고, 마우스를 움직이면 일어나 커서 쪽으로 몸통을 돌리고 갸웃하며 눈 LED도 그쪽을 본다. 4초 가만히 있으면 다시 앉는다. 시뮬레이터 모델·눈 위치를 그대로 쓴다. 3D 실패·움직임 줄이기에서는 기존 렌더 이미지(assets/intro-cove.png).
 - **규격**(Design 하단): Height 160–237 mm, Width 222–251 mm (모델에서 접힌 상태~최대 확장 상태로 측정). Weight·Finish는 미정(—).
 - **Experience 섹션은 삭제됨**(사용자 요청). 상단 메뉴는 About / Features / Design / Gallery, Gallery 라벨은 04.
