@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#f6f1ea">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600&family=Noto+Sans+KR:wght@300;400;500&family=Jost:wght@200;300;400;500&family=Fredoka:wdth,wght@125,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600&family=Noto+Sans+KR:wght@300;400;500&family=Jost:wght@200;300;400;500&family=JetBrains+Mono:wght@300;400&family=Fredoka:wdth,wght@125,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/intro.css">
   <link rel="stylesheet" href="css/outro.css">
@@ -220,29 +220,33 @@
       </div>
     </section>
 
-    <!-- ───────────── Outro: 엔딩 크레딧 ─────────────
-         명단은 js/credits.js 에서 고칩니다. -->
-    <section class="closing outro" id="outro" aria-label="Outro — Credits">
-      <div class="closing__glow" aria-hidden="true"></div>
+    <!-- ───────────── Outro: 프로젝트 명세 (한 줄씩) ───────────── -->
+    <section class="closing outro" id="outro" aria-label="Outro — Project info">
+      <div class="outro__sheet">
+        <img class="outro__logo" src="assets/cove-logo.svg" alt="COVE">
+        <p class="outro__event">ROBOTWORLD 2026</p>
 
-      <div class="outro__window">
-        <div class="outro__roll">
-          <img class="outro__logo" src="assets/cove-logo.svg" alt="COVE">
-          <p class="outro__project">Desktop Home Robot Project</p>
+        <dl class="outro__group">
+          <div class="r"><dt>Project</dt><dd>COVE — PHYSICAL AI COMPANION</dd></div>
+          <div class="r"><dt>Team</dt><dd>HIDE LAB · HONGIK UNIVERSITY</dd></div>
+          <div class="r"><dt>Period</dt><dd>2026.08.01 → 2026.10.27</dd></div>
+          <div class="r"><dt aria-hidden="true"></dt><dd>88 DAYS</dd></div>
+        </dl>
 
-          <div class="outro__groups"></div>
+        <dl class="outro__group">
+          <div class="r"><dt>Members</dt><dd>고은결 · 김동수 · 김채영 · 박소연 · 송상훈 · 신승혁 · 이서연</dd></div>
+          <div class="r"><dt>Advisor</dt><dd>박기철</dd></div>
+        </dl>
 
-          <div class="outro__lab">
-            <p class="outro__made">Made at</p>
-            <p class="outro__labname">HIDE LAB</p>
-            <p class="outro__uni">Hongik University</p>
-            <p class="outro__ko">홍익대학교 HIDE LAB</p>
-          </div>
-        </div>
-      </div>
+        <dl class="outro__group">
+          <div class="r"><dt>Actuators</dt><dd>DYNAMIXEL XL330 ×4 · XM430</dd></div>
+          <div class="r"><dt>Brain</dt><dd>RASPBERRY PI ZERO W · U2D2</dd></div>
+          <div class="r"><dt>Sensing</dt><dd>LD2410C · VL53L0X · TTP223</dd></div>
+          <div class="r"><dt>Expression</dt><dd>HT16K33 8×8 LED ×2</dd></div>
+          <div class="r"><dt>Model</dt><dd>RHINO 8 · 1026_COVE</dd></div>
+        </dl>
 
-      <div class="outro__end">
-        <h2 class="closing__title">A quiet light,<br><em>right beside you.</em></h2>
+        <p class="outro__end r"><span aria-hidden="true">✳</span>HIDE LAB — 2026</p>
       </div>
     </section>
   </main>
@@ -269,7 +273,6 @@
 
   <script src="js/main.js"></script>
   <script src="js/intro.js"></script>
-  <script src="js/credits.js"></script>
   <script src="js/outro.js"></script>
   <script type="importmap">
     { "imports": {

@@ -38,10 +38,10 @@
 - **폰트**: 상단 메뉴 로고는 Cove.ai의 COVE 글자(assets/cove-logo.svg, 높이 20px), 푸터 로고와 그 밖의 제목은 Instrument Serif, 본문·UI Manrope, 한글 Noto Sans KR. 인트로는 Jost(HI, I'm cove)와 Fredoka(배경의 큰 COVE). 한국어 강조 문구(`em.ko`)는 기울이지 않음.
 - **글자 크기**: 인트로 HI·I'm cove `clamp(36px, 4.8vw, 84px)`, 배경의 큰 COVE `24vw`, 섹션 제목 `clamp(34px, 5.4vw, 72px)`, About 문장 `clamp(28px, 4.4vw, 60px)`, 라벨 12px 대문자, 본문 14~16px.
 - **레이아웃·비율**: 좌우 여백 `clamp(16px, 5vw, 72px)`, 섹션 위아래 여백 `clamp(96px, 14vw, 180px)`, 모서리 둥글기 28px, Design 대표 이미지 4:5, 디테일 컷 16:10, 갤러리 3열 그리드.
-- **아웃트로(엔딩 크레딧)**: 배경은 사이트 기본 톤(크림 + 연한 라벤더·복숭아 빛), 이름만 표기(직책 구분 없음): 학생 7명 가나다순 4+3 배치, 아래에 지도교수 한 줄. 명단은 js/credits.js.
+- **아웃트로**: 참고 이미지처럼 모노스페이스(JetBrains Mono) 프로젝트 명세. 회색 그라데이션 위에서 줄이 차례로 나타남. 내용은 index.html 의 #outro (ROBOTWORLD 2026, 프로젝트·팀·기간·참여자·지도교수·하드웨어 구성). 이름은 직책 구분 없이 표기.
 - **Hero 섹션은 삭제됨**: 인트로의 큰 COVE 글자 + Cove 렌더 장면이 그 자리를 대신함(사용자 요청).
 - **반응형 기준**: 1024px 이하 기능 카드 2열, 760px 이하 1열 구성과 메뉴 숨김, 520px 이하 기능 카드 1열.
-- **섹션 순서**: 인트로(HI → I'm cove → 큰 COVE 글자 + Cove 렌더, 스크롤로 이어짐) → About → Key Features → Design & Detail → Experience(Wake/Listen/Focus/Rest) → Gallery → 아웃트로(엔딩 크레딧, 명단은 js/credits.js) → Footer.
+- **섹션 순서**: 인트로(HI → I'm cove → 큰 COVE 글자 + Cove 렌더, 스크롤로 이어짐) → About → Key Features → Design & Detail → Experience(Wake/Listen/Focus/Rest) → Gallery → 아웃트로(프로젝트 명세) → Footer.
 - **스크롤·움직임**: 부드러운 스크롤, 스크롤 시 서서히 나타나는 효과, 로봇이 떠 있는 움직임과 눈 깜빡임, 인트로 I'm cove 장면의 그라디언트가 마우스를 따라감, 스크롤 위치에 맞는 상단 메뉴 항목이 보라색(#5b43a6)+굵은 밑줄로 강조됨, 좌측 하단 페이지 표시는 메뉴가 숨겨지는 모바일(760px 이하)에서만 보임, Design 대표 이미지 화면 고정(sticky), 스크롤하면 메뉴 배경이 반투명해짐, 움직임 줄이기 설정 존중.
 
 ## 문구 원칙 (사용자 지시)
