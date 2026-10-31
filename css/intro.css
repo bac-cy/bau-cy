@@ -83,3 +83,7 @@
 
 /* 화면에는 보이지 않지만 검색·스크린리더용 제목 */
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* 마우스를 따라 일어나는 3D Cove: 준비되면 같은 자리의 렌더 이미지를 대신한다 */
+.intro__render.is-live img { visibility: hidden; }
+.intro__render .intro__live { display: block; }
