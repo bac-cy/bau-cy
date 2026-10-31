@@ -373,3 +373,6 @@ em.ko { font-family: var(--font-ui); font-style: normal; font-weight: 400; font-
 /* 상단 메뉴가 보이는 화면(761px 이상)에서는 메뉴 강조로 위치를 알 수 있으므로 좌측 하단 표시는 숨김.
    메뉴가 숨겨지는 모바일(760px 이하)에서만 계속 보임 */
 @media (min-width: 761px) { .pager { display: none; } }
+
+/* 갤러리: 렌더 이미지는 칸을 꽉 채움 */
+.gallery .slot > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
