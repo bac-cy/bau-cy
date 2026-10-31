@@ -59,3 +59,4 @@
 - **인트로 Cove**(js/intro-cove.js): 인트로 마지막 장면의 Cove는 처음엔 겹쳐진(앉은) 상태이고, 마우스를 움직이면 일어나 커서 쪽으로 몸통을 돌리고 갸웃하며 눈 LED도 그쪽을 본다. 4초 가만히 있으면 다시 앉는다. 시뮬레이터 모델·눈 위치를 그대로 쓴다. 3D 실패·움직임 줄이기에서는 기존 렌더 이미지(assets/intro-cove.png).
 - **규격**(Design 하단): Height 160–237 mm, Width 222–251 mm (모델에서 접힌 상태~최대 확장 상태로 측정). Weight·Finish는 미정(—).
 - **Experience 섹션은 삭제됨**(사용자 요청). 상단 메뉴는 About / Features / Design / Gallery, Gallery 라벨은 04.
+- **Gallery**: 홍보 영상(assets/cove-film.mp4, 20초, 소리 없이 반복 재생, 화면에 절반 이상 보일 때만 재생) 하나만 크게 둔다. 기존 Cove 렌더 이미지 칸들은 뺐다(사용자 요청).

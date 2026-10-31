@@ -145,3 +145,16 @@ function updateNavSpy() {
 window.addEventListener('scroll', () => { if (!spyTick) { spyTick = true; requestAnimationFrame(updateNavSpy); } }, { passive: true });
 window.addEventListener('resize', updateNavSpy);
 updateNavSpy();
+
+/* ---------- 8. Gallery film ----------
+   영상은 화면에 절반 이상 보일 때만 재생하고, 벗어나면 멈춥니다. (소리 없이 반복) */
+(() => {
+  const v = document.querySelector('.gallery__film video');
+  if (!v) return;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  new IntersectionObserver(([en]) => {
+    if (reduce) return;
+    if (en.intersectionRatio >= 0.5) { const p = v.play(); if (p && p.catch) p.catch(() => {}); } else v.pause();
+  }, { threshold: [0, 0.5] }).observe(v);
+  if (reduce) v.controls = true;
+})();
