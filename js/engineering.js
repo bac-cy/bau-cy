@@ -1,90 +1,107 @@
 /* ==========================================================
-   Design — Engineering: 스크롤하면 Cove 안쪽 부품이 층층이 펼쳐져요.
-   · 스크롤에 맞춰 분해 이미지 60장이 재생돼요. (조립된 모습 → 부품이 모두 펼쳐진 모습)
-   · 펼쳐진 뒤 부품에 마우스를 올리면(모바일은 누르면) 이름과 역할이 보여요.
-   · 부품 이름·설명은 assets/eng/eng.json 에서 읽어요.
+   Design — Engineering 카드: STEP 모델(COVE FINAL)로 만든 실시간 분해 뷰
+   · 카드가 화면에 올라오면 Cove가 층층이 펼쳐져요. (스크롤에 맞춰 열고 닫혀요)
+   · 층에 마우스를 올리면(모바일은 누르면) 그 층이 강조되고 이름과 역할이 보여요.
+   · 좌우로 끌면 돌려 볼 수 있어요.
+   모델: assets/eng/cove-eng.glb — 부품 402개를 층 8개로 묶어 가볍게 줄인 것
    ========================================================== */
 const root = document.getElementById('engineering');
+const LAYERS = {   // 위 → 아래
+  head_top:   { ko: '머리 윗 껍데기', en: 'Head top shell', desc: '3D 프린팅한 머리의 바깥 껍데기. 안쪽의 LED·센서·모터를 감싸고, 패브릭이 그 위를 덮어요.' },
+  head_inner: { ko: '머리 모터와 브라켓', en: 'Head motors & brackets', desc: '고개를 들고 숙이고, 갸웃하게 하는 다이나믹셀 모터 2개와 이를 붙잡는 브라켓이에요.' },
+  head_low:   { ko: '머리 프레임과 아래 판', en: 'Head frame & lower plate', desc: '머리 안쪽의 뼈대예요. LED, 센서, 모터가 이 프레임에 고정되고, 아래 판은 우레탄 폼으로 마감해요.' },
+  body_top:   { ko: '몸통 윗 폼', en: 'Body top foam', desc: '기대는 손과 팔에 안전하고 부드러운 압력을 전하는 우레탄 폼 층이에요. 기둥이 드나드는 홈이 있어요.' },
+  board:      { ko: '제어 보드층', en: 'Control boards', desc: '전원, 통신, 제어 보드와 커넥터가 모여 있는 층이에요.' },
+  ring:       { ko: '자석 링과 브라켓', en: 'Magnet ring & bracket', desc: '몸통 폼을 쉽게 떼고 붙일 수 있도록 자석을 붙잡아 주는 링과 브라켓이에요.' },
+  body_frame: { ko: '몸통 프레임과 목 모터', en: 'Body frame & neck motor', desc: '몸통 안쪽의 뼈대와, 기둥을 일으키는 목 모터가 들어 있어요.' },
+  base:       { ko: '회전 바닥판', en: 'Rotating base', desc: '몸통을 좌우로 돌리는 회전 바닥판과 베어링, 받침이에요.' },
+};
 if (root) {
-  const cv = root.querySelector('canvas'), ctx = cv.getContext('2d');
-  const tip = root.querySelector('.eng__tip');
-  const view = root;                                              // 카드의 이미지 칸
-  const hint = root.querySelector('.eng__hint');
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const touch = window.matchMedia('(hover: none)').matches;
-  if (touch && hint) hint.textContent = '펼쳐진 부품을 눌러 보세요';
-  let data = null, imgs = [], loaded = 0, started = false;
-  let frame = 0, goal = 0, hoverName = null, W = 640, H = 960, dpr = 1;
-  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-  const smooth = (t) => t * t * (3 - 2 * t);
+  const cv = root.querySelector('canvas'), tip = root.querySelector('.eng__tip'), hint = root.querySelector('.eng__hint');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches, touch = window.matchMedia('(hover: none)').matches;
+  if (touch && hint) hint.textContent = '펼쳐진 층을 눌러 보세요';
+  let started = false;
+  new IntersectionObserver(([e]) => { if (e.isIntersecting && !started) { started = true; init().catch(err => console.warn('Engineering view unavailable:', err)); } }, { rootMargin: '900px 0px' }).observe(root);
 
-  function load() {
-    if (started) return; started = true;
-    fetch('assets/eng/eng.json').then(r => r.json()).then(d => {
-      data = d; W = d.w; H = d.h;
-      for (let i = 0; i < d.n; i++) { const im = new Image(); im.decoding = 'async'; im.src = `assets/eng/${String(i).padStart(2, '0')}.webp`; im.onload = () => { loaded++; dirty = true; }; imgs.push(im); }
-      root.classList.add('is-ready'); fit();
-    }).catch(() => {});
-  }
-  new IntersectionObserver(([e]) => { if (e.isIntersecting) load(); }, { rootMargin: '1200px 0px' }).observe(root);
+  async function init() {
+    const [THREE, { GLTFLoader }, { MeshoptDecoder }, { RoomEnvironment }] = await Promise.all([
+      import('three'), import('three/addons/loaders/GLTFLoader.js'), import('three/addons/libs/meshopt_decoder.module.js'), import('three/addons/environments/RoomEnvironment.js'),
+    ]);
+    const clamp = (v, a, b) => Math.min(b, Math.max(a, v)), smooth = (t) => t * t * (3 - 2 * t);
+    const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    const scene = new THREE.Scene(); scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.add(new THREE.HemisphereLight(0xfff4e8, 0xd8c8c0, 1.1)); const key = new THREE.DirectionalLight(0xfff1e2, 1.0); key.position.set(-1, 2, 1.5); scene.add(key);
+    const loader = new GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder);
+    const model = (await loader.loadAsync('assets/eng/cove-eng.glb')).scene; scene.add(model);
 
-  function fit() {
-    const w = cv.clientWidth, h = cv.clientHeight; if (!w || !h) return;
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); dirty = true;
-  }
-  new ResizeObserver(fit).observe(cv);
+    // 층(노드 이름 앞부분)별로 묶기
+    const layers = {}; const pick = [];
+    model.traverse(o => {
+      if (!o.isMesh) return;
+      const name = o.name.split('__')[0]; o.userData.layer = name; if (!o.geometry.attributes.normal) o.geometry.computeVertexNormals();
+      o.material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.62, metalness: 0.08, envMapIntensity: 0.9, emissive: 0x7d6aa8, emissiveIntensity: 0, side: THREE.DoubleSide });
+      (layers[name] ||= []).push(o); pick.push(o);
+    });
+    const order = Object.keys(LAYERS).filter(k => layers[k]);                 // 위 → 아래
+    const rank = (k) => order.length - 1 - order.indexOf(k);                   // 아래에서부터 0,1,2…
+    const GAP = 0.06;                                                          // 층 사이를 벌리는 간격(m)
+    const box = new THREE.Box3().setFromObject(model), size = box.getSize(new THREE.Vector3());
+    const center = new THREE.Vector3(0, (size.y + GAP * (order.length - 1)) / 2, 0);
+    const radius = Math.hypot(size.x, size.y + GAP * (order.length - 1), size.z) / 2;
+    const camera = new THREE.PerspectiveCamera(26, 1, 0.01, 10);
 
-  let dirty = true;
-  function progress() {                                             // 카드가 화면 아래에서 올라와 가운데쯤 오는 동안 펼쳐진다
-    const r = root.getBoundingClientRect(), vh = window.innerHeight, c = r.top + r.height / 2;
-    return clamp((vh * 0.88 - c) / (vh * 0.42), 0, 1);
-  }
-  function draw() {
-    if (!data) return;
-    const f = Math.round(frame), im = imgs[f] && imgs[f].complete && imgs[f].naturalWidth ? imgs[f] : imgs.slice(0, f + 1).reverse().find(i => i.complete && i.naturalWidth);
-    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height);
-    if (im) ctx.drawImage(im, 0, 0, cv.width, cv.height);
-    // 펼쳐진 뒤에는 부품 위치에 작은 점
-    if (f >= 40) {
-      ctx.fillStyle = 'rgba(125,106,168,.55)';
-      for (const [k, v] of Object.entries(data.frames[f])) { ctx.beginPath(); ctx.arc(v[0] * cv.width, v[1] * cv.height, (k === hoverName ? 5.5 : 2.6) * dpr, 0, 7); if (k === hoverName) ctx.fillStyle = '#5b43a6'; ctx.fill(); ctx.fillStyle = 'rgba(125,106,168,.55)'; }
+    let w = 0, h = 0, openT = 0, yaw = -0.5, yawGoal = -0.5, drag = null, hover = null, dirty = true, visible = false;
+    function fit() {
+      w = cv.clientWidth; h = cv.clientHeight; if (!w || !h) return;
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); dirty = true;
     }
-  }
-  function nearest(x, y) {                                             // x, y: 캔버스 안 0~1 위치
-    if (!data || Math.round(frame) < 40) return null;
-    const a = data.frames[Math.round(frame)], r = cv.getBoundingClientRect(); let best = null, bd = (34 / r.height) ** 2;
-    for (const [k, v] of Object.entries(a)) { const dx = (v[0] - x) * (r.width / r.height), dy = v[1] - y, d = dx * dx + dy * dy; if (d < bd) { bd = d; best = k; } }
-    return best;
-  }
-  function show(name, px, py) {
-    hoverName = name; dirty = true;
-    if (!name) { tip.classList.remove('is-on'); return; }
-    const n = data.names[name];
-    tip.innerHTML = `<b></b><i></i><span></span>`; tip.children[0].textContent = name + (n.count > 1 ? ` ×${n.count}` : ''); tip.children[1].textContent = n.en; tip.children[2].textContent = n.desc;
-    const rr = cv.getBoundingClientRect(), br = view.getBoundingClientRect();
-    let left = rr.left - br.left + px, top = rr.top - br.top + py;
-    tip.classList.add('is-on');
-    const tw = tip.offsetWidth, th = tip.offsetHeight;
-    left = clamp(left + 16, 8, br.width - tw - 8); top = clamp(top - th / 2, 8, br.height - th - 8);
-    tip.style.left = left + 'px'; tip.style.top = top + 'px';
-  }
-  const pos = (e) => { const r = cv.getBoundingClientRect(); const px = e.clientX - r.left, py = e.clientY - r.top; return [px, py, px / r.width, py / r.height]; };
-  cv.addEventListener('pointermove', (e) => { if (e.pointerType === 'touch') return; const [px, py, x, y] = pos(e); const n = nearest(x, y); if (n !== hoverName) show(n, px, py); else if (n) show(n, px, py); });
-  cv.addEventListener('pointerleave', () => show(null));
-  cv.addEventListener('click', (e) => { const [px, py, x, y] = pos(e); const n = nearest(x, y); show(n === hoverName && touch ? null : n, px, py); });
+    new ResizeObserver(fit).observe(cv); fit();
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; dirty = true; }).observe(root);
 
-  let last = performance.now();
-  (function loop(now) {
-    requestAnimationFrame(loop);
-    const dt = Math.min(0.05, (now - last) / 1000); last = now;
-    const r = root.getBoundingClientRect(); if (r.bottom < -100 || r.top > window.innerHeight + 100) return;
-    const p = reduced ? 1 : progress();
-    goal = smooth(clamp(p, 0, 1)) * ((data ? data.n : 60) - 1);
-    const nf = frame + (goal - frame) * Math.min(1, dt * 9);
-    if (Math.abs(nf - frame) > 0.01) { frame = nf; dirty = true; } else if (frame !== goal) { frame = goal; dirty = true; }
-    if (Math.round(frame) < 40 && hoverName) show(null);
-    root.classList.toggle('is-open', Math.round(frame) >= 40);
-    if (dirty) { dirty = false; draw(); }
-  })(performance.now());
+    function progress() { const r = root.getBoundingClientRect(), vh = window.innerHeight, c = r.top + r.height / 2; return clamp((vh * 0.88 - c) / (vh * 0.42), 0, 1); }
+    function place(e) {                                                        // e: 0(조립) ~ 1(펼침)
+      for (const k of order) for (const m of layers[k]) m.position.y = e * rank(k) * GAP;
+    }
+    function camPlace() {
+      const fov = camera.fov * Math.PI / 180, d = radius / Math.sin(Math.min(fov, 2 * Math.atan(Math.tan(fov / 2) * camera.aspect)) / 2) * 0.68;
+      const el = 0.2, az = yaw;
+      camera.position.set(center.x + d * Math.sin(az) * Math.cos(el), center.y + d * Math.sin(el), center.z + d * Math.cos(az) * Math.cos(el)); camera.lookAt(center);
+    }
+    const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+    function hit(ev) { const r = cv.getBoundingClientRect(); ndc.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, camera); const i = ray.intersectObjects(pick, false)[0]; return i ? i.object.userData.layer : null; }
+    function setHover(k, ev) {
+      if (k !== hover) { hover = k; dirty = true; }
+      if (!k) { tip.classList.remove('is-on'); return; }
+      const L = LAYERS[k]; tip.innerHTML = '<b></b><i></i><span></span>'; tip.children[0].textContent = L.ko; tip.children[1].textContent = L.en; tip.children[2].textContent = L.desc;
+      const rr = root.getBoundingClientRect(); tip.classList.add('is-on');
+      const tw = tip.offsetWidth, th = tip.offsetHeight;
+      tip.style.left = clamp(ev.clientX - rr.left + 16, 8, rr.width - tw - 8) + 'px'; tip.style.top = clamp(ev.clientY - rr.top - th / 2, 8, rr.height - th - 8) + 'px';
+    }
+    cv.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, yaw: yawGoal, moved: false }; try { cv.setPointerCapture(e.pointerId); } catch {} });
+    cv.addEventListener('pointermove', (e) => {
+      if (drag) { const dx = e.clientX - drag.x; if (Math.abs(dx) > 4) drag.moved = true; if (drag.moved) { yawGoal = drag.yaw + dx * 0.008; return; } }
+      if (e.pointerType !== 'touch' && openT > 0.55) setHover(hit(e), e);
+    });
+    cv.addEventListener('pointerup', (e) => { const d = drag; drag = null; if (d && !d.moved && openT > 0.55) { const k = hit(e); setHover(touch && k === hover ? null : k, e); } });
+    cv.addEventListener('pointerleave', () => { if (!drag) setHover(null); });
+    cv.style.touchAction = 'pan-y';
+
+    let last = performance.now();
+    (function loop(now) {
+      requestAnimationFrame(loop);
+      const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      if (!visible) return;
+      const goal = reduced ? 1 : smooth(progress());
+      const nt = openT + (goal - openT) * Math.min(1, dt * 7); if (Math.abs(nt - openT) > 0.0005) { openT = nt; dirty = true; }
+      const ny = yaw + (yawGoal - yaw) * Math.min(1, dt * 8); if (Math.abs(ny - yaw) > 0.0005) { yaw = ny; dirty = true; }
+      root.classList.toggle('is-open', openT > 0.55);
+      if (openT < 0.55 && hover) setHover(null);
+      if (dirty) {
+        dirty = false; place(openT); camPlace();
+        for (const k of order) for (const m of layers[k]) m.material.emissiveIntensity = k === hover ? 0.32 : 0;
+        renderer.render(scene, camera);
+      }
+    })(performance.now());
+  }
 }
