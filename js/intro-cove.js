@@ -6,10 +6,16 @@
    3D를 불러오지 못하거나 "움직임 줄이기"를 켠 경우에는 기존 렌더 이미지가 그대로 보여요.
    ========================================================== */
 const figure = document.querySelector('.intro__render');
+const ptr = { x: 0, y: 0, at: -1e9, seen: false };               // 마우스·터치 위치: 3D가 준비되기 전부터 기억해 둔다
+{
+  const onMove = (e) => { ptr.x = e.clientX; ptr.y = e.clientY; ptr.at = performance.now(); ptr.seen = true; };
+  window.addEventListener('pointermove', onMove, { passive: true });
+  window.addEventListener('pointerdown', onMove, { passive: true });
+  document.addEventListener('pointerleave', () => { ptr.at = -1e9; });
+}
 if (figure && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   const start = () => init().catch(err => console.warn('Intro Cove unavailable:', err));
-  const go = () => ('requestIdleCallback' in window ? requestIdleCallback(start, { timeout: 2500 }) : setTimeout(start, 1200));
-  if (document.readyState === 'complete') setTimeout(go, 600); else window.addEventListener('load', () => setTimeout(go, 600));
+  if (document.readyState === 'complete') setTimeout(start, 300); else window.addEventListener('load', () => setTimeout(start, 300));
 }
 
 async function init() {
@@ -75,14 +81,7 @@ async function init() {
   }
   resize(); new ResizeObserver(resize).observe(figure);
 
-  /* 마우스 */
-  const ptr = { x: 0, y: 0, at: -1e9, seen: false };
-  const onMove = (e) => { ptr.x = e.clientX; ptr.y = e.clientY; ptr.at = performance.now(); ptr.seen = true; };
-  window.addEventListener('pointermove', onMove, { passive: true });
-  window.addEventListener('pointerdown', onMove, { passive: true });
-  document.addEventListener('pointerleave', () => { ptr.at = -1e9; });
-
-  const AWAKE = { neck: 25, head: -34 }, IDLE_MS = 4200;
+  const AWAKE = { neck: 25, head: -34 }, IDLE_MS = 9000;
   const pose = { neck: 0, head: 0, tilt: 0, body: 0 }, vel = { neck: { v: 0 }, head: { v: 0 }, tilt: { v: 0 }, body: { v: 0 } };
   let gaze = { x: 0, y: 0 }, tNow = 0, last = performance.now(), shown = false;
   const visible = () => { const r = figure.getBoundingClientRect(); return +getComputedStyle(figure).opacity > 0.4 && r.bottom > 0 && r.top < innerHeight; };
@@ -110,9 +109,10 @@ async function init() {
     spin(col, AXZ, pose.neck + sway * 0.4 * Math.sin(2 * Math.PI * tNow / 3.7));
     spin(head, AXZ, pose.head + sway * 0.6 * Math.sin(2 * Math.PI * tNow / 4.3 + 0.6));
     spin(tilt, AXY, pose.tilt); spin(rig, AXY, pose.body);
-    eyes.group.visible = pose.neck > 5;
-    const gx = Math.round(gaze.x * 2), gy = Math.round(gaze.y * 1.4);
-    eyes.show(pose.neck < 12 ? '감은 눈' : awake && Math.abs(gaze.x) + Math.abs(gaze.y) > 0.9 ? '반짝 눈' : '뜬 눈', gx, gy, tNow);
+    eyes.group.visible = true;
+    const near = ptr.seen && now - ptr.at < IDLE_MS + 3000;
+    const gx = Math.round(clamp((ptr.x - cx) / (innerWidth * 0.5), -1, 1) * (near ? 2 : 0)), gy = Math.round(gaze.y * 1.4);
+    eyes.show(awake && Math.abs(gaze.x) + Math.abs(gaze.y) > 0.9 ? '반짝 눈' : '뜬 눈', awake ? Math.round(gaze.x * 2) : gx, gy, tNow);
     renderer.render(scene, camera);
     if (!shown) { shown = true; figure.classList.add('is-live'); }
   }
