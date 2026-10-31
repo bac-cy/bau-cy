@@ -127,12 +127,18 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   const full = (n) => { const c = find(n); return { keys: c.keys, eyes: c.eyes || [], markers: c.markers || [], duration: c.duration }; };
   const rest1 = find('시나리오1 휴식'), tickle = find('시나리오2 간지럽히기'), snack = find('시나리오3 간식주기'), greet = find('시나리오4 인사');
   const petStart = (rest1.markers.find(m => m.label === '쓰다듬어 줘서 좋아요') || { t: 3 }).t;
+  // 버튼을 누르면 바로 그 동작이 나오도록, 각 시나리오에서 "그 동작이 일어나는 부분"만 잘라 쓴다 (도입 단계 없음)
   const CLIPS = {
-    greet: full('시나리오4 인사'),
+    greet: slice(greet, 3, 14),            // 반가워서 고개를 들고 인사하기
     pet: slice(rest1, petStart, petStart + 6),
-    tickle: slice(tickle, 0, 14),
-    snack: slice(snack, 0, 14),
-    rest: full('시나리오1 휴식'),
+    tickle: slice(tickle, 8, 22),          // 간지러워요! → 더 놀고 싶어요
+    snack: slice(snack, 14, 27),           // 먹고 싶어요 → 냠냠 → 배가 불러요
+    rest: slice(rest1, 9, 16),             // 팔을 올려 주길 기다리다 기대니까 편안해요
+    sleep: slice(rest1, 14, 24),           // 스르르 잠이 와요 → 감은 눈
+  };
+  const GUIDE = {
+    greet: '인사하는 Cove를 지켜보세요', pet: '마우스로 머리를 쓰다듬어 보세요', tickle: '마우스로 몸통을 살살 문질러 보세요',
+    snack: '간식을 끌어다 Cove에게 주세요', rest: '기대어 쉬는 Cove를 지켜보세요', sleep: 'Cove가 스르르 잠들어요',
   };
   let clip = null, clipT = 0, clipName = '';
   function sampleClip(c, t) {
@@ -147,10 +153,12 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   const HINT = '머리와 몸통을 끌어서 움직여 보세요';
   const stepsEl = figure.querySelector('.sim__steps'); let stepIdx = -1;
   function buildSteps(c) {
-    if (!stepsEl) return; stepsEl.textContent = ''; stepIdx = -1;
+    if (!stepsEl) return; stepsEl.textContent = ''; stepIdx = -1; stepsEl.hidden = true; return;   // 번호 목록은 쓰지 않음(안내 문구만 표시)
     (c?.markers || []).forEach((m, i) => { const li = document.createElement('li'); li.innerHTML = `<i>${String(i + 1).padStart(2, '0')}</i><span></span>`; li.lastChild.textContent = m.label; stepsEl.appendChild(li); });
     stepsEl.hidden = !c || !c.markers?.length;
   }
+  let mode = null;                                                         // 직접 체험 중인 동작: 'pet' | 'tickle' | 'snack'
+  const treat = figure.querySelector('.sim__treat');
   let lastActive = -1e9, gest = null, nextGest = 3;                        // 사용자가 마지막으로 만진 시각 / 지금 하는 혼자 동작 / 다음 동작 시각
   figure.addEventListener('pointerdown', () => { lastActive = tNow; gest = null; }, true);
   window.addEventListener('pointerup', () => { lastActive = tNow; });
@@ -158,12 +166,12 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     if (!CLIPS[name]) return;
     if (clipName === name && clip) { stopClip(); return; }                  // 같은 버튼을 다시 누르면 멈춤
     clip = CLIPS[name]; clipName = name; clipT = -0.9; gest = null; lastActive = tNow;   // 처음 0.9초는 시작 자세로 부드럽게 이동
-    buildSteps(clip);
-    motionBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.motion === name)));
+    buildSteps(clip); setStatus(GUIDE[name] || HINT, 'on');
+    motionBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.motion === name || b.dataset.motion === mode)));
   }
   function stopClip(keepPose = true) {
-    clip = null; clipName = ''; motionBtns.forEach(b => b.setAttribute('aria-pressed', 'false'));
-    setStatus(HINT); buildSteps(null); lastActive = tNow;
+    clip = null; clipName = ''; motionBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.motion === mode)));
+    setStatus(mode ? GUIDE[mode] : HINT); buildSteps(null); lastActive = tNow;
     if (!keepPose) Object.assign(goal, AWAKE);
   }
 
@@ -203,7 +211,14 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   const g2 = c2.getContext('2d'), gr = g2.createRadialGradient(64, 64, 0, 64, 64, 64);
   gr.addColorStop(0, 'rgba(110,80,120,.26)'); gr.addColorStop(1, 'rgba(110,80,120,0)'); g2.fillStyle = gr; g2.fillRect(0, 0, 128, 128);
   const shadow = new THREE.Mesh(new THREE.PlaneGeometry(sphere.radius * 1.9, sphere.radius * 1.9), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c2), transparent: true, depthWrite: false }));
-  shadow.rotation.x = -Math.PI / 2; shadow.position.set(center.x, box.min.y - 0.001, center.z); scene.add(shadow);
+  shadow.rotation.x = -Math.PI / 2; shadow.position.set(center.x, box.min.y + 0.0006, center.z); scene.add(shadow);
+  // 책상: 은은한 연한 나무 상판 (소품 없이 Cove가 놓인 면만)
+  { const W = sphere.radius * 1.75, D = sphere.radius * 1.3, T = sphere.radius * 0.07, r = sphere.radius * 0.4, hw = W / 2, hd = D / 2;
+    const sh = new THREE.Shape(); sh.moveTo(-hw + r, -hd); sh.lineTo(hw - r, -hd); sh.quadraticCurveTo(hw, -hd, hw, -hd + r); sh.lineTo(hw, hd - r); sh.quadraticCurveTo(hw, hd, hw - r, hd);
+    sh.lineTo(-hw + r, hd); sh.quadraticCurveTo(-hw, hd, -hw, hd - r); sh.lineTo(-hw, -hd + r); sh.quadraticCurveTo(-hw, -hd, -hw + r, -hd);
+    const g = new THREE.ExtrudeGeometry(sh, { depth: T, bevelEnabled: true, bevelSize: T * 0.25, bevelThickness: T * 0.25, bevelSegments: 3 });
+    const desk = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: '#e6d8c4', roughness: 0.78, metalness: 0, envMapIntensity: 0.5 }));
+    desk.rotation.x = -Math.PI / 2; desk.position.set(center.x, box.min.y - T - 0.0004, center.z); scene.add(desk); }
 
   /* ───────── 끌기 / 누르기 ───────── */
   const el = renderer.domElement, ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
@@ -235,11 +250,12 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     if (ev.button > 0) return;
     const kind = pick(ev);
     drag = { kind, x0: ev.clientX, y0: ev.clientY, p0: { ...goal }, moved: false, az0: camGoal.az, el0: camGoal.el, id: ev.pointerId };
-    if (kind) stopClip();
+    if (kind && !(mode && kind === (mode === 'pet' ? 'head' : 'body'))) stopClip();
     try { el.setPointerCapture(ev.pointerId); } catch { /* 무시 */ }
   });
   el.addEventListener('pointermove', (ev) => {
-    if (!drag) { el.style.cursor = pick(ev) ? 'grab' : 'default'; return; }
+    if (!drag) { const kk = pick(ev); el.style.cursor = kk ? (mode ? 'pointer' : 'grab') : 'default'; strokeMove(ev, kk); return; }
+    if (mode && (drag.kind === (mode === 'pet' ? 'head' : mode === 'tickle' ? 'body' : '-'))) { strokeMove(ev, drag.kind); return; }   // 체험 중에는 문지르기로 처리
     const dx = ev.clientX - drag.x0, dy = ev.clientY - drag.y0;
     if (!drag.moved && Math.hypot(dx, dy) < 5) return;
     if (!drag.moved) { drag.moved = true; el.style.cursor = 'grabbing'; }
@@ -250,14 +266,46 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   const end = (ev) => {
     if (!drag) return;
     const d = drag; drag = null; el.style.cursor = 'default';
+    if (mode === 'pet' || mode === 'tickle') { if (!d.moved && d.kind === (mode === 'pet' ? 'head' : 'body')) play(mode); return; }
     if (!d.moved && d.kind === 'head') play('pet');                         // 머리를 톡 누르면 쓰다듬음
     else if (!d.moved && d.kind === 'body') play('greet');                  // 몸통을 톡 누르면 인사
   };
   el.addEventListener('pointerup', end); el.addEventListener('pointercancel', () => { drag = null; });
 
   viewBtns.forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
-  motionBtns.forEach(b => b.addEventListener('click', () => play(b.dataset.motion)));
-  figure.querySelector('[data-act="reset"]')?.addEventListener('click', () => { stopClip(false); setView('persp'); camGoal.zoom = 1; });
+  const EXPERIENCE = ['pet', 'tickle', 'snack'];
+  function setMode(m) {
+    mode = m; if (m) stopClip(); else setStatus(HINT);
+    motionBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.motion === mode)));
+    if (m) setStatus(GUIDE[m]); if (treat) { treat.hidden = m !== 'snack'; treat.style.transform = ''; }
+  }
+  motionBtns.forEach(b => b.addEventListener('click', () => {
+    const n = b.dataset.motion;
+    if (EXPERIENCE.includes(n)) { setMode(mode === n ? null : n); return; }                        // 쓰다듬기·간지럽히기·간식: 직접 해보기
+    setMode(null); play(n);                                                                           // 인사·쉬기·잠들기: 바로 재생
+  }));
+  // 마우스로 문지르기: 머리(쓰다듬기)·몸통(간지럽히기) 위에서 마우스를 일정 거리 움직이면 반응
+  let stroke = { x: 0, y: 0, len: 0, on: false };
+  function strokeMove(ev, kind) {
+    const want = mode === 'pet' ? 'head' : mode === 'tickle' ? 'body' : null;
+    if (!want || kind !== want) { stroke.on = false; stroke.len = Math.max(0, stroke.len - 4); return; }
+    if (stroke.on) stroke.len += Math.hypot(ev.clientX - stroke.x, ev.clientY - stroke.y);
+    stroke.on = true; stroke.x = ev.clientX; stroke.y = ev.clientY;
+    if (stroke.len > 220 && clipName !== mode) { stroke.len = 0; play(mode); }
+  }
+  // 간식 끌어다 주기
+  if (treat) {
+    let td = null;
+    treat.addEventListener('pointerdown', (e) => { td = { x: e.clientX, y: e.clientY }; treat.setPointerCapture(e.pointerId); treat.classList.add('is-drag'); });
+    treat.addEventListener('pointermove', (e) => { if (td) treat.style.transform = `translate(${e.clientX - td.x}px, ${e.clientY - td.y}px) scale(1.08)`; });
+    const drop = (e) => {
+      if (!td) return; td = null; treat.classList.remove('is-drag');
+      if (pick(e)) { treat.hidden = true; play('snack'); const back = setInterval(() => { if (clipName !== 'snack') { clearInterval(back); if (mode === 'snack') { treat.hidden = false; treat.style.transform = ''; } } }, 400); }
+      else treat.style.transform = '';
+    };
+    treat.addEventListener('pointerup', drop); treat.addEventListener('pointercancel', () => { td = null; treat.style.transform = ''; treat.classList.remove('is-drag'); });
+  }
+  figure.querySelector('[data-act="reset"]')?.addEventListener('click', () => { setMode(null); stopClip(false); setView('persp'); camGoal.zoom = 1; });
 
   /* 확대·축소: + − 버튼, Ctrl(⌘)+휠 또는 트랙패드 핀치, 터치 두 손가락 핀치, 빈 곳을 두 번 누르면 원래 크기.
      그냥 휠은 페이지 스크롤에 쓰이도록 그대로 둔다. */
