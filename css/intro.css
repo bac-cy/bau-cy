@@ -65,15 +65,16 @@
   opacity: 0; will-change: transform, opacity;
 }
 .intro__render {
-  position: absolute; left: 50%; bottom: 4svh; margin: 0;
-  width: min(92vw, 118svh); translate: -50% 0; opacity: 0; will-change: transform, opacity;
+  /* Hero의 로봇과 같은 자리·크기: 화면 하단 중앙. 크기는 Hero 로봇 영역(min(480px, 82vw, 48svh))을 기준으로 함 */
+  position: absolute; left: 50%; bottom: 11svh; margin: 0;
+  width: min(calc(min(480px, 82vw, 48svh) * 1.17), 92vw);
+  translate: -50% 0; opacity: 0; will-change: transform, opacity;
 }
 .intro__render img { width: 100%; height: auto; display: block; }
 
 /* ---------- Mobile ---------- */
 @media (max-width: 760px) {
   .intro__bigword { font-size: 24vw; top: 42%; }
-  .intro__render { width: min(104vw, 100svh); bottom: 10svh; }
 }
 
 /* ---------- Reduced motion: 타이핑·움직임 없이 장면만 전환 ---------- */
