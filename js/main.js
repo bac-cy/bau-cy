@@ -88,10 +88,10 @@ onScroll();
 /* ---------- 5. Experience moods ----------
    문구를 바꾸고 싶으면 아래 내용만 수정하면 됩니다. */
 const MOODS = {
-  wake:   { title: 'Good morning', desc: '아침이 오면 천천히 눈을 뜨고, 따뜻한 빛으로 하루의 시작을 알립니다.' },
-  listen: { title: 'I’m listening', desc: '말을 걸면 눈빛이 부드러운 라벤더로 바뀌며, 숨 쉬듯 반응합니다.' },
-  focus:  { title: 'Stay with you', desc: '집중하는 동안에는 눈을 가늘게 뜨고, 은은한 빛만 남긴 채 조용히 곁을 지킵니다.' },
-  rest:   { title: 'Rest well',     desc: '하루가 끝나면 노을빛으로 물들며 천천히 눈을 감습니다.' },
+  wake:   { title: 'Good morning', desc: '아침이 오면 천천히 눈을 뜨고, 고개를 들어 인사해요.' },
+  listen: { title: 'I’m listening', desc: '고개를 갸웃하며 이쪽으로 몸을 돌려 귀 기울여요.' },
+  focus:  { title: 'Stay with you', desc: '눈을 가늘게 뜨고, 조용히 곁에서 함께 집중해요.' },
+  rest:   { title: 'Rest well',     desc: '하루가 끝나면 눈을 감고 고개를 살짝 숙여 쉬어요.' },
 };
 const exp = document.getElementById('experience');
 const moodText = document.querySelector('.mood-text');
