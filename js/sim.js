@@ -135,6 +135,19 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     snack: slice(snack, 14, 27),           // 먹고 싶어요 → 냠냠 → 배가 불러요
     rest: slice(rest1, 9, 16),             // 팔을 올려 주길 기다리다 기대니까 편안해요
     sleep: slice(rest1, 14, 24),           // 스르르 잠이 와요 → 감은 눈
+    // 콕 찌르기 반응 (기본 상태에서 머리·몸통을 클릭할 때)
+    startle: { duration: 2.7, label: '깜짝', markers: [{ t: 0, label: '앗, 깜짝이야!' }, { t: 0.9, label: '뭐지? 두리번' }],
+      keys: [[0, 25, -34, 0, 0], [0.12, 34, -46, 0, 0], [0.7, 33, -44, 0, 0], [1.1, 30, -38, 0, 14], [1.7, 30, -38, 0, -14], [2.2, 27, -35, 0, 4], [2.7, 25, -34, 0, 0]],
+      eyes: [[0, '놀란 눈'], [1.0, '뜬 눈']] },
+    wink: { duration: 2.0, label: '윙크', markers: [{ t: 0, label: '움찔! 윙크~' }],
+      keys: [[0, 25, -34, 0, 0], [0.18, 24, -32, 5, -6], [0.5, 27, -36, 5, -6], [1.4, 27, -36, 3, -3], [2.0, 25, -34, 0, 0]],
+      eyes: [[0, '놀란 눈'], [0.25, '윙크'], [1.5, '뜬 눈']] },
+    happy: { duration: 3.2, label: '좋아함', markers: [{ t: 0, label: '좋아요! 더 해 주세요' }],
+      keys: [[0, 25, -34, 0, 0], [0.3, 29, -38, 7, 14], [0.7, 29, -38, -7, -14], [1.1, 29, -38, 7, 14], [1.5, 29, -38, -7, -14], [1.9, 29, -38, 7, 12], [2.4, 28, -37, -5, -8], [3.2, 25, -34, 0, 0]],
+      eyes: [[0, '하트 눈'], [1.6, '별 눈'], [2.8, '뜬 눈']] },
+    upset: { duration: 3.0, label: '속상', markers: [{ t: 0, label: '그만~ 속상해요' }],
+      keys: [[0, 25, -34, 0, 0], [0.5, 12, -14, 0, 0], [1.0, 12, -14, 0, 42], [2.2, 12, -14, 0, 42], [3.0, 25, -34, 0, 0]],
+      eyes: [[0, '속상한 눈'], [2.6, '뜬 눈']] },
     // 공놀이(영상 속 장면): 공이 굴러와요 → 쳐다봐요 → 머리 위로 띄워요 → 통통 균형 잡기 → 옆으로 굴러 떨어져 따라가 봐요
     ball: { duration: 15, label: '공놀이', markers: [{ t: 0, label: '공이 굴러와요' }, { t: 2.2, label: '어? 이게 뭘까요' }, { t: 3.2, label: '머리 위로 쏙!' }, { t: 4.2, label: '통통 균형을 잡아요' }, { t: 11, label: '앗, 굴러 떨어졌어요' }, { t: 13, label: '어디 갔지?' }],
       keys: [[0, 25, -34, 0, 0], [1.6, 25, -34, 0, 0], [2.6, 27, -37, 6, 0], [3.3, 18, -24, 8, 0], [4.1, 20, -27, 0, 0], [5.0, 20, -27, 8, 0], [6.2, 20, -27, -8, 0], [7.4, 20, -27, 8, 0], [8.6, 20, -27, -8, 0], [9.8, 20, -27, 7, 0], [11.0, 20, -27, -9, 0], [12.2, 24, -33, -10, -20], [13.8, 25, -34, -6, -35], [15, 25, -34, 0, 0]],
@@ -264,8 +277,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     if (!drag) return;
     const d = drag; drag = null; el.style.cursor = 'default';
     if (mode === 'pet' || mode === 'tickle') { if (!d.moved && d.kind === (mode === 'pet' ? 'head' : 'body')) play(mode); return; }
-    if (!d.moved && d.kind === 'head') play('pet');                         // 머리를 톡 누르면 쓰다듬음
-    else if (!d.moved && d.kind === 'body') play('greet');                  // 몸통을 톡 누르면 인사
+    if (!d.moved && d.kind) poke(d.kind);                                    // 머리·몸통을 콕 누르면 반응 (놀람 · 윙크 · 좋아함 · 속상함)
   };
   el.addEventListener('pointerup', end); el.addEventListener('pointercancel', () => { drag = null; });
 
@@ -291,6 +303,33 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     if (stroke.on) stroke.len += Math.hypot(ev.clientX - stroke.x, ev.clientY - stroke.y);
     stroke.on = true; stroke.x = ev.clientX; stroke.y = ev.clientY;
     if (stroke.len > 220 && clipName !== mode) { stroke.len = 0; play(mode); }
+  }
+  /* ───────── 콕 찌르기 반응 ───────── */
+  const pokes = [];
+  function react(name) { stopClip(); play(name); }
+  function poke(kind) {
+    const now = performance.now(); pokes.push(now); while (pokes.length && now - pokes[0] > 4200) pokes.shift();
+    const n = pokes.length;
+    if (n >= 6) react('upset'); else if (n >= 3) react('happy'); else react(kind === 'head' ? 'startle' : 'wink');
+    if (n >= 6) pokes.length = 0;
+  }
+  /* ───────── 마우스를 막 흔들면 어지러워해요 ───────── */
+  const dz = { on: false, amp: 0, t: 0, cool: 0 }; let shake = 0, lmx = null, lmy = null, reactEye = null;
+  figure.addEventListener('pointermove', (e) => { if (e.pointerType === 'touch') return; if (lmx !== null) shake += Math.hypot(e.clientX - lmx, e.clientY - lmy); lmx = e.clientX; lmy = e.clientY; }, { passive: true });
+  figure.addEventListener('pointerleave', () => { lmx = lmy = null; });
+  function updateDizzy(dt) {
+    shake *= Math.exp(-1.8 * dt); dz.cool -= dt;
+    const free = !clip && !drag && !mode && !ball;
+    if (free && !dz.on && dz.cool <= 0 && shake > 900) { dz.on = true; dz.t = 0; }
+    if (dz.on) {
+      dz.t += dt; dz.amp = Math.min(1, dz.amp + dt * 4); lastActive = tNow; gest = null;
+      if (!free || (dz.t > 2.5 && shake < 350)) { dz.on = false; dz.cool = 2.2; }                    // 2.5초 이상 흔들린 뒤 마우스를 멈추면 회복 시작
+    } else dz.amp = Math.max(0, dz.amp - dt * 0.6);                                                   // 서서히 회복 (약 1.7초)
+    if (dz.amp > 0.01 && free) {
+      const a = dz.amp;
+      Object.assign(goal, limit({ neck: AWAKE.neck - 4 * a, head: AWAKE.head + 6 * a, tilt: 9 * a * Math.sin(tNow * 6.2), body: 26 * a * Math.sin(tNow * 3.6) }));
+      reactEye = dz.on || a > 0.55 ? '어지러운 눈' : '졸린 눈'; if (statusEl && dz.on && statusEl.textContent !== '어지러워요~') setStatus('어지러워요~', 'play');
+    } else { if (reactEye) { reactEye = null; if (!clip && !mode) setStatus(HINT); } }
   }
   /* ───────── 간식·공: 아이콘을 끌어다 Cove에게 주기 ───────── */
   const showToys = () => toys.forEach(t => { t.hidden = t.dataset.mode !== mode || (ball && t.dataset.mode === 'ball') || (clipName === 'snack' && t.dataset.mode === 'snack'); t.style.transform = ''; });
@@ -404,6 +443,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
       if (mi !== stepIdx && stepsEl) { stepIdx = mi; [...stepsEl.children].forEach((li, i) => li.classList.toggle('cur', i === mi)); }
       if (clipT >= clip.duration + 0.4) { stopClip(); setStatus(HINT); }
     }
+    updateDizzy(dt);
     // 가만히 두면 혼자서 움직인다 (일어서 있고, 끌거나 동작을 재생하는 중이 아닐 때)
     let off = null, gx = 0;
     const idle = !clip && !drag && tNow - lastActive > 2.4 && goal.neck > 12 && pose.neck > 12;
@@ -425,7 +465,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     if (clip && clipName === 'ball') updateBall(Math.max(0, clipT)); bob *= Math.exp(-7 * dt);
     const shown = { ...pose }; shown.neck += sway.neck - bob * 3.5; shown.head += sway.head + bob * 2.5;
     const saved = { ...pose }; Object.assign(pose, shown); writePose(); Object.assign(pose, saved);
-    if (!clip) eyeName = eyeForce || (gest ? gest.eye : pose.neck < 4 ? '감은 눈' : '뜬 눈');
+    if (!clip) eyeName = eyeForce || reactEye || (gest ? gest.eye : pose.neck < 4 ? '감은 눈' : '뜬 눈');
     eyes.show(eyeName, gx, 0, tNow);
     // 카메라
     cam.az = smoothDamp(cam.az, camGoal.az, cv.az, 0.28, dt); cam.el = smoothDamp(cam.el, camGoal.el, cv.el, 0.28, dt); cam.zoom = smoothDamp(cam.zoom, camGoal.zoom, cv.zoom, 0.22, dt);
