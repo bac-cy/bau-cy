@@ -100,3 +100,20 @@
 .sim__toy.is-drag { cursor: grabbing; transition: none; animation: none; }
 @keyframes toyfloat { 50% { translate: 0 -5px; } }
 .sim__motions button[aria-pressed="true"] { background: #2b2731; color: #fff; border-color: #2b2731; }
+
+/* ───── 모바일(760px 이하): 시뮬레이터를 한 손으로 보고 누르기 쉽게 ───── */
+@media (max-width: 760px) {
+  .design__visual { aspect-ratio: 3 / 5; }                                  /* 칸을 더 세로로 길게: 위는 Cove, 아래는 조작 패널 */
+  .design__visual .sim__ui { padding: 12px 12px 34px; }
+  .sim__ui .sim__views button { font-size: 11px; padding: 9px 12px; min-height: 36px; }
+  .sim__ui .sim__zoom { top: 34%; right: 8px; }
+  .sim__ui .sim__zoom button { width: 44px; height: 44px; }
+  .sim__bottom { width: 100%; gap: 10px; padding: 12px 10px 12px; border-radius: 22px; background: rgba(251, 248, 244, .6); box-shadow: 0 0 0 1px var(--line); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .sim__status { font-size: 13.5px; min-height: 2.6em; display: grid; place-items: center; line-height: 1.4; }
+  .sim__motions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; width: 100%; }
+  .sim__motions button, .sim__ui .sim__motions button { min-height: 46px; padding: 8px 4px; font-size: 13px; letter-spacing: 0; line-height: 1.2; white-space: nowrap; }
+  .sim__toy { width: 58px; height: 58px; left: 4%; }
+  .sim__toy[data-kind="snack"], .sim__toy[data-kind="ping"] { top: 17% !important; }
+  .sim__toy[data-kind="base"] { top: 29% !important; }
+  .design__visual figcaption { left: 16px; bottom: 12px; font-size: 10px; }
+}

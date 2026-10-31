@@ -203,7 +203,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   const viewBtns = [...figure.querySelectorAll('[data-view]')];
   // 3D 칸은 카드 전체를 덮는다(확대해도 가장자리가 보이지 않음). 모델은 그 안의 "안전 영역"에 맞춰 놓는다.
   const mobileMQ = window.matchMedia('(max-width: 760px)');
-  const safe = () => (mobileMQ.matches ? { w: 0.96, h: 0.69, cy: 0.455 } : { w: 0.92, h: 0.78, cy: 0.47 });
+  const safe = () => (mobileMQ.matches ? { w: 0.96, h: 0.54, cy: 0.39 } : { w: 0.92, h: 0.78, cy: 0.47 });
   function fitDistance() {
     const s = safe(), vf = camera.fov * D2R, tv = Math.tan(vf / 2), th = tv * camera.aspect;
     const vv = 2 * Math.atan(tv * s.h), hv = 2 * Math.atan(th * s.w);

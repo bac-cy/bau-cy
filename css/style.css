@@ -450,3 +450,10 @@ em.ko { font-family: var(--font-ui); font-style: normal; font-weight: 400; font-
 .gallery__dots { display: flex; gap: 10px; }
 .gallery__dots button { width: 9px; height: 9px; padding: 0; border-radius: 50%; border: 0; background: rgba(43, 39, 49, .22); cursor: pointer; transition: width .35s var(--ease), background .35s; }
 .gallery__dots button[aria-selected="true"] { width: 28px; border-radius: 99px; background: var(--ink); }
+
+/* 모바일: 카드 사이 간격과 위쪽 여백을 줄여 스크롤 길이를 알맞게 */
+@media (max-width: 760px) {
+  .design__details { gap: 56px; padding-top: 40px; }
+  .design__layout { gap: 36px; }
+  .detail h3 { margin-top: 20px; }
+}
