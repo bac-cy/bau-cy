@@ -35,9 +35,10 @@
 
 - **콘셉트**: 로봇이 주인공인 브랜드형 소개 페이지. 사람 이미지 없음. dreamy · warm futuristic · soft glow · minimal · premium · calm.
 - **색상** (`css/style.css`의 `:root`): 배경 `#f6f1ea`, 보조 배경 `#efe8de`, 크림 `#e8ddcf`, 글자 `#2b2731` / `#6c6573` / `#a49ca8`, 라벤더 `#b8a6e0`, 라일락 `#d9cdf2`, 실버 `#c9c6cf`, 피치 `#f6c9a8`, 글로우 `#ffd9b8`, Experience 섹션 어두운 배경 `#2a2533` / `#3a3145`, 강조 글자색 `#7d6aa8`.
-- **폰트**: Hero의 "Cove" 로고는 Jost 400(Futura 계열), 상단 메뉴 로고는 Cove.ai의 COVE 글자(assets/cove-logo.svg, 높이 20px), 푸터 로고와 그 밖의 제목은 Instrument Serif, 본문·UI Manrope, 한글 Noto Sans KR. 인트로는 Jost(HI, I'm cove)와 Fredoka(배경의 큰 COVE). 한국어 강조 문구(`em.ko`)는 기울이지 않음.
-- **글자 크기**: Hero 로고 `clamp(88px, min(18vw, 24svh), 220px)`, 섹션 제목 `clamp(34px, 5.4vw, 72px)`, About 문장 `clamp(28px, 4.4vw, 60px)`, 라벨 12px 대문자, 본문 14~16px.
-- **레이아웃·비율**: 좌우 여백 `clamp(16px, 5vw, 72px)`, 섹션 위아래 여백 `clamp(96px, 14vw, 180px)`, 모서리 둥글기 28px, Hero는 화면 전체 높이(100svh), Design 대표 이미지 4:5, 디테일 컷 16:10, 갤러리 3열 그리드.
+- **폰트**: 상단 메뉴 로고는 Cove.ai의 COVE 글자(assets/cove-logo.svg, 높이 20px), 푸터 로고와 그 밖의 제목은 Instrument Serif, 본문·UI Manrope, 한글 Noto Sans KR. 인트로는 Jost(HI, I'm cove)와 Fredoka(배경의 큰 COVE). 한국어 강조 문구(`em.ko`)는 기울이지 않음.
+- **글자 크기**: 인트로 HI·I'm cove `clamp(36px, 4.8vw, 84px)`, 배경의 큰 COVE `24vw`, 섹션 제목 `clamp(34px, 5.4vw, 72px)`, About 문장 `clamp(28px, 4.4vw, 60px)`, 라벨 12px 대문자, 본문 14~16px.
+- **레이아웃·비율**: 좌우 여백 `clamp(16px, 5vw, 72px)`, 섹션 위아래 여백 `clamp(96px, 14vw, 180px)`, 모서리 둥글기 28px, Design 대표 이미지 4:5, 디테일 컷 16:10, 갤러리 3열 그리드.
+- **Hero 섹션은 삭제됨**: 인트로의 큰 COVE 글자 + Cove 렌더 장면이 그 자리를 대신함(사용자 요청).
 - **반응형 기준**: 1024px 이하 기능 카드 2열, 760px 이하 1열 구성과 메뉴 숨김, 520px 이하 기능 카드 1열.
-- **섹션 순서**: Hero → About → Key Features → Design & Detail → Experience(Wake/Listen/Focus/Rest) → Gallery → Closing → Footer.
-- **스크롤·움직임**: 부드러운 스크롤, 스크롤 시 서서히 나타나는 효과, 로봇이 떠 있는 움직임과 눈 깜빡임, Hero 빛이 마우스를 살짝 따라감, Design 대표 이미지 화면 고정(sticky), 스크롤하면 메뉴 배경이 반투명해짐, 움직임 줄이기 설정 존중.
+- **섹션 순서**: 인트로(HI → I'm cove → 큰 COVE 글자 + Cove 렌더, 스크롤로 이어짐) → About → Key Features → Design & Detail → Experience(Wake/Listen/Focus/Rest) → Gallery → Closing → Footer.
+- **스크롤·움직임**: 부드러운 스크롤, 스크롤 시 서서히 나타나는 효과, 로봇이 떠 있는 움직임과 눈 깜빡임, 인트로 I'm cove 장면의 그라디언트가 마우스를 따라감, Design 대표 이미지 화면 고정(sticky), 스크롤하면 메뉴 배경이 반투명해짐, 움직임 줄이기 설정 존중.

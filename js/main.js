@@ -85,19 +85,6 @@ const onScroll = () => nav.classList.toggle('is-scrolled', window.scrollY > 40);
 window.addEventListener('scroll', onScroll, { passive: true });
 onScroll();
 
-/* ---------- 4. Hero glow follows the pointer (subtle) ---------- */
-const hero = document.querySelector('.hero');
-const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-if (hero && !reduced) {
-  hero.addEventListener('pointermove', e => {
-    const r = hero.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width - 0.5;
-    const y = (e.clientY - r.top) / r.height - 0.5;
-    hero.style.setProperty('--mx', `${x * 60}px`);
-    hero.style.setProperty('--my', `${y * 40}px`);
-  });
-}
-
 /* ---------- 5. Experience moods ----------
    문구를 바꾸고 싶으면 아래 내용만 수정하면 됩니다. */
 const MOODS = {
@@ -128,10 +115,10 @@ moodButtons.forEach(btn => {
 });
 
 /* ---------- 6. Page indicator ----------
-   좌측 하단에 지금 보고 있는 섹션을 표시합니다. (Hero에서는 숨김)
+   좌측 하단에 지금 보고 있는 섹션을 표시합니다. (인트로에서는 숨김)
    이름/번호를 바꾸려면 아래 목록만 수정하면 됩니다. */
 const PAGES = [
-  { sel: '.hero',        num: '',   name: '' },
+  { sel: '#intro',       num: '',   name: '' },
   { sel: '#about',       num: '01', name: 'About' },
   { sel: '#features',    num: '02', name: 'Features' },
   { sel: '#design',      num: '03', name: 'Design' },

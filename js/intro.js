@@ -10,7 +10,7 @@
   const $ = s => intro.querySelector(s);
   const lineHi = $('.intro__line--hi'), lineIm = $('.intro__line--im');
   const peach = $('.intro__peach'), blobA = $('.intro__blob--a'), blobB = $('.intro__blob--b');
-  const dots = $('.intro__dots'), fade = $('.intro__fade');
+  const dots = $('.intro__dots');
   const word = $('.intro__bigword'), render = $('.intro__render');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -54,7 +54,6 @@
   // I'm cove → Cove 렌더 구간
   const OUT_START = 0.50, OUT_SPAN = 0.28;         // I'm cove 사라지기
   const RISE_START = 0.56, RISE_SPAN = 1.26;       // 큰 COVE 글자 + 렌더 올라오기
-  const FADE_START = 2.35, FADE_SPAN = 0.17;       // 끝에서 기본 배경으로 이어짐
 
   let on = false, t = 0, last = performance.now();
 
@@ -77,7 +76,6 @@
     const imA = easeOut(clamp((t - 0.35) / 0.65));
     const out = clamp((s - OUT_START) / OUT_SPAN);
     const b = easeOut(clamp((s - RISE_START) / RISE_SPAN));
-    const f = clamp((s - FADE_START) / FADE_SPAN);
 
     if (t > 0.3) startIm();
     if (s >= RISE_START && imStarted && !imDone) {      // 타이핑이 끝나기 전에 넘어가면 바로 완성
@@ -111,7 +109,6 @@
     render.style.opacity = clamp(b * 3);
     render.style.transform = `translate3d(0, ${(1 - b) * H * 0.95}px, 0)`;
 
-    fade.style.opacity = f;
   }
   requestAnimationFrame(frame);
 })();

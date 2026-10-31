@@ -5,7 +5,7 @@
 (3D 모델은 웹 주소(GitHub Pages)에서만 보이고, 파일을 직접 열면 임시 이미지가 대신 보여요.)
 
 ## 구조
-- `index.html` — 페이지 내용 (Hero · About · Features · Design · Experience · Gallery · Footer)
+- `index.html` — 페이지 내용 (인트로 · About · Features · Design · Experience · Gallery · Footer)
 - `css/style.css` — 디자인 (색상은 맨 위 `:root`에서 한 번에 바꿀 수 있음)
 - `js/main.js` — 스크롤 효과, Experience 상태 전환, 임시 로봇 일러스트
 - `css/intro.css`, `js/intro.js` — 맨 앞 인트로 (HI → I'm cove → Cove 렌더)

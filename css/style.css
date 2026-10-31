@@ -103,49 +103,6 @@ body::before {
 .nav__links a:hover { color: var(--ink); }
 .nav__links a:hover::after { transform: scaleX(1); }
 
-/* ---------- Hero ---------- */
-.hero {
-  position: relative; min-height: 100svh; overflow: hidden;
-  display: grid; grid-template-rows: auto 1fr; justify-items: center;
-  padding: 120px var(--gutter) 40px; text-align: center;
-  background:
-    radial-gradient(60% 50% at 50% 70%, rgba(255, 217, 184, .55), transparent 70%),
-    radial-gradient(45% 40% at 25% 30%, rgba(217, 205, 242, .55), transparent 70%),
-    radial-gradient(40% 40% at 80% 25%, rgba(232, 221, 207, .9), transparent 70%),
-    var(--bg);
-}
-.hero__glow {
-  position: absolute; width: 70vmin; height: 70vmin; left: 50%; top: 62%;
-  translate: calc(-50% + var(--mx, 0px)) calc(-50% + var(--my, 0px));
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 224, 196, .9), rgba(217, 205, 242, .45) 45%, transparent 70%);
-  filter: blur(40px);
-  animation: breathe 7s ease-in-out infinite;
-  pointer-events: none;
-}
-.hero__inner { position: relative; z-index: 2; }
-.hero__title {
-  font-family: "Jost", "Futura", var(--font-ui); font-weight: 400;   /* Futura 계열 로고체 (Jost) */
-  font-size: clamp(88px, min(18vw, 24svh), 220px); line-height: .85; letter-spacing: -.02em;
-  background: linear-gradient(180deg, #3a3442 20%, #8a7aa8 120%);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-  transition-delay: .1s;
-}
-.hero__tagline { font-family: var(--font-display); font-style: italic; font-size: clamp(22px, 2.6vw, 32px); margin-top: 16px; transition-delay: .2s; }
-.hero__sub { color: var(--ink-soft); font-size: 15px; margin-top: 8px; font-weight: 300; transition-delay: .3s; }
-.hero__visual {
-  position: relative; z-index: 1; align-self: end;
-  width: min(480px, 82vw, 48svh); aspect-ratio: 1; margin-top: 8px;
-}
-
-.scroll-cue {
-  position: absolute; bottom: 28px; left: var(--gutter); z-index: 3;
-  display: flex; align-items: center; gap: 12px;
-  font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft);
-}
-.scroll-cue i { width: 48px; height: 1px; background: var(--ink-faint); position: relative; overflow: hidden; }
-.scroll-cue i::after { content: ""; position: absolute; inset: 0; background: var(--ink); animation: slide 2.4s var(--ease) infinite; }
-
 /* ---------- Cove art (placeholder robot) ---------- */
 .cove-art { width: 100%; height: 100%; display: grid; place-items: center; }
 .cove-art svg { width: 100%; height: 100%; overflow: visible; }
@@ -355,7 +312,6 @@ body::before {
 @keyframes breathe { 0%, 100% { opacity: .85; scale: 1; } 50% { opacity: 1; scale: 1.06; } }
 @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.08); } }
 @keyframes listen { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
-@keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1024px) {
@@ -364,7 +320,6 @@ body::before {
 }
 @media (max-width: 760px) {
   .nav__links { display: none; }
-  .hero { padding-top: 110px; }
   .about__grid, .principles, .design__layout, .experience__inner { grid-template-columns: 1fr; }
   .principles li { padding: 24px 0; border-bottom: 1px solid var(--line); }
   .design__visual { position: relative; top: 0; }
