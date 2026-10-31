@@ -131,11 +131,11 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   function frame(now) {
     requestAnimationFrame(frame);
     const dt = Math.min(0.05, (now - prev) / 1000); prev = now;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const PR = Math.min(window.devicePixelRatio, 2); renderer.setPixelRatio(1);   // 카드 그림은 직접 PR배로 그리므로 렌더러는 1배로 (고해상도 화면에서 그림이 한쪽으로 쏠리던 문제)
     for (const c of cards) {
       if (!c.visible) continue;
       const w = c.slot.clientWidth, h = c.slot.clientHeight; if (!w || !h) continue;
-      if (w !== c.w || h !== c.h) { c.w = w; c.h = h; c.cv.width = Math.round(w * renderer.getPixelRatio()); c.cv.height = Math.round(h * renderer.getPixelRatio()); c.camera.aspect = w / h; c.camera.updateProjectionMatrix(); }
+      if (w !== c.w || h !== c.h) { c.w = w; c.h = h; c.cv.width = Math.round(w * PR); c.cv.height = Math.round(h * PR); c.camera.aspect = w / h; c.camera.updateProjectionMatrix(); }
       c.t += reduced ? 0 : dt;
       const { g, pose, eye } = goal(c);
       for (const k of ['az', 'el', 'zoom', 'tx', 'ty', 'tz']) c.cam[k] = reduced ? g[k] : smoothDamp(c.cam[k], g[k], c.cvel[k], k === 'zoom' ? 0.5 : 0.34, dt);

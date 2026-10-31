@@ -1,6 +1,7 @@
 /* ==========================================================
    Design — Engineering 카드: STEP 모델(COVE FINAL)로 만든 X-ray 분해 뷰
    · 투명한 몸체 위에 안쪽 부품의 윤곽선이 겹쳐 보이는 기술 도면 느낌이에요.
+   · 마우스 왼쪽 버튼을 누른 채 끌면 정면·측면·위에서 자유롭게 돌려 볼 수 있어요.
    · 카드 위에서 마우스를 좌우로 움직이면 분해 ↔ 조립이 부드럽게 이어져요.
      (왼쪽 = 분해, 오른쪽 = 조립. 모바일은 카드 위를 좌우로 쓸어 보세요.)
    · 마우스를 올리기 전에는 스크롤에 맞춰 조립돼요.
@@ -8,11 +9,11 @@
    ========================================================== */
 const root = document.getElementById('engineering');
 const LAYERS = ['head_top', 'head_inner', 'head_low', 'body_top', 'board', 'ring', 'body_frame', 'base'];   // 위 → 아래
-const SHELL = new Set(['head_top', 'head_low', 'body_top']);                                              // 겉 껍데기 층: 은은한 라벤더 빛을 입힘
+const SHELL = new Set(['head_top', 'head_low', 'body_top']);                                              // 겉 껍데기 층: 은은한 샌드 빛을 입힘
 if (root) {
   const cv = root.querySelector('canvas'), hint = root.querySelector('.eng__hint');
   const reduced = false, touch = window.matchMedia('(hover: none)').matches;
-  if (hint) hint.textContent = touch ? '카드를 좌우로 쓸어 보세요 · 왼쪽 분해 → 오른쪽 조립' : '마우스를 좌우로 움직여 보세요 · 왼쪽 분해 → 오른쪽 조립';
+  if (hint) hint.textContent = touch ? '한 손가락으로 끌어 돌려 보세요' : '끌어서 돌려 보세요 · 좌우로 움직이면 분해 ↔ 조립';
   let started = false;
   new IntersectionObserver(([e]) => { if (e.isIntersecting && !started) { started = true; init().catch(err => console.warn('Engineering view unavailable:', err)); } }, { rootMargin: '900px 0px' }).observe(root);
 
@@ -26,16 +27,16 @@ if (root) {
     const loader = new GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder);
     const model = (await loader.loadAsync('assets/eng/cove-eng.glb')).scene; scene.add(model);
 
-    // X-ray 재질: 몸체는 거의 투명, 가장자리(윤곽선)는 가는 먹색 선. 겉 껍데기는 테두리에 라벤더 빛이 번짐.
+    // X-ray 재질: 몸체는 거의 투명, 가장자리(윤곽선)는 가는 먹색 선. 겉 껍데기는 테두리에 은은한 샌드 빛이 번짐.
     const fillPlain = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.16, depthWrite: false, side: THREE.DoubleSide });
     const fillShell = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, side: THREE.DoubleSide,
-      uniforms: { c1: { value: new THREE.Color('#b8a6e0') }, c2: { value: new THREE.Color('#f6c9a8') } },
+      uniforms: { c1: { value: new THREE.Color('#c8b8a6') }, c2: { value: new THREE.Color('#f0dcc8') } },
       vertexShader: 'varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix * vec4(position,1.); vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }',
-      fragmentShader: 'uniform vec3 c1; uniform vec3 c2; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1. - abs(dot(normalize(vN), normalize(vV))), 1.6); vec3 col = mix(c2, c1, smoothstep(0., 1., f)); gl_FragColor = vec4(col, 0.10 + 0.62 * f); }',
+      fragmentShader: 'uniform vec3 c1; uniform vec3 c2; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1. - abs(dot(normalize(vN), normalize(vV))), 1.6); vec3 col = mix(c2, c1, smoothstep(0., 1., f)); gl_FragColor = vec4(col, 0.08 + 0.5 * f); }',
     });
     const lineMat = new THREE.LineBasicMaterial({ color: 0x2b2731, transparent: true, opacity: 0.5, depthWrite: false });
-    const lineShell = new THREE.LineBasicMaterial({ color: 0x4b3f78, transparent: true, opacity: 0.42, depthWrite: false });
+    const lineShell = new THREE.LineBasicMaterial({ color: 0x4a4038, transparent: true, opacity: 0.42, depthWrite: false });
     const layers = {}, meshes = [];
     model.traverse(o => { if (o.isMesh) meshes.push(o); });
     for (const o of meshes) {
@@ -53,7 +54,7 @@ if (root) {
     const box = new THREE.Box3().setFromObject(model), size = box.getSize(new THREE.Vector3());
     const camera = new THREE.PerspectiveCamera(26, 1, 0.01, 10);
 
-    let w = 0, h = 0, e = 1, eGoal = 1, yaw = -0.55, tiltEl = 0.2, dirty = true, visible = false, usingMouse = false, mx = 0.5, my = 0.5;
+    let w = 0, h = 0, e = 1, eGoal = 1, yaw = -0.55, tiltEl = 0.2, baseYaw = -0.55, baseEl = 0.2, drag = null, dirty = true, visible = false, usingMouse = false, mx = 0.5, my = 0.5;
     function fit() {
       w = cv.clientWidth; h = cv.clientHeight; if (!w || !h) return;
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); dirty = true;
@@ -68,8 +69,14 @@ if (root) {
       const r = root.getBoundingClientRect(); mx = clamp((ev.clientX - r.left) / r.width, 0, 1); my = clamp((ev.clientY - r.top) / r.height, 0, 1);
       usingMouse = true; dirty = true;
     };
-    root.addEventListener('pointermove', onMove); root.addEventListener('pointerdown', onMove);
-    root.style.touchAction = 'pan-y';
+    root.addEventListener('pointermove', (ev) => {
+      if (drag) { baseYaw = drag.yaw + (ev.clientX - drag.x) * 0.009; baseEl = clamp(drag.el + (ev.clientY - drag.y) * 0.006, -0.25, 1.35); dirty = true; return; }   // 끄는 동안: 돌려 보기
+      onMove(ev);
+    });
+    root.addEventListener('pointerdown', (ev) => { if (ev.button > 0) return; drag = { x: ev.clientX, y: ev.clientY, yaw: baseYaw, el: baseEl }; root.classList.add('is-grab'); try { root.setPointerCapture(ev.pointerId); } catch {} });
+    const endDrag = () => { drag = null; root.classList.remove('is-grab'); };
+    root.addEventListener('pointerup', endDrag); root.addEventListener('pointercancel', endDrag);
+    root.style.touchAction = 'pan-y'; root.style.cursor = 'grab';
 
     function place(v) { for (const k of order) for (const m of layers[k]) m.position.y = m.userData.y0 + v * rank(k) * GAP; }
     function camPlace(v) {
@@ -88,7 +95,7 @@ if (root) {
       eGoal = reduced ? 0 : usingMouse ? smooth(1 - mx) : smooth(scrollGoal());
       const ne = e + (eGoal - e) * Math.min(1, dt * 5);                       // 천천히 흐르듯 따라감
       if (Math.abs(ne - e) > 0.0004) { e = ne; dirty = true; }
-      const yawGoal = -0.55 + (mx - 0.5) * 0.5, elGoal = 0.2 + (0.5 - my) * 0.25;   // 마우스에 따라 살짝 돌아보는 시차
+      const yawGoal = baseYaw, elGoal = baseEl;
       const ny = yaw + (yawGoal - yaw) * Math.min(1, dt * 4), nel = tiltEl + (elGoal - tiltEl) * Math.min(1, dt * 4);
       if (Math.abs(ny - yaw) > 0.0004 || Math.abs(nel - tiltEl) > 0.0004) { yaw = ny; tiltEl = nel; dirty = true; }
       if (dirty) { dirty = false; place(e); camPlace(e); renderer.render(scene, camera); }
