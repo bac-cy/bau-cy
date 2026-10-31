@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cove — Desktop Home Robot</title>
+  <meta name="description" content="책상 위, 가장 가까운 거리에서 함께하는 작은 존재. 데스크탑 홈 로봇 Cove.">
+  <meta name="theme-color" content="#f6f1ea">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ───────────── Navigation ───────────── -->
+  <header class="nav" id="nav">
+    <a href="#top" class="nav__logo" aria-label="Cove 홈">Cove</a>
+    <nav class="nav__links" aria-label="주요 메뉴">
+      <a href="#about">About</a>
+      <a href="#features">Features</a>
+      <a href="#design">Design</a>
+      <a href="#experience">Experience</a>
+      <a href="#gallery">Gallery</a>
+    </nav>
+  </header>
+
+  <main id="top">
+
+    <!-- ───────────── 1. Hero ───────────── -->
+    <section class="hero">
+      <div class="hero__glow" aria-hidden="true"></div>
+      <div class="hero__inner">
+        <p class="eyebrow reveal">Desktop Home Robot</p>
+        <h1 class="hero__title reveal">Cove</h1>
+        <p class="hero__tagline reveal">A small light that stays close.</p>
+        <p class="hero__sub reveal">책상 위, 가장 가까운 거리에서 함께하는 작은 존재.</p>
+      </div>
+
+      <!-- 메인 렌더 자리: 렌더가 준비되면 아래 div를
+           <img src="assets/hero.png" alt="Cove 정면 렌더"> 로 바꾸면 됩니다. -->
+      <figure class="hero__visual">
+        <div class="cove-art cove-art--float" data-cove></div>
+      </figure>
+
+      <a href="#about" class="scroll-cue" aria-label="아래로 스크롤">
+        <span>Scroll</span><i></i>
+      </a>
+    </section>
+
+    <!-- ───────────── 2. About ───────────── -->
+    <section class="about section" id="about">
+      <p class="label reveal">01 — About Cove</p>
+      <h2 class="statement reveal">
+        Cove는 화면 속이 아니라,<br>
+        <em class="ko">당신의 책상 위</em>에 머무는 로봇입니다.
+      </h2>
+
+      <div class="about__grid">
+        <div class="about__text reveal">
+          <h3>Concept</h3>
+          <p>Cove라는 이름은 바다가 육지를 부드럽게 감싸 안은 작은 만(cove)에서 왔습니다. 바쁜 하루 속에서도 잠시 머물러 숨을 고를 수 있는, 책상 위의 작은 안식처가 되고자 합니다.</p>
+        </div>
+        <div class="about__text reveal">
+          <h3>Philosophy</h3>
+          <p>기술을 앞세우기보다 곁에 있다는 느낌을 먼저 생각합니다. Cove는 많은 말 대신 빛과 작은 움직임으로 대화하며, 필요할 때만 조용히 다가옵니다.</p>
+        </div>
+      </div>
+
+      <ul class="principles">
+        <li class="reveal"><span>Close</span>가까이, 손이 닿는 거리에서</li>
+        <li class="reveal"><span>Calm</span>조용하게, 방해하지 않도록</li>
+        <li class="reveal"><span>Warm</span>따뜻하게, 빛으로 반응하며</li>
+      </ul>
+    </section>
+
+    <!-- ───────────── 3. Key Features ─────────────
+         기능을 바꿀 때는 <article class="feature"> 블록 하나를 통째로
+         복사/수정/삭제하면 됩니다. 아이콘 숫자(01~04)는 자유롭게 바꿔도 됩니다. -->
+    <section class="features section" id="features">
+      <div class="section__head">
+        <p class="label reveal">02 — Key Features</p>
+        <h2 class="heading reveal">작은 몸에 담긴<br><em class="ko">조용한 기술</em></h2>
+      </div>
+
+      <div class="features__grid">
+        <article class="feature reveal">
+          <span class="feature__num">01</span>
+          <h3>Ambient Presence</h3>
+          <p>은은하게 번지는 빛으로 시간과 상태를 알려줍니다. 화면을 보지 않아도 Cove의 빛만으로 지금을 느낄 수 있습니다.</p>
+        </article>
+        <article class="feature reveal">
+          <span class="feature__num">02</span>
+          <h3>Gentle Expression</h3>
+          <p>얼굴 디스플레이 속 두 눈이 깜빡이고, 기울고, 웃습니다. 작은 표정 변화로 감정을 전합니다.</p>
+        </article>
+        <article class="feature reveal">
+          <span class="feature__num">03</span>
+          <h3>Voice &amp; Touch</h3>
+          <p>말을 걸거나 손끝으로 살짝 터치하면 반응합니다. 가장 자연스러운 방식으로 대화가 시작됩니다.</p>
+        </article>
+        <article class="feature reveal">
+          <span class="feature__num">04</span>
+          <h3>Desk Rhythm</h3>
+          <p>집중할 때는 조용히, 쉬어야 할 때는 부드럽게. 하루의 리듬에 맞춰 함께 움직입니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ───────────── 4. Design / Detail ───────────── -->
+    <section class="design section" id="design">
+      <div class="section__head">
+        <p class="label reveal">03 — Design &amp; Detail</p>
+        <h2 class="heading reveal">손바닥 위의<br><em class="ko">부드러운 미래</em></h2>
+      </div>
+
+      <div class="design__layout">
+        <!-- 큰 제품 이미지 (스크롤 시 고정) -->
+        <figure class="design__visual">
+          <div class="cove-art" data-cove></div>
+          <figcaption>Render — 3/4 View</figcaption>
+        </figure>
+
+        <div class="design__details">
+          <article class="detail reveal">
+            <figure class="slot slot--detail" data-label="Detail 01 — Form">
+              <div class="cove-art cove-art--crop-top" data-cove></div>
+            </figure>
+            <h3>Form</h3>
+            <p>모서리 없이 이어지는 곡면. 어느 각도에서 보아도 부드럽게 흐르도록, 조약돌에서 영감을 받은 실루엣입니다.</p>
+          </article>
+          <article class="detail reveal">
+            <figure class="slot slot--detail" data-label="Detail 02 — Material">
+              <div class="cove-art cove-art--crop-face" data-cove></div>
+            </figure>
+            <h3>Material</h3>
+            <p>빛을 머금는 매트 세라믹 화이트 바디와 실버 링. 손에 닿는 감촉까지 차분하게 설계했습니다.</p>
+          </article>
+          <article class="detail reveal">
+            <figure class="slot slot--detail" data-label="Detail 03 — Light">
+              <div class="cove-art cove-art--crop-base" data-cove></div>
+            </figure>
+            <h3>Light</h3>
+            <p>바디 아래로 번지는 앰비언트 라이트가 책상 위에 작은 빛의 웅덩이를 만듭니다.</p>
+          </article>
+        </div>
+      </div>
+
+      <!-- 스펙 수치는 확정되면 바꿔 주세요 -->
+      <dl class="specs reveal">
+        <div><dt>Height</dt><dd>— mm</dd></div>
+        <div><dt>Width</dt><dd>— mm</dd></div>
+        <div><dt>Weight</dt><dd>— g</dd></div>
+        <div><dt>Finish</dt><dd>Ceramic White</dd></div>
+      </dl>
+    </section>
+
+    <!-- ───────────── 5. Experience / Interaction ───────────── -->
+    <section class="experience" id="experience" data-mood="wake">
+      <div class="experience__glow" aria-hidden="true"></div>
+      <div class="experience__inner section">
+        <div class="experience__copy">
+          <p class="label reveal">04 — Experience</p>
+          <h2 class="heading reveal">Cove는<br><em class="ko">빛으로 말합니다</em></h2>
+          <p class="experience__intro reveal">상태에 따라 눈과 빛이 달라집니다. 아래 버튼을 눌러 Cove의 하루를 느껴보세요.</p>
+
+          <div class="moods reveal" role="tablist" aria-label="Cove 상태">
+            <button role="tab" aria-selected="true"  data-mood="wake">Wake</button>
+            <button role="tab" aria-selected="false" data-mood="listen">Listen</button>
+            <button role="tab" aria-selected="false" data-mood="focus">Focus</button>
+            <button role="tab" aria-selected="false" data-mood="rest">Rest</button>
+          </div>
+
+          <div class="mood-text" aria-live="polite">
+            <h3 id="mood-title">Good morning</h3>
+            <p id="mood-desc">아침이 오면 천천히 눈을 뜨고, 따뜻한 빛으로 하루의 시작을 알립니다.</p>
+          </div>
+        </div>
+
+        <figure class="experience__visual">
+          <div class="cove-art cove-art--float" data-cove></div>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ───────────── 6. Gallery / Media ─────────────
+         각 <figure class="slot"> 안의 div를 <img> 또는 <video>로 바꾸면 됩니다.
+         예) <img src="assets/render-01.jpg" alt="Cove 측면 렌더">
+             <video src="assets/turntable.mp4" autoplay muted loop playsinline></video> -->
+    <section class="gallery section" id="gallery">
+      <div class="section__head">
+        <p class="label reveal">05 — Gallery</p>
+        <h2 class="heading reveal">모든 각도의<br><em>Cove</em></h2>
+      </div>
+
+      <div class="gallery__grid">
+        <figure class="slot slot--wide reveal" data-label="Video — 360° Turntable">
+          <div class="cove-art" data-cove></div>
+          <span class="slot__play" aria-hidden="true"></span>
+        </figure>
+        <figure class="slot reveal" data-label="Render 01 — Front">
+          <div class="cove-art" data-cove></div>
+        </figure>
+        <figure class="slot slot--tall reveal" data-label="Render 02 — Side">
+          <div class="cove-art cove-art--side" data-cove></div>
+        </figure>
+        <figure class="slot reveal" data-label="Render 03 — Face Detail">
+          <div class="cove-art cove-art--crop-face" data-cove></div>
+        </figure>
+        <figure class="slot reveal" data-label="Model — Wireframe">
+          <div class="cove-art cove-art--wire" data-cove></div>
+        </figure>
+        <figure class="slot slot--wide reveal" data-label="Render 04 — Night Glow">
+          <div class="cove-art cove-art--night" data-cove></div>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ───────────── Closing ───────────── -->
+    <section class="closing section">
+      <div class="closing__glow" aria-hidden="true"></div>
+      <p class="label reveal">Coming soon</p>
+      <h2 class="closing__title reveal">A quiet light,<br><em>right beside you.</em></h2>
+    </section>
+  </main>
+
+  <!-- ───────────── 7. Footer ───────────── -->
+  <footer class="footer">
+    <div class="footer__brand">
+      <span class="footer__logo">Cove</span>
+      <p>Desktop Home Robot Project</p>
+    </div>
+    <nav class="footer__links" aria-label="하단 메뉴">
+      <a href="#about">About</a>
+      <a href="#features">Features</a>
+      <a href="#design">Design</a>
+      <a href="#gallery">Gallery</a>
+    </nav>
+    <p class="footer__copy">© 2026 Cove Project. All rights reserved.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
