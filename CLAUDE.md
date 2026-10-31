@@ -40,5 +40,5 @@
 - **레이아웃·비율**: 좌우 여백 `clamp(16px, 5vw, 72px)`, 섹션 위아래 여백 `clamp(96px, 14vw, 180px)`, 모서리 둥글기 28px, Design 대표 이미지 4:5, 디테일 컷 16:10, 갤러리 3열 그리드.
 - **Hero 섹션은 삭제됨**: 인트로의 큰 COVE 글자 + Cove 렌더 장면이 그 자리를 대신함(사용자 요청).
 - **반응형 기준**: 1024px 이하 기능 카드 2열, 760px 이하 1열 구성과 메뉴 숨김, 520px 이하 기능 카드 1열.
-- **섹션 순서**: 인트로(HI → I'm cove → 큰 COVE 글자 + Cove 렌더, 스크롤로 이어짐) → About → Key Features → Design & Detail → Experience(Wake/Listen/Focus/Rest) → Gallery → Closing → Footer.
+- **섹션 순서**: 인트로(HI → I'm cove → 큰 COVE 글자 + Cove 렌더, 스크롤로 이어짐) → About → Key Features → Design & Detail → Experience(Wake/Listen/Focus/Rest) → Gallery → 아웃트로(엔딩 크레딧, 명단은 js/credits.js) → Footer.
 - **스크롤·움직임**: 부드러운 스크롤, 스크롤 시 서서히 나타나는 효과, 로봇이 떠 있는 움직임과 눈 깜빡임, 인트로 I'm cove 장면의 그라디언트가 마우스를 따라감, 스크롤 위치에 맞는 상단 메뉴 항목이 보라색(#5b43a6)+굵은 밑줄로 강조됨, 좌측 하단 페이지 표시는 메뉴가 숨겨지는 모바일(760px 이하)에서만 보임, Design 대표 이미지 화면 고정(sticky), 스크롤하면 메뉴 배경이 반투명해짐, 움직임 줄이기 설정 존중.

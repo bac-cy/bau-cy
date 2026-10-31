@@ -1,0 +1,65 @@
+/* ==========================================================
+   Cove — Outro (엔딩 크레딧)
+   어두운 보랏빛 노을 배경 위로 크레딧이 자동으로 천천히 올라가고,
+   끝나면 마지막 문구가 남습니다.
+   ========================================================== */
+.closing.outro {
+  --outro-ink: #f3eef7;
+  --outro-soft: #b8afc4;
+  position: relative; min-height: 100svh; padding: 0; overflow: hidden;
+  text-align: center; color: var(--outro-ink);
+  background:
+    radial-gradient(70% 45% at 50% 100%, rgba(246, 201, 168, .26), transparent 70%),
+    radial-gradient(60% 40% at 50% 0%, rgba(184, 166, 224, .22), transparent 70%),
+    linear-gradient(180deg, var(--bg) 0, var(--dusk) 12%, #221d2b 55%, var(--dusk) 88%, var(--bg) 100%);
+}
+.closing.outro .closing__glow {
+  top: 62%; width: 90vmin; height: 60vmin;
+  background: radial-gradient(closest-side, rgba(255, 217, 184, .30), rgba(184, 166, 224, .18) 60%, transparent);
+}
+
+/* 크레딧이 지나가는 창: 위아래로 서서히 사라짐 */
+.outro__window {
+  position: absolute; inset: 0; overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 82%, transparent 100%);
+          mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 82%, transparent 100%);
+}
+.outro__roll {
+  position: absolute; left: 0; right: 0; top: 0; padding: 0 var(--gutter);
+  transform: translateY(100vh); will-change: transform;
+}
+
+.outro__logo { display: block; margin: 0 auto; height: clamp(44px, 6.5vw, 76px); width: auto; filter: invert(1) brightness(1.15); }
+.outro__project, .outro__role, .outro__made, .outro__uni {
+  font-size: 12px; letter-spacing: .28em; text-transform: uppercase; color: var(--outro-soft); font-weight: 400;
+}
+.outro__project { margin-top: 22px; }
+
+.outro__group { margin-top: clamp(64px, 11vh, 110px); }
+.outro__role { margin-bottom: 18px; }
+.outro__name {
+  font-family: "Jost", "Noto Sans KR", system-ui, sans-serif; font-weight: 300;
+  font-size: clamp(22px, 2.4vw, 32px); letter-spacing: .06em; line-height: 1.9; color: var(--outro-ink);
+}
+
+.outro__lab { margin-top: clamp(96px, 16vh, 170px); }
+.outro__labname {
+  font-family: "Jost", system-ui, sans-serif; font-weight: 200; letter-spacing: .14em; line-height: 1.1;
+  font-size: clamp(44px, 7.5vw, 104px); margin: 14px 0 12px; color: var(--outro-ink);
+}
+.outro__ko { margin-top: 14px; font-size: 15px; letter-spacing: .12em; color: var(--outro-soft); font-weight: 300; }
+
+/* 크레딧이 끝난 뒤 남는 마지막 문구 */
+.outro__end {
+  position: absolute; inset: 0; display: grid; place-items: center; padding: 0 var(--gutter);
+  opacity: 0; pointer-events: none; transition: opacity 1.8s ease;
+}
+.closing.outro.is-ended .outro__end { opacity: 1; }
+.closing.outro .closing__title { color: var(--outro-ink); }
+.closing.outro .closing__title em { color: #d9cdf2; }
+
+/* 움직임 줄이기 설정: 크레딧을 흐르게 하지 않고 한 화면에 그대로 보여줌 */
+.closing.outro.is-static { padding: clamp(120px, 18vh, 200px) 0 clamp(96px, 14vh, 160px); min-height: 0; }
+.closing.outro.is-static .outro__window { position: static; -webkit-mask-image: none; mask-image: none; overflow: visible; }
+.closing.outro.is-static .outro__roll { position: static; transform: none; }
+.closing.outro.is-static .outro__end { position: static; opacity: 1; margin-top: clamp(96px, 16vh, 170px); display: block; }

@@ -124,7 +124,7 @@ const PAGES = [
   { sel: '#design',      num: '03', name: 'Design' },
   { sel: '#experience',  num: '04', name: 'Experience' },
   { sel: '#gallery',     num: '05', name: 'Gallery' },
-  { sel: '.closing',     num: '',   name: 'Coming soon' },
+  { sel: '.closing',     num: '',   name: 'Credits' },
 ].map(p => ({ ...p, el: document.querySelector(p.sel) })).filter(p => p.el);
 
 const pager = document.getElementById('pager');
@@ -140,7 +140,7 @@ function updatePager() {
   const cur = PAGES[idx];
   const show = Boolean(cur.name);
   pager.classList.toggle('is-visible', show);
-  pager.classList.toggle('is-dark', cur.sel === '#experience');
+  pager.classList.toggle('is-dark', cur.sel === '#experience' || cur.sel === '.closing');
   if (idx !== pagerIndex && show) {
     const first = pagerIndex === -1 || !pager.classList.contains('is-visible');
     pager.classList.add('is-swapping');
