@@ -91,7 +91,9 @@ body::before {
   padding-block: 14px;
   box-shadow: 0 1px 0 var(--line);
 }
-.nav__logo { font-family: var(--font-display); font-size: 28px; letter-spacing: .02em; }
+/* 로고: Cove.ai 의 COVE 글자. 칸(너비 자동·높이 47.6px)과 위치는 기존과 같고, 글자 높이만 이전 로고의 대문자 높이에 맞춤 */
+.nav__logo { display: flex; align-items: center; height: calc(28px * 1.7); }
+.nav__logo svg { display: block; height: 20px; width: auto; }
 .nav__links { display: flex; gap: clamp(16px, 3vw, 40px); font-size: 13px; letter-spacing: .06em; color: var(--ink-soft); }
 .nav__links a { position: relative; transition: color .3s; }
 .nav__links a::after {
