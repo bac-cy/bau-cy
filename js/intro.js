@@ -28,9 +28,9 @@
       else { setTimeout(() => caret.classList.add('is-done'), 900); onDone && onDone(); }
     })();
   }
-  let hiStarted = false, imStarted = false, imDone = false;
+  const IM_TEXT = lineIm.dataset.type, imOut = lineIm.querySelector('.intro__typed'), imCaret = lineIm.querySelector('.intro__caret');
+  let hiStarted = false, imShown = -1;
   const startHi = () => { if (hiStarted) return; hiStarted = true; setTimeout(() => typeInto(lineHi, 220), 500); };
-  const startIm = () => { if (imStarted) return; imStarted = true; typeInto(lineIm, 110, () => { imDone = true; }); };
   // 글꼴이 준비된 뒤에 시작해야 깜빡임 없이 타이핑됩니다.
   (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(startHi);
   setTimeout(startHi, 1500);
@@ -60,8 +60,9 @@
   const STEP1 = 0.10;                              // 이만큼 스크롤하면 I'm cove 장면 완성 (약 1.5칸)
   // I'm cove → Cove 렌더 구간
   // 휠 1칸 ≈ 0.067 (HI → I'm cove 가 1.5칸 = 0.10). 구간 길이를 칸 수로 환산해 잡았습니다.
-  const OUT_START = 0.27, OUT_SPAN = 0.09;         // I'm cove 사라지기 (I'm cove 가 읽히는 구간을 이전의 약 2배로)
-  const RISE_START = 0.31, RISE_SPAN = 0.17;       // 큰 COVE 글자 + 렌더 올라오기
+  const TYPE_START = 0.08, TYPE_END = 0.22;       // 이 구간을 스크롤하는 동안 I'm cove 가 한 글자씩 입력됨
+  const OUT_START = 0.32, OUT_SPAN = 0.09;         // I'm cove 사라지기 (I'm cove 가 읽히는 구간을 이전의 약 2배로)
+  const RISE_START = 0.36, RISE_SPAN = 0.17;       // 큰 COVE 글자 + 렌더 올라오기
   const P1_TIME = 0.42;                            // HI → I'm cove 가 녹아들듯 넘어가는 시간(초) — 클수록 더 부드럽고 느긋
   const GLIDE_TIME = 0.2;                          // 스크롤을 따라오는 시간(초) — 작을수록 쫀쫀, 클수록 부드러움
 
@@ -91,10 +92,13 @@
     const out = clamp((ss - OUT_START) / OUT_SPAN);
     const b = smooth(clamp((ss - RISE_START) / RISE_SPAN));
 
-    if (p1 > 0.5) startIm();
-    if (ss >= RISE_START && imStarted && !imDone) {      // 타이핑이 끝나기 전에 넘어가면 바로 완성
-      lineIm.querySelector('.intro__typed').textContent = lineIm.dataset.type;
-      lineIm.querySelector('.intro__caret').classList.add('is-done'); imDone = true;
+    // I'm cove: 스크롤하는 만큼 한 글자씩 입력된다 (올리면 지워진다)
+    if (!reduced) {
+      const tp = smooth(clamp((ss - TYPE_START) / (TYPE_END - TYPE_START))), k = Math.round(tp * IM_TEXT.length);
+      if (k !== imShown) {
+        imShown = k; imOut.textContent = IM_TEXT.slice(0, k);
+        imCaret.classList.toggle('is-done', k === IM_TEXT.length);
+      }
     }
 
     // Scene 1
