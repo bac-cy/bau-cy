@@ -15,15 +15,19 @@
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // 명단 채우기
-  (window.COVE_CREDITS || []).forEach(g => {
-    const wrap = document.createElement('div'); wrap.className = 'outro__group';
-    const role = document.createElement('p'); role.className = 'outro__role'; role.textContent = g.role;
-    wrap.appendChild(role);
-    const list = document.createElement('div'); list.className = 'outro__names';
-    (g.names || []).forEach(n => { const p = document.createElement('p'); p.className = 'outro__name'; p.textContent = n; list.appendChild(p); });
-    wrap.appendChild(list);
+  const mk = (tag, cls, text) => { const e = document.createElement(tag); e.className = cls; if (text != null) e.textContent = text; return e; };
+  const namesEl = arr => { const l = mk('div', 'outro__names'); (arr || []).forEach(n => l.appendChild(mk('p', 'outro__name', n))); return l; };
+  const credits = window.COVE_CREDITS || [];
+  let total = 0;
+  credits.forEach(g => {
+    const wrap = mk('div', 'outro__group');
+    wrap.appendChild(mk('p', 'outro__role', g.role));
+    if (g.sub) g.sub.forEach(s => {
+      const sub = mk('div', 'outro__sub'); sub.appendChild(mk('p', 'outro__sublabel', s.label)); sub.appendChild(namesEl(s.names)); wrap.appendChild(sub); total += (s.names || []).length;
+    }); else { wrap.appendChild(namesEl(g.names)); total += (g.names || []).length; }
     slot.appendChild(wrap);
   });
+  if (total > 16) slot.classList.add('is-wide');   // 이름이 많으면 두 칸 배치
 
   if (reduced) { outro.classList.add('is-static', 'is-ended'); return; }
 

@@ -35,14 +35,17 @@
 }
 .outro__project { margin-top: 20px; }
 
-/* 역할별 묶음을 두 칸으로 나란히 — 한 화면에 많은 이름이 보이게 */
+/* 역할별 묶음: 기본은 가운데 한 줄 정렬, 이름이 많아지면(.is-wide) 두 칸으로 나란히 */
 .outro__groups {
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(36px, 6vh, 56px) clamp(32px, 6vw, 88px);
+  display: grid; grid-template-columns: 1fr; max-width: 640px;
+  gap: clamp(40px, 7vh, 64px);
   margin-top: clamp(56px, 9vh, 90px);
 }
-.outro__group:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.outro__groups.is-wide { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 1040px; gap: clamp(36px, 6vh, 56px) clamp(32px, 6vw, 88px); }
+.outro__groups.is-wide .outro__group:last-child:nth-child(odd) { grid-column: 1 / -1; }
 .outro__role { margin-bottom: 12px; }
+.outro__sub + .outro__sub { margin-top: 18px; }
+.outro__sublabel { font-size: 12px; letter-spacing: .12em; color: var(--ink-soft); font-weight: 300; margin-bottom: 2px; }
 .outro__names { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 22px; }
 .outro__name {
   font-family: "Jost", "Noto Sans KR", system-ui, sans-serif; font-weight: 300;
@@ -64,7 +67,7 @@
 .closing.outro.is-ended .outro__end { opacity: 1; }
 
 @media (max-width: 700px) {
-  .outro__groups { grid-template-columns: 1fr; }
+  .outro__groups.is-wide { grid-template-columns: 1fr; }
   .outro__name { font-size: 15px; }
 }
 
