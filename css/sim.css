@@ -79,27 +79,15 @@
 /* 사진 카드의 라벨은 왼쪽 위로: 몸통·바닥판 위에 겹치지 않도록 */
 .slot--photo::after { top: 14px; bottom: auto; left: 20px; }
 
-/* ───── Design — Engineering (분해 이미지) ───── */
-.eng { position: relative; height: 260svh; margin-top: clamp(80px, 10vw, 140px); }
-.eng__stage { position: sticky; top: 76px; height: calc(100svh - 96px); display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(28px, 5vw, 80px); align-items: center; }
-.eng__copy h3 { font-family: "Jost", "Futura", system-ui, sans-serif; font-style: normal; font-weight: 400; font-size: clamp(32px, 3.4vw, 44px); letter-spacing: .01em; margin: 0; }
-.eng__copy p { color: var(--ink-soft); font-weight: 300; max-width: 26em; margin-top: 10px; }
-.eng__copy .eng__hint { font-size: 13px; letter-spacing: .06em; color: var(--ink-faint); margin-top: 28px; opacity: 0; transition: opacity .6s var(--ease); }
-.eng.is-open .eng__hint { opacity: 1; }
-.eng__view { position: relative; height: 100%; display: grid; place-items: center; border-radius: var(--radius);
-  background: radial-gradient(60% 55% at 50% 60%, rgba(255, 224, 196, .7), transparent 70%), radial-gradient(50% 45% at 25% 20%, rgba(217, 205, 242, .65), transparent 70%), var(--cream); }
-.eng__view canvas { height: 94%; aspect-ratio: 2 / 3; width: auto; max-width: 96%; display: block; cursor: default; }
-.eng.is-open .eng__view canvas { cursor: pointer; }
-.eng__tip { position: absolute; z-index: 3; width: min(280px, 70%); padding: 12px 14px; border-radius: 16px; pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity .2s var(--ease), transform .2s var(--ease);
-  background: rgba(251, 248, 244, .86); box-shadow: 0 0 0 1px var(--line), 0 14px 40px -18px rgba(80, 60, 100, .35); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+/* ───── Design — Engineering 카드 (Form · Material · Motion 과 같은 칸) ───── */
+.slot--eng { aspect-ratio: 5 / 6; }
+.slot--eng > canvas { position: absolute; left: 50%; top: 47%; height: 84%; aspect-ratio: 2 / 3; width: auto; transform: translate(-50%, -50%); display: block; cursor: default; }
+.slot--eng.is-open > canvas { cursor: pointer; }
+.eng__hint { position: absolute; left: 0; right: 0; bottom: 14px; z-index: 2; text-align: center; font-size: 12px; letter-spacing: .06em; color: var(--ink-soft); opacity: 0; transition: opacity .6s var(--ease); pointer-events: none; }
+.slot--eng.is-open .eng__hint { opacity: 1; }
+.eng__tip { position: absolute; z-index: 3; width: min(250px, 78%); padding: 12px 14px; border-radius: 16px; pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity .2s var(--ease), transform .2s var(--ease);
+  background: rgba(251, 248, 244, .9); box-shadow: 0 0 0 1px var(--line), 0 14px 40px -18px rgba(80, 60, 100, .35); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
 .eng__tip.is-on { opacity: 1; transform: none; }
 .eng__tip b { display: block; font-weight: 600; font-size: 14px; }
 .eng__tip i { display: block; font-style: normal; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); margin: 1px 0 6px; }
 .eng__tip span { display: block; font-size: 12.5px; line-height: 1.55; color: var(--ink-soft); }
-@media (max-width: 760px) {
-  .eng { height: 240svh; }
-  .eng__stage { grid-template-columns: 1fr; grid-template-rows: auto 1fr; gap: 16px; align-items: start; top: 64px; height: calc(100svh - 80px); }
-  .eng__copy p { max-width: none; }
-  .eng__copy .eng__hint { margin-top: 10px; }
-}
-@media (prefers-reduced-motion: reduce) { .eng { height: auto; } .eng__stage { position: relative; top: 0; height: 80svh; } }

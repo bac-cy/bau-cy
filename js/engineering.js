@@ -8,6 +8,7 @@ const root = document.getElementById('engineering');
 if (root) {
   const cv = root.querySelector('canvas'), ctx = cv.getContext('2d');
   const tip = root.querySelector('.eng__tip');
+  const view = root;                                              // 카드의 이미지 칸
   const hint = root.querySelector('.eng__hint');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const touch = window.matchMedia('(hover: none)').matches;
@@ -35,9 +36,9 @@ if (root) {
   new ResizeObserver(fit).observe(cv);
 
   let dirty = true;
-  function progress() {
-    const r = root.getBoundingClientRect(), total = r.height - window.innerHeight;
-    return total > 0 ? clamp(-r.top / total, 0, 1) : 1;
+  function progress() {                                             // 카드가 화면 아래에서 올라와 가운데쯤 오는 동안 펼쳐진다
+    const r = root.getBoundingClientRect(), vh = window.innerHeight, c = r.top + r.height / 2;
+    return clamp((vh * 0.88 - c) / (vh * 0.42), 0, 1);
   }
   function draw() {
     if (!data) return;
@@ -61,7 +62,7 @@ if (root) {
     if (!name) { tip.classList.remove('is-on'); return; }
     const n = data.names[name];
     tip.innerHTML = `<b></b><i></i><span></span>`; tip.children[0].textContent = name + (n.count > 1 ? ` ×${n.count}` : ''); tip.children[1].textContent = n.en; tip.children[2].textContent = n.desc;
-    const rr = cv.getBoundingClientRect(), br = root.querySelector('.eng__view').getBoundingClientRect();
+    const rr = cv.getBoundingClientRect(), br = view.getBoundingClientRect();
     let left = rr.left - br.left + px, top = rr.top - br.top + py;
     tip.classList.add('is-on');
     const tw = tip.offsetWidth, th = tip.offsetHeight;
@@ -79,7 +80,7 @@ if (root) {
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     const r = root.getBoundingClientRect(); if (r.bottom < -100 || r.top > window.innerHeight + 100) return;
     const p = reduced ? 1 : progress();
-    goal = smooth(clamp((p - 0.04) / 0.72, 0, 1)) * ((data ? data.n : 60) - 1);
+    goal = smooth(clamp(p, 0, 1)) * ((data ? data.n : 60) - 1);
     const nf = frame + (goal - frame) * Math.min(1, dt * 9);
     if (Math.abs(nf - frame) > 0.01) { frame = nf; dirty = true; } else if (frame !== goal) { frame = goal; dirty = true; }
     if (Math.round(frame) < 40 && hoverName) show(null);
