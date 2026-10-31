@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/intro.css">
   <link rel="stylesheet" href="css/outro.css">
+  <link rel="stylesheet" href="css/sim.css">
 </head>
 <body>
 
@@ -120,8 +121,27 @@
         <!-- 큰 제품 이미지 (스크롤 시 고정) -->
         <figure class="design__visual">
           <div class="cove-art" data-cove></div>
-          <!-- 돌려볼 수 있는 3D 모델 (불러오지 못하면 위의 임시 이미지가 그대로 보임) -->
-          <div class="cove-3d" data-model="assets/cove.glb" data-az="35" data-el="14"></div>
+          <!-- 움직여 볼 수 있는 Cove 시뮬레이터 (불러오지 못하면 위의 임시 이미지가 그대로 보임) -->
+          <div class="cove-3d" data-model="assets/cove-rig.glb"></div>
+          <div class="sim__ui" hidden>
+            <div class="sim__views" role="group" aria-label="보는 각도">
+              <button type="button" data-view="top" aria-pressed="false">Top</button>
+              <button type="button" data-view="front" aria-pressed="false">Front</button>
+              <button type="button" data-view="persp" aria-pressed="true">Perspective</button>
+              <button type="button" data-view="side" aria-pressed="false">Side</button>
+            </div>
+            <div class="sim__bottom">
+              <p class="sim__status" aria-live="polite"></p>
+              <div class="sim__motions" role="group" aria-label="동작">
+                <button type="button" data-motion="greet" aria-pressed="false">인사</button>
+                <button type="button" data-motion="pet" aria-pressed="false">쓰다듬음</button>
+                <button type="button" data-motion="tickle" aria-pressed="false">간지럼</button>
+                <button type="button" data-motion="snack" aria-pressed="false">간식</button>
+                <button type="button" class="sim__ghost" data-act="toggle">앉기</button>
+                <button type="button" class="sim__ghost" data-act="reset">처음으로</button>
+              </div>
+            </div>
+          </div>
           <figcaption>Render — 3/4 View</figcaption>
         </figure>
 
@@ -272,6 +292,6 @@
         "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
     } }
   </script>
-  <script type="module" src="js/viewer.js"></script>
+  <script type="module" src="js/sim.js"></script>
 </body>
 </html>

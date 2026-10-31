@@ -1,0 +1,36 @@
+/* ==========================================================
+   Cove 시뮬레이터 (Design 섹션) — 보기 각도 · 동작 버튼 · 안내
+   ========================================================== */
+.design__visual .sim__ui { position: absolute; inset: 0; z-index: 3; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 16px 16px 40px; }
+.design__visual .sim__ui[hidden] { display: none; }
+.sim__ui button, .sim__ui .sim__status { pointer-events: auto; }
+
+.sim__views, .sim__motions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.sim__ui button {
+  font: inherit; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft);
+  padding: 7px 12px; border-radius: 999px; cursor: pointer;
+  background: rgba(251, 248, 244, .62); box-shadow: 0 0 0 1px var(--line);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  transition: background .3s var(--ease), color .3s var(--ease), box-shadow .3s var(--ease);
+}
+.sim__ui button:hover { color: var(--ink); box-shadow: 0 0 0 1px rgba(43, 39, 49, .28); }
+.sim__ui button[aria-pressed="true"] { background: var(--ink); color: var(--bg); box-shadow: none; }
+.sim__ui button:focus-visible { outline: 2px solid var(--lavender); outline-offset: 2px; }
+.sim__motions button { letter-spacing: .04em; text-transform: none; font-size: 12.5px; padding: 8px 14px; }
+.sim__ghost { background: transparent !important; backdrop-filter: none !important; }
+.sim__bottom { display: grid; gap: 12px; justify-items: center; }
+.sim__status { margin: 0; min-height: 1.4em; font-size: 12.5px; letter-spacing: .02em; color: var(--ink-soft); text-align: center; transition: color .3s; }
+.sim__status[data-k="play"] { color: #5b43a6; }
+
+/* 캔버스는 시뮬레이터가 있을 때 화면을 더 넓게 사용 */
+.design__visual.has-3d .cove-3d { inset: 8% 4% 14%; }
+.design__visual.has-3d figcaption { left: 20px; bottom: 14px; }
+@media (max-width: 760px) {
+  .sim__motions button { padding: 7px 11px; font-size: 12px; }
+  .design__visual.has-3d .cove-3d { inset: 11% 2% 20%; }
+}
+
+/* 화면 높이가 낮은 노트북에서도 아래 동작 버튼이 보이도록, 고정되는 칸의 높이를 화면 안으로 제한 */
+@media (min-width: 761px) {
+  .design__visual { max-height: calc(100svh - 124px); min-height: 520px; }
+}
