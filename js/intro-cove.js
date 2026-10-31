@@ -1,4 +1,5 @@
 import { printedMaterial, layerUV } from './print-material.js';
+import { fabricFor, FABRIC_NAMES } from './fabric-material.js';
 /* ==========================================================
    인트로의 Cove — 마우스를 따라 일어나서 바라봐요
    · 처음에는 조약돌처럼 겹쳐 있고, 마우스를 움직이면 일어나요.
@@ -47,7 +48,7 @@ async function init() {
   const by = {}, matrices = [], shells = [];
   model.traverse(o => {
     by[o.name] = o; if (!o.isMesh) return;
-    if (BODY.includes(o.name)) o.material = white; else if (ALU.includes(o.name)) { o.material = aluminum; layerUV(THREE, o); }
+    if (FABRIC_NAMES.includes(o.name)) o.material = fabricFor(THREE, o.name); else if (BODY.includes(o.name)) o.material = white; else if (ALU.includes(o.name)) { o.material = aluminum; layerUV(THREE, o); }
     if (/KeyStudio-HT16K33-8x8-LED-Matrix/.test(o.name)) { matrices.push(o); o.visible = false; }
     if (['새_헤드_상판', '새_쿠션', '새_헤드_하부판'].includes(o.name)) shells.push(o);
   });

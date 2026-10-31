@@ -442,3 +442,9 @@ em.ko { font-family: var(--font-ui); font-style: normal; font-weight: 400; font-
 }
 .footer__links { margin-right: calc(-1 * clamp(32px, 6vw, 96px)); }
 @media (max-width: 900px) { .footer__links { margin-right: 0; } }
+
+/* About 하단 Close · Calm · Kind 아래 렌더 이미지 (투명 배경 → 카드 배경이 비침) */
+.principles__img { position: relative; margin: 28px 0 0; aspect-ratio: 4 / 5; overflow: hidden; }
+.principles__img::after { content: none; }
+.principles__img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+@media (max-width: 760px) { .principles__img { aspect-ratio: 16 / 11; } }

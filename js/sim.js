@@ -1,4 +1,5 @@
 import { printedMaterial, layerUV } from './print-material.js';
+import { fabricFor } from './fabric-material.js';
 /* ==========================================================
    Cove 시뮬레이터 — Design 섹션
    · 머리·몸통을 끌거나 눌러서 자세를 바꿀 수 있어요.
@@ -74,7 +75,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   const matrices = [], shells = [], pickables = [];
   model.traverse(o => {
     if (!o.isMesh) return;
-    if (FABRIC.includes(o.name)) o.material = fabric; else if (PIPING.includes(o.name)) o.material = piping;
+    if (FABRIC.includes(o.name)) o.material = fabricFor(THREE, o.name); else if (PIPING.includes(o.name)) o.material = piping;
     else if (ALU.includes(o.name)) { o.material = aluminum; layerUV(THREE, o); } else if (RUBBER.includes(o.name)) o.material = rubber;
     if (/KeyStudio-HT16K33-8x8-LED-Matrix/.test(o.name)) { matrices.push(o); o.visible = false; return; }   // 눈 위치 계산용 (화면에는 안 보임)
     if (['새_헤드_상판', '새_쿠션', '새_헤드_하부판'].includes(o.name)) shells.push(o);

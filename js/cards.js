@@ -1,4 +1,5 @@
 import { printedMaterial, layerUV } from './print-material.js';
+import { fabricFor } from './fabric-material.js';
 /* ==========================================================
    Design 카드 안의 Cove 장면 (Form / Material / Motion)
    각 카드의 이미지 칸에서 그 항목을 보여주는 장면이 저절로 재생돼요.
@@ -72,7 +73,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     const matrices = [], shells = [];
     root3.traverse(o => {
       if (!o.isMesh) return;
-      if (FABRIC.includes(o.name)) o.material = fabric; else if (PIPING.includes(o.name)) o.material = piping; else if (ALU.includes(o.name)) { o.material = aluminum; layerUV(THREE, o); } else if (RUBBER.includes(o.name)) o.material = rubber;
+      if (FABRIC.includes(o.name)) o.material = fabricFor(THREE, o.name); else if (PIPING.includes(o.name)) o.material = piping; else if (ALU.includes(o.name)) { o.material = aluminum; layerUV(THREE, o); } else if (RUBBER.includes(o.name)) o.material = rubber;
       if (/KeyStudio-HT16K33-8x8-LED-Matrix/.test(o.name)) { matrices.push(o); o.visible = false; return; }
       if (['새_헤드_상판', '새_쿠션', '새_헤드_하부판'].includes(o.name)) shells.push(o);
     });
@@ -121,7 +122,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
       say(c, '소재가 만나는 이음선');
     } else {
       const cyc = TOUR_LEN + TOUR_REST, p = t % cyc, q = Math.min(p, TOUR_LEN);
-      pose = tourAt(q); eye = last(TOUR_EYES, q)[1]; g = { az: 24, el: 10, zoom: 1, tx: 0, ty: 0, tz: 0 };
+      pose = tourAt(q); eye = last(TOUR_EYES, q)[1]; g = { az: 24, el: 10, zoom: 0.9, tx: 0, ty: 0, tz: 0 };
       say(c, last(TOUR_MSG, q)[1]);
     }
     return { g, pose, eye };
