@@ -123,8 +123,8 @@ body::before {
 }
 .hero__inner { position: relative; z-index: 2; }
 .hero__title {
-  font-family: var(--font-display); font-weight: 400;
-  font-size: clamp(88px, min(18vw, 24svh), 220px); line-height: .85; letter-spacing: -.03em;
+  font-family: "Jost", "Futura", var(--font-ui); font-weight: 400;   /* Futura 계열 로고체 (Jost) */
+  font-size: clamp(88px, min(18vw, 24svh), 220px); line-height: .85; letter-spacing: -.02em;
   background: linear-gradient(180deg, #3a3442 20%, #8a7aa8 120%);
   -webkit-background-clip: text; background-clip: text; color: transparent;
   transition-delay: .1s;
