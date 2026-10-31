@@ -118,6 +118,8 @@
         <!-- 큰 제품 이미지 (스크롤 시 고정) -->
         <figure class="design__visual">
           <div class="cove-art" data-cove></div>
+          <!-- 돌려볼 수 있는 3D 모델 (불러오지 못하면 위의 임시 이미지가 그대로 보임) -->
+          <div class="cove-3d" data-model="assets/cove.glb" data-az="35" data-el="14"></div>
           <figcaption>Render — 3/4 View</figcaption>
         </figure>
 
@@ -245,5 +247,12 @@
   </div>
 
   <script src="js/main.js"></script>
+  <script type="importmap">
+    { "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+  <script type="module" src="js/viewer.js"></script>
 </body>
 </html>

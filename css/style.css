@@ -404,3 +404,8 @@ em.ko { font-family: var(--font-ui); font-style: normal; font-weight: 400; font-
 .pager__num { font-family: var(--font-display); font-style: italic; font-size: 15px; letter-spacing: .04em; color: inherit; }
 .pager__name { transition: opacity .3s var(--ease); }
 .pager.is-swapping .pager__name, .pager.is-swapping .pager__num { opacity: 0; }
+
+/* ---------- Design 섹션: 돌려볼 수 있는 3D ---------- */
+.design__visual .cove-3d { position: absolute; inset: 12%; z-index: 1; }
+.design__visual.has-3d .cove-art { visibility: hidden; }
+.design__visual figcaption { z-index: 2; }

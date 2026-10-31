@@ -2,11 +2,14 @@
 
 데스크탑 홈 로봇 **Cove**를 소개하는 브랜드 홈페이지입니다.
 `index.html`을 브라우저로 열면 바로 볼 수 있어요.
+(3D 모델은 웹 주소(GitHub Pages)에서만 보이고, 파일을 직접 열면 임시 이미지가 대신 보여요.)
 
 ## 구조
 - `index.html` — 페이지 내용 (Hero · About · Features · Design · Experience · Gallery · Footer)
 - `css/style.css` — 디자인 (색상은 맨 위 `:root`에서 한 번에 바꿀 수 있음)
 - `js/main.js` — 스크롤 효과, Experience 상태 전환, 임시 로봇 일러스트
+- `js/viewer.js` — Design 섹션의 돌려볼 수 있는 3D 뷰어
+- `assets/cove.glb` — Cove 3D 모델 (겉모습만 담은 가벼운 버전)
 - `assets/` — 렌더 이미지·영상을 넣을 폴더
 
 ## 렌더 이미지로 교체하기
