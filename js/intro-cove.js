@@ -99,15 +99,15 @@ async function init() {
     const awake = pAwake || aAwake;
     const r = figure.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height * 0.5;
     // 마우스가 Cove 기준 어디에 있는지 (-1 ~ 1)
-    let dx = clamp((ptr.x - cx) / (innerWidth * 0.5), -1, 1), dy = clamp((ptr.y - cy) / (innerHeight * 0.5), -1, 1);
+    let dx = clamp((ptr.x - cx) / (innerWidth * 0.26), -1, 1), dy = clamp((ptr.y - cy) / (innerHeight * 0.3), -1, 1);   // Cove 주변 가까운 범위에서 최대로 반응
     if (aAwake) { const u = tNow - autoFrom; dx = 0.8 * Math.sin(u * 1.25); dy = -0.12 + 0.2 * Math.sin(u * 0.8); }   // 좌우로 천천히 둘러봄
     else if (!awake) { dx = 0; dy = 0; }
-    gaze.x += (dx - gaze.x) * Math.min(1, dt * 5); gaze.y += (dy - gaze.y) * Math.min(1, dt * 5);
+    gaze.x += (dx - gaze.x) * Math.min(1, dt * 8); gaze.y += (dy - gaze.y) * Math.min(1, dt * 8);
     const goal = { neck: 0, head: 0, tilt: 0, body: 0 };
     if (awake) {
-      goal.neck = AWAKE.neck; goal.head = clamp(AWAKE.head + gaze.y * 9, -46, -22);          // 마우스가 위쪽이면 고개를 들고, 아래쪽이면 숙임
-      goal.body = clamp(gaze.x * 46, -60, 60);                                               // 마우스 쪽으로 몸통을 돌림
-      const [lo, hi] = tiltRange(goal.head); goal.tilt = clamp(gaze.x * 9, lo, hi);          // 가능한 만큼 갸웃
+      goal.neck = AWAKE.neck + gaze.y * -3; goal.head = clamp(-29 + gaze.y * 5, -34, -24);   // 갸웃이 크게 되는 높이에서, 커서가 위면 고개를 들고 아래면 숙임
+      goal.body = clamp(gaze.x * 70, -75, 75);                                               // 커서 쪽으로 몸통을 크게 돌림
+      const [lo, hi] = tiltRange(goal.head); goal.tilt = clamp(gaze.x * 15, lo, hi);         // 가능한 만큼 갸웃
     }
     const T = { neck: awake ? 0.45 : 0.9, head: awake ? 0.4 : 0.9, tilt: 0.3, body: awake ? 0.35 : 0.8 };
     for (const j of ['neck', 'head', 'tilt', 'body']) pose[j] = smoothDamp(pose[j], goal[j], vel[j], T[j], dt);
@@ -118,7 +118,7 @@ async function init() {
     eyes.group.visible = true;
     const near = ptr.seen && now - ptr.at < IDLE_MS + 3000;
     const gx = Math.round(clamp((ptr.x - cx) / (innerWidth * 0.5), -1, 1) * (near ? 2 : 0)), gy = Math.round(gaze.y * 1.4);
-    eyes.show(awake && Math.abs(gaze.x) + Math.abs(gaze.y) > 0.9 ? '반짝 눈' : '뜬 눈', awake ? Math.round(gaze.x * 2) : gx, gy, tNow);
+    eyes.show(awake && Math.abs(gaze.x) + Math.abs(gaze.y) > 0.9 ? '반짝 눈' : '뜬 눈', awake ? Math.round(clamp(gaze.x * 2.6, -2, 2)) : gx, gy, tNow);
     renderer.render(scene, camera);
     if (!shown) { shown = true; figure.classList.add('is-live'); }
   }
