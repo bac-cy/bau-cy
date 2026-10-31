@@ -398,3 +398,9 @@ em.ko { font-family: var(--font-ui); font-style: normal; font-weight: 400; font-
 .gallery__film:fullscreen video { object-fit: contain; }
 .gallery__film:-webkit-full-screen { width: 100vw; height: 100vh; aspect-ratio: auto; border-radius: 0; background: #000; cursor: default; }
 .gallery__film:-webkit-full-screen video { object-fit: contain; }
+
+/* Key Features: 숫자 자리를 작은 움직임 그래픽으로 */
+.feature__art { position: relative; height: 150px; margin: -4px -6px 0; }
+.feature__art canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.feature h3 { padding-top: 24px; }
+@media (max-width: 520px) { .feature__art { height: 130px; } }

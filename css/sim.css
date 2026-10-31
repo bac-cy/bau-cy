@@ -75,3 +75,6 @@
   .sim__steps { display: none !important; }
 }
 @media (max-width: 760px) { .sim__ui .sim__views button { font-size: 10.5px; padding: 7px 10px; letter-spacing: .08em; } .sim__views { gap: 4px; } }
+
+/* 사진 카드의 라벨은 왼쪽 위로: 몸통·바닥판 위에 겹치지 않도록 */
+.slot--photo::after { top: 14px; bottom: auto; left: 20px; }
