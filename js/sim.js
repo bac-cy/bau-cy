@@ -212,16 +212,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   gr.addColorStop(0, 'rgba(110,80,120,.26)'); gr.addColorStop(1, 'rgba(110,80,120,0)'); g2.fillStyle = gr; g2.fillRect(0, 0, 128, 128);
   const shadow = new THREE.Mesh(new THREE.PlaneGeometry(sphere.radius * 1.9, sphere.radius * 1.9), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c2), transparent: true, depthWrite: false }));
   shadow.rotation.x = -Math.PI / 2; shadow.position.set(center.x, box.min.y + 0.0006, center.z); scene.add(shadow);
-  // 책상: 은은한 연한 나무 상판 (소품 없이 Cove가 놓인 면만)
-  { const W = sphere.radius * 1.75, D = sphere.radius * 1.3, T = sphere.radius * 0.07, r = sphere.radius * 0.4, hw = W / 2, hd = D / 2;
-    const sh = new THREE.Shape(); sh.moveTo(-hw + r, -hd); sh.lineTo(hw - r, -hd); sh.quadraticCurveTo(hw, -hd, hw, -hd + r); sh.lineTo(hw, hd - r); sh.quadraticCurveTo(hw, hd, hw - r, hd);
-    sh.lineTo(-hw + r, hd); sh.quadraticCurveTo(-hw, hd, -hw, hd - r); sh.lineTo(-hw, -hd + r); sh.quadraticCurveTo(-hw, -hd, -hw + r, -hd);
-    const g = new THREE.ExtrudeGeometry(sh, { depth: T, bevelEnabled: true, bevelSize: T * 0.25, bevelThickness: T * 0.25, bevelSegments: 3 });
-    const desk = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: '#e6d8c4', roughness: 0.78, metalness: 0, envMapIntensity: 0.5 }));
-    desk.rotation.x = -Math.PI / 2; desk.position.set(center.x, box.min.y - T - 0.0004, center.z); scene.add(desk);
-    const syncDesk = () => { desk.visible = !window.matchMedia("(max-width: 760px)").matches; };   // 모바일(반응형)에서는 책상을 숨긴다
-    syncDesk(); window.matchMedia('(max-width: 760px)').addEventListener('change', syncDesk); }
-
+  // (사용자 요청) 바닥의 책상 상판은 없앴다 — 은은한 그림자만 남김
   /* ───────── 끌기 / 누르기 ───────── */
   const el = renderer.domElement, ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
   el.style.touchAction = 'pan-y';
