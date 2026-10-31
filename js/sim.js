@@ -131,6 +131,13 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     tickle: slice(tickle, 0, 14),
     snack: slice(snack, 0, 14),
   };
+  // 카드 연동(Motion)용 짧은 연기: 머리를 살짝 숙여(갸웃이 크게 되는 높이) → 몸통을 돌리며 갸웃 → 눈으로 마음 전하기. 모두 로봇이 움직일 수 있는 범위 안이다.
+  {
+    const K = [[0, 25, -34, 0, 0], [1.2, 21, -25, 0, 0], [2.6, 21, -25, 12, 18], [4.2, 21, -25, -12, -18], [5.8, 21, -25, 10, 12], [7.2, 23, -30, 0, 0], [8.4, 25, -34, 0, 0]];
+    const ease = (x) => x * x * (3 - 2 * x), keys = [];
+    for (let t = 0; t <= 8.4 + 1e-6; t += 0.1) { let i = 0; while (i < K.length - 2 && t > K[i + 1][0]) i++; const a = K[i], b = K[i + 1], f = ease(clamp((t - a[0]) / (b[0] - a[0]), 0, 1)); keys.push([+t.toFixed(2), ...[1, 2, 3, 4].map(c => a[c] + (b[c] - a[c]) * f)]); }
+    CLIPS.tour = { keys, eyes: [[0, '뜬 눈'], [1.2, '반짝 눈'], [2.6, '신난 눈'], [5.8, '반짝 눈'], [7.4, '뜬 눈']], markers: [{ t: 0, label: '머리를 살짝 숙여요' }, { t: 2.6, label: '몸을 돌리며 갸웃해요' }, { t: 5.8, label: '눈으로 마음을 전해요' }], duration: 8.4 };
+  }
   let clip = null, clipT = 0, clipName = '';
   function sampleClip(c, t) {
     const K = c.keys; if (t <= K[0][0]) return K[0]; if (t >= K[K.length - 1][0]) return K[K.length - 1];
@@ -159,25 +166,31 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   const box = new THREE.Box3().setFromObject(model), center = box.getCenter(new THREE.Vector3()), sphere = box.getBoundingSphere(new THREE.Sphere());
   center.y = box.min.y + (box.max.y - box.min.y) * 0.48;
   const VIEWS = { persp: { az: 35, el: 14, label: '3/4 View' }, front: { az: 0, el: 5, label: 'Front View' }, side: { az: 90, el: 5, label: 'Side View' }, top: { az: 180, el: 84, label: 'Top View' } };
-  const cam = { az: 35, el: 14, dist: 1 }, camGoal = { az: 35, el: 14 }, cv = { az: { v: 0 }, el: { v: 0 } };
+  const cam = { az: 35, el: 14, dist: 1, zoom: 1, tx: 0, ty: 0, tz: 0 }, camGoal = { az: 35, el: 14, zoom: 1, tx: 0, ty: 0, tz: 0 };
+  const cv = { az: { v: 0 }, el: { v: 0 }, zoom: { v: 0 }, tx: { v: 0 }, ty: { v: 0 }, tz: { v: 0 } };
   let view = 'persp';
   const viewBtns = [...figure.querySelectorAll('[data-view]')];
+  // 3D 칸은 카드 전체를 덮는다(확대해도 잘리지 않음). 모델은 그 안의 "안전 영역"에 맞춰 놓는다.
+  const mobileMQ = window.matchMedia('(max-width: 760px)');
+  const safe = () => (mobileMQ.matches ? { w: 0.96, h: 0.69, cy: 0.455 } : { w: 0.92, h: 0.78, cy: 0.47 });
   function fitDistance() {
-    const vf = camera.fov * D2R, hf = 2 * Math.atan(Math.tan(vf / 2) * camera.aspect);
-    return (sphere.radius * 0.95) / Math.sin(Math.min(vf, hf) / 2);
+    const s = safe(), vf = camera.fov * D2R, tv = Math.tan(vf / 2), th = tv * camera.aspect;
+    const vv = 2 * Math.atan(tv * s.h), hv = 2 * Math.atan(th * s.w);
+    return (sphere.radius * 0.95) / Math.sin(Math.min(vv, hv) / 2);
   }
   function setView(v) {
-    view = v; camGoal.az = VIEWS[v].az; camGoal.el = VIEWS[v].el;
+    view = v; camGoal.az = VIEWS[v].az; camGoal.el = VIEWS[v].el; camGoal.zoom = 1; camGoal.tx = camGoal.ty = camGoal.tz = 0;
     // 가장 가까운 회전 방향으로 돌도록 기준을 맞춘다
     camGoal.az = cam.az + (((camGoal.az - cam.az) % 360) + 540) % 360 - 180;
     viewBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === v)));
     if (caption) caption.textContent = `Render — ${VIEWS[v].label}`;
   }
   function placeCamera() {
-    const az = cam.az * D2R, el = cam.el * D2R, d = cam.dist;
+    const az = cam.az * D2R, el = cam.el * D2R, d = cam.dist / cam.zoom;
     const dir = FRONT.clone().multiplyScalar(Math.cos(az)).addScaledVector(RIGHT, Math.sin(az));
-    camera.position.copy(center).addScaledVector(dir, d * Math.cos(el)); camera.position.y += d * Math.sin(el);
-    camera.lookAt(center);
+    const target = center.clone().add(new THREE.Vector3(cam.tx, cam.ty, cam.tz));
+    camera.position.copy(target).addScaledVector(dir, d * Math.cos(el)); camera.position.y += d * Math.sin(el);
+    camera.lookAt(target);
   }
 
   /* ───────── 바닥 그림자 ───────── */
@@ -245,12 +258,63 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     e.currentTarget.textContent = sitting ? '앉기' : '일어나기';
   });
 
+  /* ───────── 카드 연동 (PC): 오른쪽 설명 카드에 맞춰 Cove가 보여줘요 ─────────
+     Form → 옆모습·앞모습 / Material → 이음선 가까이 / Motion → 몸통을 돌리고 갸웃.
+     사용자가 왼쪽을 만지면 자동 연출은 멈추고, 다음 카드로 넘어가면 다시 이어진다. */
+  const cards = [...document.querySelectorAll('.design__details .detail')];
+  const STEPS = ['form', 'material', 'motion'];
+  const wide = window.matchMedia('(min-width: 761px)');
+  const D = { name: null, t: 0, wait: 0, front: false, back: false };
+  let userLock = false;
+  figure.addEventListener('pointerdown', () => { userLock = true; }, true);
+  function activeStep() {
+    if (!wide.matches || !visible) return null;
+    const H = window.innerHeight, y = H * 0.55; let best = null, bd = 1e9;
+    cards.forEach((c, i) => { const r = c.getBoundingClientRect(), d = Math.abs((r.top + r.bottom) / 2 - y); if (r.top < y + H * 0.22 && r.bottom > y - H * 0.22 && d < bd) { bd = d; best = i; } });
+    return best === null ? null : STEPS[best];
+  }
+  function seamOffset() {                                                   // 머리 아래 이음선(파이핑) 앞쪽 가장자리
+    const m = by['새_헤드_하부판']; if (!m) return new THREE.Vector3();
+    model.updateMatrixWorld(true);
+    const bb = new THREE.Box3().setFromObject(m), c = bb.getCenter(new THREE.Vector3()), s = bb.getSize(new THREE.Vector3());
+    const p = c.clone().addScaledVector(FRONT, Math.min(s.x, s.z) * 0.36); p.y = bb.min.y + s.y * 0.35;
+    return p.sub(center);
+  }
+  function startTour() { clip = CLIPS.tour; clipName = 'tour'; clipT = -0.6; motionBtns.forEach(b => b.setAttribute('aria-pressed', 'false')); }
+  function enter(name) {
+    const prev = D.name; D.name = name; D.t = 0; D.wait = 0; D.front = false; D.back = false; userLock = false;
+    if (prev === 'motion' && clipName === 'tour') stopClip();
+    if (!name) { setView('persp'); setStatus(HINT); return; }
+    if (clip && clipName !== 'tour') return;                                // 사용자가 직접 고른 동작이 재생 중이면 방해하지 않는다
+    if (name === 'form') { setView('side'); setStatus('두 개의 둥근 볼륨', 'play'); }
+    if (name === 'material') {
+      setView('persp'); const o = seamOffset();
+      camGoal.az = 40; camGoal.el = 8; camGoal.zoom = 2.5; camGoal.tx = o.x; camGoal.ty = o.y; camGoal.tz = o.z;
+      if (caption) caption.textContent = 'Render — Detail View'; setStatus('소재가 만나는 이음선', 'play');
+    }
+    if (name === 'motion') { setView('persp'); camGoal.az = 24; camGoal.el = 10; startTour(); }
+    if (name !== 'motion') Object.assign(goal, clipName ? goal : AWAKE);
+  }
+  let probeAt = 0;
+  function director(dt, now) {
+    if (now - probeAt > 160) { probeAt = now; const s = activeStep(); if (s !== D.name) enter(s); }
+    if (!D.name || userLock) return;
+    D.t += dt;
+    if (D.name === 'form') {
+      if (D.t > 4.6 && !D.front) { D.front = true; setView('front'); }
+      if (D.t > 9.5 && !D.back) { D.back = true; setView('persp'); }
+    }
+    if (D.name === 'material') camGoal.az = 40 + 16 * Math.sin(D.t * 0.55);
+    if (D.name === 'motion' && !clip) { D.wait += dt; if (D.wait > 1.6) { D.wait = 0; startTour(); } }   // 끝나면 잠깐 쉬었다가 다시
+  }
+
   /* ───────── 반복 ───────── */
   let dirty = true, visible = false, last = performance.now(), tNow = 0;
   function resize() {
     const w = host.clientWidth, h = host.clientHeight; if (!w || !h) return;
     renderer.setSize(w, h, false); renderer.domElement.style.cssText += ';width:100%;height:100%;display:block';
-    camera.aspect = w / h; camera.updateProjectionMatrix(); cam.dist = fitDistance(); dirty = true;
+    camera.aspect = w / h; camera.updateProjectionMatrix(); cam.dist = fitDistance();
+    camera.setViewOffset(w, h, 0, -(safe().cy - 0.5) * h, w, h); dirty = true;     // 모델 중심을 안전 영역의 가운데로
   }
   new ResizeObserver(resize).observe(host);
   new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible) { dirty = true; last = performance.now(); } }).observe(host);
@@ -259,6 +323,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     requestAnimationFrame(frame);
     if (!visible) return;
     const dt = Math.min(0.05, (now - last) / 1000); last = now; tNow += dt;
+    director(dt, now);
     // 동작 재생
     if (clip) {
       clipT += dt;
@@ -279,7 +344,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     if (!clip) eyeName = pose.neck < 4 ? '감은 눈' : '뜬 눈';
     eyes.show(eyeName, 0, 0, tNow);
     // 카메라
-    cam.az = smoothDamp(cam.az, camGoal.az, cv.az, 0.28, dt); cam.el = smoothDamp(cam.el, camGoal.el, cv.el, 0.28, dt);
+    for (const k of ['az', 'el', 'zoom', 'tx', 'ty', 'tz']) cam[k] = smoothDamp(cam[k], camGoal[k], cv[k], k === 'zoom' ? 0.5 : 0.34, dt);
     placeCamera();
     renderer.render(scene, camera);
   }
