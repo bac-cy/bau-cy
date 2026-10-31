@@ -1,53 +1,60 @@
 /* ==========================================================
    Cove — Outro (엔딩 크레딧)
-   어두운 보랏빛 노을 배경 위로 크레딧이 자동으로 천천히 올라가고,
-   끝나면 마지막 문구가 남습니다.
+   사이트 기본 톤(따뜻한 크림 + 연한 라벤더·복숭아 빛) 위로 크레딧이 자동으로
+   천천히 올라가고, 끝나면 마지막 문구가 남습니다.
    ========================================================== */
 .closing.outro {
-  --outro-ink: #f3eef7;
-  --outro-soft: #b8afc4;
   position: relative; min-height: 100svh; padding: 0; overflow: hidden;
-  text-align: center; color: var(--outro-ink);
+  text-align: center; color: var(--ink);
   background:
-    radial-gradient(70% 45% at 50% 100%, rgba(246, 201, 168, .26), transparent 70%),
-    radial-gradient(60% 40% at 50% 0%, rgba(184, 166, 224, .22), transparent 70%),
-    linear-gradient(180deg, var(--bg) 0, var(--dusk) 12%, #221d2b 55%, var(--dusk) 88%, var(--bg) 100%);
+    radial-gradient(60% 50% at 50% 88%, rgba(255, 217, 184, .55), transparent 70%),
+    radial-gradient(45% 40% at 22% 24%, rgba(217, 205, 242, .55), transparent 70%),
+    radial-gradient(40% 40% at 82% 20%, rgba(232, 221, 207, .9), transparent 70%),
+    var(--bg);
 }
 .closing.outro .closing__glow {
-  top: 62%; width: 90vmin; height: 60vmin;
-  background: radial-gradient(closest-side, rgba(255, 217, 184, .30), rgba(184, 166, 224, .18) 60%, transparent);
+  top: 60%; width: 90vmin; height: 56vmin;
+  background: radial-gradient(closest-side, rgba(255, 224, 196, .75), rgba(217, 205, 242, .35) 60%, transparent);
 }
 
 /* 크레딧이 지나가는 창: 위아래로 서서히 사라짐 */
 .outro__window {
   position: absolute; inset: 0; overflow: hidden;
-  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 82%, transparent 100%);
-          mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 82%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 16%, #000 84%, transparent 100%);
+          mask-image: linear-gradient(180deg, transparent 0, #000 16%, #000 84%, transparent 100%);
 }
 .outro__roll {
   position: absolute; left: 0; right: 0; top: 0; padding: 0 var(--gutter);
   transform: translateY(100vh); will-change: transform;
 }
+.outro__roll > * { max-width: 1040px; margin-left: auto; margin-right: auto; }
 
-.outro__logo { display: block; margin: 0 auto; height: clamp(44px, 6.5vw, 76px); width: auto; filter: invert(1) brightness(1.15); }
+.outro__logo { display: block; margin: 0 auto; height: clamp(40px, 5.5vw, 64px); width: auto; }
 .outro__project, .outro__role, .outro__made, .outro__uni {
-  font-size: 12px; letter-spacing: .28em; text-transform: uppercase; color: var(--outro-soft); font-weight: 400;
+  font-size: 11px; letter-spacing: .26em; text-transform: uppercase; color: var(--ink-soft); font-weight: 400;
 }
-.outro__project { margin-top: 22px; }
+.outro__project { margin-top: 20px; }
 
-.outro__group { margin-top: clamp(64px, 11vh, 110px); }
-.outro__role { margin-bottom: 18px; }
+/* 역할별 묶음을 두 칸으로 나란히 — 한 화면에 많은 이름이 보이게 */
+.outro__groups {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(36px, 6vh, 56px) clamp(32px, 6vw, 88px);
+  margin-top: clamp(56px, 9vh, 90px);
+}
+.outro__group:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.outro__role { margin-bottom: 12px; }
+.outro__names { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 22px; }
 .outro__name {
   font-family: "Jost", "Noto Sans KR", system-ui, sans-serif; font-weight: 300;
-  font-size: clamp(22px, 2.4vw, 32px); letter-spacing: .06em; line-height: 1.9; color: var(--outro-ink);
+  font-size: clamp(14px, 1.25vw, 17px); letter-spacing: .05em; line-height: 1.85; color: var(--ink);
 }
 
-.outro__lab { margin-top: clamp(96px, 16vh, 170px); }
+.outro__lab { margin-top: clamp(72px, 12vh, 130px); }
 .outro__labname {
   font-family: "Jost", system-ui, sans-serif; font-weight: 200; letter-spacing: .14em; line-height: 1.1;
-  font-size: clamp(44px, 7.5vw, 104px); margin: 14px 0 12px; color: var(--outro-ink);
+  font-size: clamp(40px, 6.5vw, 92px); margin: 12px 0 10px; color: var(--ink);
 }
-.outro__ko { margin-top: 14px; font-size: 15px; letter-spacing: .12em; color: var(--outro-soft); font-weight: 300; }
+.outro__ko { margin-top: 12px; font-size: 14px; letter-spacing: .12em; color: var(--ink-soft); font-weight: 300; }
 
 /* 크레딧이 끝난 뒤 남는 마지막 문구 */
 .outro__end {
@@ -55,11 +62,14 @@
   opacity: 0; pointer-events: none; transition: opacity 1.8s ease;
 }
 .closing.outro.is-ended .outro__end { opacity: 1; }
-.closing.outro .closing__title { color: var(--outro-ink); }
-.closing.outro .closing__title em { color: #d9cdf2; }
+
+@media (max-width: 700px) {
+  .outro__groups { grid-template-columns: 1fr; }
+  .outro__name { font-size: 15px; }
+}
 
 /* 움직임 줄이기 설정: 크레딧을 흐르게 하지 않고 한 화면에 그대로 보여줌 */
 .closing.outro.is-static { padding: clamp(120px, 18vh, 200px) 0 clamp(96px, 14vh, 160px); min-height: 0; }
 .closing.outro.is-static .outro__window { position: static; -webkit-mask-image: none; mask-image: none; overflow: visible; }
 .closing.outro.is-static .outro__roll { position: static; transform: none; }
-.closing.outro.is-static .outro__end { position: static; opacity: 1; margin-top: clamp(96px, 16vh, 170px); display: block; }
+.closing.outro.is-static .outro__end { position: static; opacity: 1; margin-top: clamp(80px, 14vh, 150px); display: block; }

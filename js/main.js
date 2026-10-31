@@ -140,7 +140,7 @@ function updatePager() {
   const cur = PAGES[idx];
   const show = Boolean(cur.name);
   pager.classList.toggle('is-visible', show);
-  pager.classList.toggle('is-dark', cur.sel === '#experience' || cur.sel === '.closing');
+  pager.classList.toggle('is-dark', cur.sel === '#experience');
   if (idx !== pagerIndex && show) {
     const first = pagerIndex === -1 || !pager.classList.contains('is-visible');
     pager.classList.add('is-swapping');

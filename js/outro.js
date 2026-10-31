@@ -19,7 +19,9 @@
     const wrap = document.createElement('div'); wrap.className = 'outro__group';
     const role = document.createElement('p'); role.className = 'outro__role'; role.textContent = g.role;
     wrap.appendChild(role);
-    (g.names || []).forEach(n => { const p = document.createElement('p'); p.className = 'outro__name'; p.textContent = n; wrap.appendChild(p); });
+    const list = document.createElement('div'); list.className = 'outro__names';
+    (g.names || []).forEach(n => { const p = document.createElement('p'); p.className = 'outro__name'; p.textContent = n; list.appendChild(p); });
+    wrap.appendChild(list);
     slot.appendChild(wrap);
   });
 

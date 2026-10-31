@@ -38,6 +38,7 @@
 - **폰트**: 상단 메뉴 로고는 Cove.ai의 COVE 글자(assets/cove-logo.svg, 높이 20px), 푸터 로고와 그 밖의 제목은 Instrument Serif, 본문·UI Manrope, 한글 Noto Sans KR. 인트로는 Jost(HI, I'm cove)와 Fredoka(배경의 큰 COVE). 한국어 강조 문구(`em.ko`)는 기울이지 않음.
 - **글자 크기**: 인트로 HI·I'm cove `clamp(36px, 4.8vw, 84px)`, 배경의 큰 COVE `24vw`, 섹션 제목 `clamp(34px, 5.4vw, 72px)`, About 문장 `clamp(28px, 4.4vw, 60px)`, 라벨 12px 대문자, 본문 14~16px.
 - **레이아웃·비율**: 좌우 여백 `clamp(16px, 5vw, 72px)`, 섹션 위아래 여백 `clamp(96px, 14vw, 180px)`, 모서리 둥글기 28px, Design 대표 이미지 4:5, 디테일 컷 16:10, 갤러리 3열 그리드.
+- **아웃트로(엔딩 크레딧)**: 배경은 사이트 기본 톤(크림 + 연한 라벤더·복숭아 빛), 이름은 작은 글씨로 두 칸 배치(모바일은 한 칸). 명단은 js/credits.js.
 - **Hero 섹션은 삭제됨**: 인트로의 큰 COVE 글자 + Cove 렌더 장면이 그 자리를 대신함(사용자 요청).
 - **반응형 기준**: 1024px 이하 기능 카드 2열, 760px 이하 1열 구성과 메뉴 숨김, 520px 이하 기능 카드 1열.
 - **섹션 순서**: 인트로(HI → I'm cove → 큰 COVE 글자 + Cove 렌더, 스크롤로 이어짐) → About → Key Features → Design & Detail → Experience(Wake/Listen/Focus/Rest) → Gallery → 아웃트로(엔딩 크레딧, 명단은 js/credits.js) → Footer.
