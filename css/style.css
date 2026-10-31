@@ -196,12 +196,12 @@ body::before {
 .detail p { color: var(--ink-soft); font-weight: 300; max-width: 30em; margin-top: 8px; }
 
 .specs {
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-top: clamp(80px, 10vw, 140px); border-top: 1px solid var(--line);
 }
 .specs div { padding: 28px 16px 0 0; }
 .specs dt { font-family: "Jost", "Futura", system-ui, sans-serif; font-style: normal; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
-.specs dd { font-family: "Jost", "Futura", system-ui, sans-serif; font-style: normal; font-weight: 300; letter-spacing: -.005em; font-size: clamp(26px, 3vw, 38px); margin-top: 4px; }
+.specs dd { font-family: "Jost", "Futura", system-ui, sans-serif; font-style: normal; font-weight: 300; letter-spacing: -.005em; font-size: clamp(20px, 2.1vw, 30px); margin-top: 4px; }
 
 /* ---------- Slots (image / video placeholders) ---------- */
 .slot {
