@@ -41,7 +41,7 @@ async function init() {
 
   // 인트로 렌더 이미지와 같은 흰색 무광 재질 + 알루미늄 기둥
   const white = new THREE.MeshStandardMaterial({ color: 0xefe9e1, roughness: 0.55, metalness: 0, envMapIntensity: 1.25 });
-  const aluminum = new THREE.MeshStandardMaterial({ color: '#c6c9cc', roughness: 0.32, metalness: 1, envMapIntensity: 1.1 });
+  const aluminum = new THREE.MeshStandardMaterial({ color: '#44362e', roughness: 0.92, metalness: 0, envMapIntensity: 0.35 });
   const BODY = ['새_헤드_상판', '새_쿠션', '새_하부_폼', '새_하부_쉘', '새_헤드_하부판', '새_하부_덮개판', '새_미끄럼방지_고무링', '하부_회전판'], ALU = ['기둥_1', '본체6'];
   const by = {}, matrices = [], shells = [];
   model.traverse(o => {

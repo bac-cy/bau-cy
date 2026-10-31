@@ -65,7 +65,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   diffuseColor.rgb *= 0.93 + 0.10 * g1 + 0.05 * g2 + 0.04 * g3; }`);
   };
   const piping = new THREE.MeshStandardMaterial({ color: '#f4f2ee', roughness: 0.55, metalness: 0, envMapIntensity: 0.9 });
-  const aluminum = new THREE.MeshStandardMaterial({ color: '#c6c9cc', roughness: 0.32, metalness: 1, envMapIntensity: 1.1 });
+  const aluminum = new THREE.MeshStandardMaterial({ color: '#44362e', roughness: 0.92, metalness: 0, envMapIntensity: 0.35 });
   const rubber = new THREE.MeshStandardMaterial({ color: '#8d8c8a', roughness: 0.9, metalness: 0 });
   const FABRIC = ['새_헤드_상판', '새_쿠션', '새_하부_폼', '새_하부_쉘'], PIPING = ['새_헤드_하부판', '새_하부_덮개판'];
   const ALU = ['기둥_1', '본체6'], RUBBER = ['새_미끄럼방지_고무링', '하부_회전판'];

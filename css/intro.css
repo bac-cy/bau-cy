@@ -58,9 +58,7 @@
 .intro__finale { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
 .intro__bigword {
   position: absolute; left: 0; right: 0; top: 48%; translate: 0 -50%;
-  text-align: center; line-height: .8; user-select: none;
-  font-family: "Fredoka", "Nunito", system-ui, sans-serif; font-weight: 600; font-stretch: 125%;
-  font-size: 24vw; letter-spacing: .02em; color: var(--intro-word);
+  display: flex; justify-content: center; align-items: center; gap: 3.4vw; user-select: none;
   opacity: 0; will-change: transform, opacity;
 }
 .intro__render {
@@ -73,7 +71,7 @@
 
 /* ---------- Mobile ---------- */
 @media (max-width: 760px) {
-  .intro__bigword { font-size: 24vw; top: 42%; }
+  .intro__bigword { top: 42%; }
 }
 
 /* ---------- Reduced motion: 타이핑·움직임 없이 장면만 전환 ---------- */
@@ -90,6 +88,7 @@
 
 /* 더 극적인 연출: 글자별 움직임 · 도착하는 빛 · 커지며 올라오는 Cove */
 .intro__ch { display: inline-block; will-change: transform, opacity, filter; }
+.intro__ch svg { display: block; height: 19vw; width: auto; filter: drop-shadow(0 .4vw .8vw rgba(150, 110, 80, .22)); }
 .intro__burst {
   position: absolute; left: 50%; top: 64%; width: 92vmin; height: 92vmin; margin: -46vmin 0 0 -46vmin; border-radius: 50%;
   background: radial-gradient(closest-side, rgba(255, 238, 210, .95), rgba(255, 214, 190, .55) 42%, rgba(217, 205, 242, 0) 76%);

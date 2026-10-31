@@ -35,7 +35,7 @@
 
 - **콘셉트**: 로봇이 주인공인 브랜드형 소개 페이지. 사람 이미지 없음. dreamy · warm futuristic · soft glow · minimal · premium · calm.
 - **색상** (`css/style.css`의 `:root`): 배경 `#f6f1ea`, 보조 배경 `#efe8de`, 크림 `#e8ddcf`, 글자 `#2b2731` / `#6c6573` / `#a49ca8`, 라벤더 `#b8a6e0`, 라일락 `#d9cdf2`, 실버 `#c9c6cf`, 피치 `#f6c9a8`, 글로우 `#ffd9b8`, Experience 섹션 어두운 배경 `#2a2533` / `#3a3145`, 강조 글자색 `#7d6aa8`.
-- **폰트**: 상단 메뉴 로고는 Cove.ai의 COVE 글자(assets/cove-logo.svg, 높이 20px), About 섹션 본문(큰 문장·Concept·Philosophy·Close/Calm/Kind)과 Design의 Form·Material·Motion 제목과 규격(Height·Width·Finish)은 Jost(Futura 계열, 기울임 없음), 푸터 로고도 같은 COVE 글자(assets/cove-logo.svg), 그 밖의 제목은 Instrument Serif, 본문·UI Manrope, 한글 Noto Sans KR. 인트로는 Jost(HI, I'm cove)와 Fredoka(배경의 큰 COVE). 한국어 강조 문구(`em.ko`)는 기울이지 않음.
+- **폰트**: 상단 메뉴 로고는 Cove.ai의 COVE 글자(assets/cove-logo.svg, 높이 20px), About 섹션 본문(큰 문장·Concept·Philosophy·Close/Calm/Kind)과 Design의 Form·Material·Motion 제목과 규격(Height·Width·Finish)은 Jost(Futura 계열, 기울임 없음), 푸터 로고도 같은 COVE 글자(assets/cove-logo.svg), 그 밖의 제목은 Instrument Serif, 본문·UI Manrope, 한글 Noto Sans KR. 인트로는 Jost(HI, I'm cove)와 Cove.ai 로고의 COVE 글자 모양(배경의 큰 COVE, 글자마다 SVG, 크림→샌드 세로 그라디언트, js/intro.js의 GLYPHS). 한국어 강조 문구(`em.ko`)는 기울이지 않음.
 - **글자 크기**: 인트로 HI·I'm cove `clamp(36px, 4.8vw, 84px)`, 배경의 큰 COVE `24vw`, 섹션 제목 `clamp(34px, 5.4vw, 72px)`, About 문장 `clamp(28px, 4.4vw, 60px)`, 섹션 라벨(01 — About Cove 등) `clamp(15px, 1.35vw, 20px)` 대문자, 본문 14~16px.
 - **레이아웃·비율**: 좌우 여백 `clamp(16px, 5vw, 72px)`, 섹션 위아래 여백 `clamp(96px, 14vw, 180px)`, 모서리 둥글기 28px, Design 대표 이미지 4:5, 디테일 컷 16:10, 갤러리 3열 그리드.
 - **푸터(프로젝트 크레딧 통합, 별도 아웃트로 섹션은 없음)**: 큰 COVE 로고 아래 모노스페이스 명세(ROBOTWORLD 2026, Project·Team·Period·Members·Advisor), 메뉴, 저작권. Members 순서는 김채영 · 박소연 · 이서연 · 김동수 · 고은결 · 송상훈 · 신승혁(사용자 지정). HIDE LAB 은 http://www.hidelab.co.kr/ 링크. 이름은 직책 구분 없이 표기.
@@ -77,3 +77,5 @@
 - **이름의 유래(About Name 블록, Concept 옆)**: Cove = 해안가에서 바다를 부드럽게 감싸 안은 작은 만. 파도가 잦아드는 만처럼 감싸 안아 쉬어 갈 자리가 되고자 한다(사용자가 알려줌).
 - **인트로 Cove 커서 반응은 PC가 메인**(전시는 웹 중심): 커서가 Cove 주변에 오면 몸통을 크게(±75°) 돌리고 갸웃·눈이 그쪽을 본다. 모바일은 도착 시 스스로 두리번거린다.
 - **Design의 네 번째 카드 Engineering**(Form·Material·Motion 과 같은 오른쪽 칸, js/engineering.js, assets/eng/cove-eng.glb): STEP 파일(COVE FINAL.stp)을 3D 모델로 변환해 브라우저에서 실시간으로 그린다(이미지 시퀀스 아님 → 화질 깨짐 없음). 카드가 화면에 올라오면 층(머리 윗 껍데기·머리 안쪽·머리 아래·몸통 윗부분·제어 보드·링·몸통 프레임·바닥)이 위아래로 펼쳐지고, 부품(층)에 마우스를 올리면(모바일은 누르면) 이름·영문·역할 설명이 뜬다. 드래그로 회전. STEP 안 부품 이름이 모양과 맞지 않아 층은 눈으로 보고 라벨을 붙였다(층 설명은 js/engineering.js의 LAYERS). 모터·센서 모델명 공개는 사용자가 승인했다.
+
+- **목 기둥 색**(사용자 요청): 스틸 느낌 대신 광택 없는 3D프린터 무광 다크 브라운(#44362e, 거칠기 0.92, 금속성 0). sim.js·cards.js·intro-cove.js 의 `aluminum` 재질.
