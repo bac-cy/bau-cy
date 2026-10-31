@@ -130,6 +130,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     pet: slice(rest1, petStart, petStart + 6),
     tickle: slice(tickle, 0, 14),
     snack: slice(snack, 0, 14),
+    rest: full('시나리오1 휴식'),
   };
   let clip = null, clipT = 0, clipName = '';
   function sampleClip(c, t) {
@@ -142,15 +143,25 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   const motionBtns = [...figure.querySelectorAll('[data-motion]')];
   function setStatus(text, cls = '') { if (!statusEl) return; statusEl.textContent = text; statusEl.dataset.k = cls; }
   const HINT = '머리와 몸통을 끌어서 움직여 보세요';
+  const stepsEl = figure.querySelector('.sim__steps'); let stepIdx = -1;
+  function buildSteps(c) {
+    if (!stepsEl) return; stepsEl.textContent = ''; stepIdx = -1;
+    (c?.markers || []).forEach((m, i) => { const li = document.createElement('li'); li.innerHTML = `<i>${String(i + 1).padStart(2, '0')}</i><span></span>`; li.lastChild.textContent = m.label; stepsEl.appendChild(li); });
+    stepsEl.hidden = !c || !c.markers?.length;
+  }
+  let lastActive = -1e9, gest = null, nextGest = 3;                        // 사용자가 마지막으로 만진 시각 / 지금 하는 혼자 동작 / 다음 동작 시각
+  figure.addEventListener('pointerdown', () => { lastActive = tNow; gest = null; }, true);
+  window.addEventListener('pointerup', () => { lastActive = tNow; });
   function play(name) {
     if (!CLIPS[name]) return;
     if (clipName === name && clip) { stopClip(); return; }                  // 같은 버튼을 다시 누르면 멈춤
-    clip = CLIPS[name]; clipName = name; clipT = -0.9;                      // 처음 0.9초는 시작 자세로 부드럽게 이동
+    clip = CLIPS[name]; clipName = name; clipT = -0.9; gest = null; lastActive = tNow;   // 처음 0.9초는 시작 자세로 부드럽게 이동
+    buildSteps(clip);
     motionBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.motion === name)));
   }
   function stopClip(keepPose = true) {
     clip = null; clipName = ''; motionBtns.forEach(b => b.setAttribute('aria-pressed', 'false'));
-    setStatus(HINT);
+    setStatus(HINT); buildSteps(null); lastActive = tNow;
     if (!keepPose) Object.assign(goal, AWAKE);
   }
 
@@ -274,6 +285,21 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   new ResizeObserver(resize).observe(host);
   new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible) { dirty = true; last = performance.now(); } }).observe(host);
 
+  /* ───────── 변칙적인 움직임 ─────────
+     가만히 두면 Cove가 혼자서 두리번거리고, 갸웃하고, 끄덕이고, 깜짝 놀라고, 하품하고, 몸을 흔든다.
+     순서와 간격은 매번 달라진다. 모두 로봇이 움직일 수 있는 범위 안이다. */
+  const env = (u) => Math.sin(Math.PI * clamp(u, 0, 1));
+  const GESTS = [
+    { name: '두리번두리번', dur: 4.6, eye: '뜬 눈', f: (u) => ({ body: 26 * Math.sin(2 * Math.PI * u) * env(u * 1.0 + 0.0) ** 0.3, tilt: 6 * Math.sin(2 * Math.PI * u), gx: Math.round(2 * Math.sin(2 * Math.PI * u)) }) },
+    { name: '갸웃?', dur: 3.2, eye: '반짝 눈', f: (u) => ({ tilt: 12 * env(u), head: -3 * env(u), body: 8 * env(u) }) },
+    { name: '끄덕끄덕', dur: 1.8, eye: '뜬 눈', f: (u) => ({ head: -8 * Math.sin(4 * Math.PI * u) * env(u) }) },
+    { name: '앗, 깜짝!', dur: 1.8, eye: '놀란 눈', f: (u) => { const p = u < 0.14 ? u / 0.14 : Math.exp(-(u - 0.14) * 4.2); return { neck: 7 * p, head: -7 * p, body: 6 * p }; } },
+    { name: '하아암~', dur: 3.6, eye: '졸린 눈', f: (u) => ({ neck: -7 * env(u), head: 9 * env(u) }) },
+    { name: '신나서 흔들흔들', dur: 2.4, eye: '신난 눈', f: (u) => ({ body: 13 * Math.sin(6 * Math.PI * u) * env(u), tilt: 5 * Math.sin(6 * Math.PI * u) * env(u) }) },
+  ];
+  let lastG = -1;
+  function pickGesture() { let i; do { i = Math.floor(Math.random() * GESTS.length); } while (i === lastG); lastG = i; return { ...GESTS[i], t: 0 }; }
+
   function frame(now) {
     requestAnimationFrame(frame);
     if (!visible) return;
@@ -284,19 +310,32 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
       const t = clamp(clipT, 0, clip.duration), s = sampleClip(clip, t);
       Object.assign(goal, limit({ neck: s[1], head: s[2], tilt: s[3] ?? 0, body: s[4] ?? 0 }));
       eyeName = eyeAt(clip.eyes, t);
-      const m = clip.markers.filter(x => x.t <= t + 1e-6).pop(); if (m) setStatus(m.label, 'play');
+      const mi = clip.markers.reduce((r, x, i) => (x.t <= t + 1e-6 ? i : r), -1); const m = clip.markers[mi]; if (m) setStatus(m.label, 'play');
+      if (mi !== stepIdx && stepsEl) { stepIdx = mi; [...stepsEl.children].forEach((li, i) => li.classList.toggle('cur', i === mi)); }
       if (clipT >= clip.duration + 0.4) { stopClip(); setStatus(HINT); }
     }
+    // 가만히 두면 혼자서 움직인다 (일어서 있고, 끌거나 동작을 재생하는 중이 아닐 때)
+    let off = null, gx = 0;
+    const idle = !clip && !drag && tNow - lastActive > 2.4 && goal.neck > 12 && pose.neck > 12;
+    if (!idle) { if (gest) { gest = null; setStatus(HINT); } }
+    else if (!gest && tNow >= nextGest) { gest = pickGesture(); }
+    if (gest) {
+      gest.t += dt; const u = gest.t / gest.dur;
+      if (u >= 1) { gest = null; nextGest = tNow + 3 + Math.random() * 5; setStatus(HINT); }
+      else { off = gest.f(u); gx = off.gx || 0; if (statusEl && statusEl.textContent !== gest.name) setStatus(gest.name, 'play'); }
+    }
+    let target = goal;
+    if (off) target = limit({ neck: goal.neck + (off.neck || 0), head: goal.head + (off.head || 0), tilt: goal.tilt + (off.tilt || 0), body: goal.body + (off.body || 0) });
     // 목표 자세를 부드럽게 따라간다
-    const tm = clip ? (clipT < 0 ? 0.3 : 0.07) : 0.1;           // 동작이 시작되기 전 준비 구간은 천천히 부드럽게
-    for (const j of ['neck', 'head', 'tilt', 'body']) pose[j] = smoothDamp(pose[j], goal[j], vv[j], tm, dt);
+    const tm = clip ? (clipT < 0 ? 0.3 : 0.07) : gest ? 0.16 : 0.1;           // 동작이 시작되기 전 준비 구간은 천천히 부드럽게
+    for (const j of ['neck', 'head', 'tilt', 'body']) pose[j] = smoothDamp(pose[j], target[j], vv[j], tm, dt);
     // 서 있을 때는 숨 쉬듯 아주 조금 흔들린다
     const g = clamp((pose.neck - 2) / 10, 0, 1), a = g * g * (3 - 2 * g);
     const sway = { neck: a * (0.45 * Math.sin(2 * Math.PI * tNow / 3.7) + 0.25 * Math.sin(2 * Math.PI * tNow / 5.9 + 1.3)), head: a * (0.7 * Math.sin(2 * Math.PI * tNow / 4.3 + 0.6) + 0.3 * Math.sin(2 * Math.PI * tNow / 2.9 + 2.1)) };
     const shown = { ...pose }; shown.neck += sway.neck; shown.head += sway.head;
     const saved = { ...pose }; Object.assign(pose, shown); writePose(); Object.assign(pose, saved);
-    if (!clip) eyeName = pose.neck < 4 ? '감은 눈' : '뜬 눈';
-    eyes.show(eyeName, 0, 0, tNow);
+    if (!clip) eyeName = gest ? gest.eye : pose.neck < 4 ? '감은 눈' : '뜬 눈';
+    eyes.show(eyeName, gx, 0, tNow);
     // 카메라
     cam.az = smoothDamp(cam.az, camGoal.az, cv.az, 0.28, dt); cam.el = smoothDamp(cam.el, camGoal.el, cv.el, 0.28, dt); cam.zoom = smoothDamp(cam.zoom, camGoal.zoom, cv.zoom, 0.22, dt);
     placeCamera();

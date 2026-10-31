@@ -177,7 +177,7 @@ body::before {
 .feature p { color: var(--ink-soft); font-size: 14px; font-weight: 300; margin-top: 12px; position: relative; }
 
 /* ---------- Design / Detail ---------- */
-.design__layout { display: grid; grid-template-columns: 1.45fr 1fr; gap: clamp(28px, 5vw, 80px); align-items: start; }
+.design__layout { display: grid; grid-template-columns: 1.7fr 1fr; gap: clamp(28px, 4.5vw, 72px); align-items: start; }
 .design__visual {
   position: sticky; top: 88px; width: 100%;
   aspect-ratio: 9 / 10; border-radius: var(--radius); overflow: hidden;
