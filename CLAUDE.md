@@ -35,7 +35,7 @@
 
 - **콘셉트**: 로봇이 주인공인 브랜드형 소개 페이지. 사람 이미지 없음. dreamy · warm futuristic · soft glow · minimal · premium · calm.
 - **색상** (`css/style.css`의 `:root`): 배경 `#f6f1ea`, 보조 배경 `#efe8de`, 크림 `#e8ddcf`, 글자 `#2b2731` / `#6c6573` / `#a49ca8`, 라벤더 `#b8a6e0`, 라일락 `#d9cdf2`, 실버 `#c9c6cf`, 피치 `#f6c9a8`, 글로우 `#ffd9b8`, Experience 섹션 어두운 배경 `#2a2533` / `#3a3145`, 강조 글자색 `#7d6aa8`.
-- **폰트**: 상단 메뉴 로고는 Cove.ai의 COVE 글자(assets/cove-logo.svg, 높이 20px), Design의 Form·Material·Motion 제목은 Jost 400(Futura 계열), 푸터 로고와 그 밖의 제목은 Instrument Serif, 본문·UI Manrope, 한글 Noto Sans KR. 인트로는 Jost(HI, I'm cove)와 Fredoka(배경의 큰 COVE). 한국어 강조 문구(`em.ko`)는 기울이지 않음.
+- **폰트**: 상단 메뉴 로고는 Cove.ai의 COVE 글자(assets/cove-logo.svg, 높이 20px), About 섹션 본문(큰 문장·Concept·Philosophy·Close/Calm/Kind)과 Design의 Form·Material·Motion 제목은 Jost(Futura 계열, 기울임 없음), 푸터 로고와 그 밖의 제목은 Instrument Serif, 본문·UI Manrope, 한글 Noto Sans KR. 인트로는 Jost(HI, I'm cove)와 Fredoka(배경의 큰 COVE). 한국어 강조 문구(`em.ko`)는 기울이지 않음.
 - **글자 크기**: 인트로 HI·I'm cove `clamp(36px, 4.8vw, 84px)`, 배경의 큰 COVE `24vw`, 섹션 제목 `clamp(34px, 5.4vw, 72px)`, About 문장 `clamp(28px, 4.4vw, 60px)`, 섹션 라벨(01 — About Cove 등) `clamp(15px, 1.35vw, 20px)` 대문자, 본문 14~16px.
 - **레이아웃·비율**: 좌우 여백 `clamp(16px, 5vw, 72px)`, 섹션 위아래 여백 `clamp(96px, 14vw, 180px)`, 모서리 둥글기 28px, Design 대표 이미지 4:5, 디테일 컷 16:10, 갤러리 3열 그리드.
 - **아웃트로**: 참고 이미지처럼 모노스페이스(JetBrains Mono) 프로젝트 명세. 회색 그라데이션 위에서 줄이 차례로 나타남. 내용은 index.html 의 #outro (ROBOTWORLD 2026, 프로젝트·팀·기간·참여자·지도교수). 하드웨어 구성(Actuators 등)은 뺀다. HIDE LAB 은 http://www.hidelab.co.kr/ 로 링크. 이름은 직책 구분 없이 표기.
