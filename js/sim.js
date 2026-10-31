@@ -159,12 +159,17 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   const box = new THREE.Box3().setFromObject(model), center = box.getCenter(new THREE.Vector3()), sphere = box.getBoundingSphere(new THREE.Sphere());
   center.y = box.min.y + (box.max.y - box.min.y) * 0.48;
   const VIEWS = { persp: { az: 35, el: 14, label: '3/4 View' }, front: { az: 0, el: 5, label: 'Front View' }, side: { az: 90, el: 5, label: 'Side View' }, top: { az: 180, el: 84, label: 'Top View' } };
-  const cam = { az: 35, el: 14, dist: 1 }, camGoal = { az: 35, el: 14 }, cv = { az: { v: 0 }, el: { v: 0 } };
+  const cam = { az: 35, el: 14, dist: 1, zoom: 1 }, camGoal = { az: 35, el: 14, zoom: 1 }, cv = { az: { v: 0 }, el: { v: 0 }, zoom: { v: 0 } };
+  const ZMIN = 0.6, ZMAX = 3.2;
   let view = 'persp';
   const viewBtns = [...figure.querySelectorAll('[data-view]')];
+  // 3D 칸은 카드 전체를 덮는다(확대해도 가장자리가 보이지 않음). 모델은 그 안의 "안전 영역"에 맞춰 놓는다.
+  const mobileMQ = window.matchMedia('(max-width: 760px)');
+  const safe = () => (mobileMQ.matches ? { w: 0.96, h: 0.69, cy: 0.455 } : { w: 0.92, h: 0.78, cy: 0.47 });
   function fitDistance() {
-    const vf = camera.fov * D2R, hf = 2 * Math.atan(Math.tan(vf / 2) * camera.aspect);
-    return (sphere.radius * 0.95) / Math.sin(Math.min(vf, hf) / 2);
+    const s = safe(), vf = camera.fov * D2R, tv = Math.tan(vf / 2), th = tv * camera.aspect;
+    const vv = 2 * Math.atan(tv * s.h), hv = 2 * Math.atan(th * s.w);
+    return (sphere.radius * 0.95) / Math.sin(Math.min(vv, hv) / 2);
   }
   function setView(v) {
     view = v; camGoal.az = VIEWS[v].az; camGoal.el = VIEWS[v].el;
@@ -174,7 +179,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     if (caption) caption.textContent = `Render — ${VIEWS[v].label}`;
   }
   function placeCamera() {
-    const az = cam.az * D2R, el = cam.el * D2R, d = cam.dist;
+    const az = cam.az * D2R, el = cam.el * D2R, d = cam.dist / cam.zoom;
     const dir = FRONT.clone().multiplyScalar(Math.cos(az)).addScaledVector(RIGHT, Math.sin(az));
     camera.position.copy(center).addScaledVector(dir, d * Math.cos(el)); camera.position.y += d * Math.sin(el);
     camera.lookAt(center);
@@ -239,7 +244,20 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
 
   viewBtns.forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
   motionBtns.forEach(b => b.addEventListener('click', () => play(b.dataset.motion)));
-  figure.querySelector('[data-act="reset"]')?.addEventListener('click', () => { stopClip(false); setView('persp'); });
+  figure.querySelector('[data-act="reset"]')?.addEventListener('click', () => { stopClip(false); setView('persp'); camGoal.zoom = 1; });
+
+  /* 확대·축소: + − 버튼, Ctrl(⌘)+휠 또는 트랙패드 핀치, 터치 두 손가락 핀치, 빈 곳을 두 번 누르면 원래 크기.
+     그냥 휠은 페이지 스크롤에 쓰이도록 그대로 둔다. */
+  const zoomBy = (f) => { camGoal.zoom = clamp(camGoal.zoom * f, ZMIN, ZMAX); };
+  figure.querySelector('[data-zoom="in"]')?.addEventListener('click', () => zoomBy(1.25));
+  figure.querySelector('[data-zoom="out"]')?.addEventListener('click', () => zoomBy(1 / 1.25));
+  el.addEventListener('wheel', (e) => { if (!(e.ctrlKey || e.metaKey)) return; e.preventDefault(); zoomBy(Math.exp(-e.deltaY * (e.deltaMode ? 0.05 : 0.0022))); }, { passive: false });
+  el.addEventListener('dblclick', (e) => { if (!pick(e)) camGoal.zoom = 1; });
+  const touches = new Map(); let pinch0 = null;
+  el.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'touch') return; touches.set(e.pointerId, [e.clientX, e.clientY]); if (touches.size === 2) { const [a, b] = [...touches.values()]; pinch0 = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), z: camGoal.zoom }; drag = null; } }, true);
+  el.addEventListener('pointermove', (e) => { if (!touches.has(e.pointerId)) return; touches.set(e.pointerId, [e.clientX, e.clientY]); if (touches.size === 2 && pinch0) { const [a, b] = [...touches.values()]; camGoal.zoom = clamp(pinch0.z * Math.hypot(a[0] - b[0], a[1] - b[1]) / pinch0.d, ZMIN, ZMAX); } }, true);
+  const lift = (e) => { touches.delete(e.pointerId); if (touches.size < 2) pinch0 = null; };
+  el.addEventListener('pointerup', lift, true); el.addEventListener('pointercancel', lift, true);
   figure.querySelector('[data-act="toggle"]')?.addEventListener('click', (e) => {
     stopClip(); const sitting = goal.neck < 10; Object.assign(goal, sitting ? AWAKE : { neck: 0, head: 0, tilt: 0, body: goal.body });
     e.currentTarget.textContent = sitting ? '앉기' : '일어나기';
@@ -250,7 +268,8 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   function resize() {
     const w = host.clientWidth, h = host.clientHeight; if (!w || !h) return;
     renderer.setSize(w, h, false); renderer.domElement.style.cssText += ';width:100%;height:100%;display:block';
-    camera.aspect = w / h; camera.updateProjectionMatrix(); cam.dist = fitDistance(); dirty = true;
+    camera.aspect = w / h; camera.updateProjectionMatrix(); cam.dist = fitDistance();
+    camera.setViewOffset(w, h, 0, -(safe().cy - 0.5) * h, w, h); dirty = true;     // 모델 중심을 안전 영역의 가운데로
   }
   new ResizeObserver(resize).observe(host);
   new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible) { dirty = true; last = performance.now(); } }).observe(host);
@@ -279,7 +298,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     if (!clip) eyeName = pose.neck < 4 ? '감은 눈' : '뜬 눈';
     eyes.show(eyeName, 0, 0, tNow);
     // 카메라
-    cam.az = smoothDamp(cam.az, camGoal.az, cv.az, 0.28, dt); cam.el = smoothDamp(cam.el, camGoal.el, cv.el, 0.28, dt);
+    cam.az = smoothDamp(cam.az, camGoal.az, cv.az, 0.28, dt); cam.el = smoothDamp(cam.el, camGoal.el, cv.el, 0.28, dt); cam.zoom = smoothDamp(cam.zoom, camGoal.zoom, cv.zoom, 0.22, dt);
     placeCamera();
     renderer.render(scene, camera);
   }
@@ -289,5 +308,5 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   requestAnimationFrame(frame);
 
   // 확인·연동용 (콘솔에서 COVE_SIM.play('greet') 처럼 쓸 수 있어요)
-  window.COVE_SIM = { play, stop: stopClip, setView, goal, pose, eyes, pick, get view() { return view; }, setTiltSign(s) { TILT_SIGN = s; } };
+  window.COVE_SIM = { play, stop: stopClip, setView, goal, pose, eyes, pick, camGoal, cam, get view() { return view; }, setTiltSign(s) { TILT_SIGN = s; } };
 }
