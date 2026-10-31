@@ -219,7 +219,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     const g = new THREE.ExtrudeGeometry(sh, { depth: T, bevelEnabled: true, bevelSize: T * 0.25, bevelThickness: T * 0.25, bevelSegments: 3 });
     const desk = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: '#e6d8c4', roughness: 0.78, metalness: 0, envMapIntensity: 0.5 }));
     desk.rotation.x = -Math.PI / 2; desk.position.set(center.x, box.min.y - T - 0.0004, center.z); scene.add(desk);
-    const syncDesk = () => { desk.visible = !window.matchMedia('(max-width: 760px)').matches; dirty = true; };   // 모바일(반응형)에서는 책상을 숨긴다
+    const syncDesk = () => { desk.visible = !window.matchMedia("(max-width: 760px)").matches; };   // 모바일(반응형)에서는 책상을 숨긴다
     syncDesk(); window.matchMedia('(max-width: 760px)').addEventListener('change', syncDesk); }
 
   /* ───────── 끌기 / 누르기 ───────── */
