@@ -85,35 +85,6 @@ const onScroll = () => nav.classList.toggle('is-scrolled', window.scrollY > 40);
 window.addEventListener('scroll', onScroll, { passive: true });
 onScroll();
 
-/* ---------- 5. Experience moods ----------
-   문구를 바꾸고 싶으면 아래 내용만 수정하면 됩니다. */
-const MOODS = {
-  wake:   { title: 'Good morning', desc: '아침이 오면 천천히 눈을 뜨고, 고개를 들어 인사해요.' },
-  listen: { title: 'I’m listening', desc: '고개를 갸웃하며 이쪽으로 몸을 돌려 귀 기울여요.' },
-  focus:  { title: 'Stay with you', desc: '눈을 가늘게 뜨고, 조용히 곁에서 함께 집중해요.' },
-  rest:   { title: 'Rest well',     desc: '하루가 끝나면 눈을 감고 고개를 살짝 숙여 쉬어요.' },
-};
-const exp = document.getElementById('experience');
-const moodText = document.querySelector('.mood-text');
-const moodTitle = document.getElementById('mood-title');
-const moodDesc = document.getElementById('mood-desc');
-const moodButtons = document.querySelectorAll('.moods button');
-
-moodButtons.forEach(btn => {
-  btn.addEventListener('click', () => {
-    const mood = btn.dataset.mood;
-    if (exp.dataset.mood === mood) return;
-    moodButtons.forEach(b => b.setAttribute('aria-selected', String(b === btn)));
-    exp.dataset.mood = mood;
-    moodText.classList.add('is-changing');
-    setTimeout(() => {
-      moodTitle.textContent = MOODS[mood].title;
-      moodDesc.textContent = MOODS[mood].desc;
-      moodText.classList.remove('is-changing');
-    }, 300);
-  });
-});
-
 /* ---------- 6. Page indicator ----------
    좌측 하단에 지금 보고 있는 섹션을 표시합니다. (인트로에서는 숨김)
    이름/번호를 바꾸려면 아래 목록만 수정하면 됩니다. */
@@ -122,8 +93,7 @@ const PAGES = [
   { sel: '#about',       num: '01', name: 'About' },
   { sel: '#features',    num: '02', name: 'Features' },
   { sel: '#design',      num: '03', name: 'Design' },
-  { sel: '#experience',  num: '04', name: 'Experience' },
-  { sel: '#gallery',     num: '05', name: 'Gallery' },
+  { sel: '#gallery',     num: '04', name: 'Gallery' },
   { sel: '.closing',     num: '',   name: 'Credits' },
 ].map(p => ({ ...p, el: document.querySelector(p.sel) })).filter(p => p.el);
 
@@ -140,7 +110,7 @@ function updatePager() {
   const cur = PAGES[idx];
   const show = Boolean(cur.name);
   pager.classList.toggle('is-visible', show);
-  pager.classList.toggle('is-dark', cur.sel === '#experience');
+  pager.classList.toggle('is-dark', false);
   if (idx !== pagerIndex && show) {
     const first = pagerIndex === -1 || !pager.classList.contains('is-visible');
     pager.classList.add('is-swapping');

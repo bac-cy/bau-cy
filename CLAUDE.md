@@ -41,7 +41,7 @@
 - **아웃트로**: 참고 이미지처럼 모노스페이스(JetBrains Mono) 프로젝트 명세. 회색 그라데이션 위에서 줄이 차례로 나타남. 내용은 index.html 의 #outro (ROBOTWORLD 2026, 프로젝트·팀·기간·참여자·지도교수). 하드웨어 구성(Actuators 등)은 뺀다. HIDE LAB 은 http://www.hidelab.co.kr/ 로 링크. 이름은 직책 구분 없이 표기.
 - **Hero 섹션은 삭제됨**: 인트로의 큰 COVE 글자 + Cove 렌더 장면이 그 자리를 대신함(사용자 요청).
 - **반응형 기준**: 1024px 이하 기능 카드 2열, 760px 이하 1열 구성과 메뉴 숨김, 520px 이하 기능 카드 1열.
-- **섹션 순서**: 인트로(HI → I'm cove → 큰 COVE 글자 + Cove 렌더, 스크롤로 이어짐) → About → Key Features → Design & Detail → Experience(Wake/Listen/Focus/Rest) → Gallery → 아웃트로(프로젝트 명세) → Footer.
+- **섹션 순서**: 인트로(HI → I'm cove → 큰 COVE 글자 + Cove 렌더, 스크롤로 이어짐) → About → Key Features → Design & Detail → Gallery → 아웃트로(프로젝트 명세) → Footer.
 - **스크롤·움직임**: 부드러운 스크롤, 스크롤 시 서서히 나타나는 효과, 로봇이 떠 있는 움직임과 눈 깜빡임, 인트로 I'm cove 장면의 그라디언트가 마우스를 따라감, 스크롤 위치에 맞는 상단 메뉴 항목이 보라색(#5b43a6)+굵은 밑줄로 강조됨, 좌측 하단 페이지 표시는 메뉴가 숨겨지는 모바일(760px 이하)에서만 보임, Design 대표 이미지 화면 고정(sticky), 스크롤하면 메뉴 배경이 반투명해짐, 움직임 줄이기 설정 존중.
 
 ## 문구 원칙 (사용자 지시)
@@ -58,3 +58,4 @@
 - **Design 카드 안의 Cove 장면**(js/cards.js): Form·Material·Motion 각 카드의 이미지 칸에서 그 항목 장면이 스스로 재생된다. Form은 옆모습→앞모습→3/4, Material은 이음선 확대, Motion은 숙임→몸통 회전·갸웃→눈 표정(반짝·신난 눈) 반복. 왼쪽 시뮬레이터는 카드와 연동하지 않고 독립적으로 동작한다(사용자 요청). 화면에 보이는 카드만 그린다.
 - **인트로 Cove**(js/intro-cove.js): 인트로 마지막 장면의 Cove는 처음엔 겹쳐진(앉은) 상태이고, 마우스를 움직이면 일어나 커서 쪽으로 몸통을 돌리고 갸웃하며 눈 LED도 그쪽을 본다. 4초 가만히 있으면 다시 앉는다. 시뮬레이터 모델·눈 위치를 그대로 쓴다. 3D 실패·움직임 줄이기에서는 기존 렌더 이미지(assets/intro-cove.png).
 - **규격**(Design 하단): Height 160–237 mm, Width 222–251 mm (모델에서 접힌 상태~최대 확장 상태로 측정). Weight·Finish는 미정(—).
+- **Experience 섹션은 삭제됨**(사용자 요청). 상단 메뉴는 About / Features / Design / Gallery, Gallery 라벨은 04.
