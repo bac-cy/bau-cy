@@ -155,3 +155,23 @@ function updatePager() {
 window.addEventListener('scroll', () => { if (!pagerTick) { pagerTick = true; requestAnimationFrame(updatePager); } }, { passive: true });
 window.addEventListener('resize', updatePager);
 updatePager();
+
+/* ---------- 7. Nav highlight ----------
+   스크롤 위치에 맞는 상단 메뉴 항목을 강조합니다. (인트로·마지막 문구 구간에서는 강조 없음) */
+const spyItems = [...document.querySelectorAll('.nav__links a')]
+  .map(a => ({ a, el: document.querySelector(a.getAttribute('href')) })).filter(x => x.el);
+const spyEnd = document.querySelector('.closing');
+let spyTick = false;
+function updateNavSpy() {
+  spyTick = false;
+  const mid = window.innerHeight * 0.45;
+  let cur = null;
+  spyItems.forEach(x => { if (x.el.getBoundingClientRect().top <= mid) cur = x; });
+  if (cur && spyEnd && spyEnd.getBoundingClientRect().top <= mid) cur = null;
+  spyItems.forEach(x => {
+    if (x === cur) x.a.setAttribute('aria-current', 'location'); else x.a.removeAttribute('aria-current');
+  });
+}
+window.addEventListener('scroll', () => { if (!spyTick) { spyTick = true; requestAnimationFrame(updateNavSpy); } }, { passive: true });
+window.addEventListener('resize', updateNavSpy);
+updateNavSpy();
