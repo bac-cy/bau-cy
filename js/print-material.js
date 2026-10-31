@@ -1,4 +1,4 @@
-/* 3D프린터(FDM) 무광 다크 브라운 재질 — 목 기둥에 사용.
+/* 3D프린터 출력 느낌의 은은한 새틴 로즈 그레이 재질 — 목 기둥에 사용.
    Visune "3D Printed Materials Pack (MAT040)"의 Large Format FDM 변위 이미지(적층 결)를
    요철(bump)로 입혀, 한 층씩 쌓아 올린 프린트 결이 은은하게 보인다. (assets/fdm-layers.webp) */
 let tex = null;
@@ -7,7 +7,7 @@ export function printedMaterial(THREE) {
     tex = new THREE.TextureLoader().load(new URL('../assets/fdm-layers.webp', import.meta.url).href);
     tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.anisotropy = 4;
   }
-  return new THREE.MeshStandardMaterial({ color: '#44362e', roughness: 0.88, metalness: 0, envMapIntensity: 0.35, bumpMap: tex, bumpScale: 9 });
+  return new THREE.MeshStandardMaterial({ color: '#cbbfc2', roughness: 0.5, metalness: 0.12, envMapIntensity: 0.9, bumpMap: tex, bumpScale: 2.5 });
 }
 // 모델에 UV가 없어서, 모델 안쪽 높이(y)를 따라 결이 층층이 쌓이도록 UV를 만든다.
 export function layerUV(THREE, mesh) {
