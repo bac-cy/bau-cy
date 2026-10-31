@@ -126,3 +126,45 @@ moodButtons.forEach(btn => {
     }, 300);
   });
 });
+
+/* ---------- 6. Page indicator ----------
+   좌측 하단에 지금 보고 있는 섹션을 표시합니다. (Hero에서는 숨김)
+   이름/번호를 바꾸려면 아래 목록만 수정하면 됩니다. */
+const PAGES = [
+  { sel: '.hero',        num: '',   name: '' },
+  { sel: '#about',       num: '01', name: 'About' },
+  { sel: '#features',    num: '02', name: 'Features' },
+  { sel: '#design',      num: '03', name: 'Design' },
+  { sel: '#experience',  num: '04', name: 'Experience' },
+  { sel: '#gallery',     num: '05', name: 'Gallery' },
+  { sel: '.closing',     num: '',   name: 'Coming soon' },
+].map(p => ({ ...p, el: document.querySelector(p.sel) })).filter(p => p.el);
+
+const pager = document.getElementById('pager');
+const pagerNum = pager.querySelector('.pager__num');
+const pagerName = pager.querySelector('.pager__name');
+let pagerIndex = -1, pagerTick = false;
+
+function updatePager() {
+  pagerTick = false;
+  const mid = window.innerHeight * 0.5;
+  let idx = 0;
+  PAGES.forEach((p, i) => { if (p.el.getBoundingClientRect().top <= mid) idx = i; });
+  const cur = PAGES[idx];
+  const show = Boolean(cur.name);
+  pager.classList.toggle('is-visible', show);
+  pager.classList.toggle('is-dark', cur.sel === '#experience');
+  if (idx !== pagerIndex && show) {
+    const first = pagerIndex === -1 || !pager.classList.contains('is-visible');
+    pager.classList.add('is-swapping');
+    setTimeout(() => {
+      pagerNum.textContent = cur.num;
+      pagerName.textContent = cur.name;
+      pager.classList.remove('is-swapping');
+    }, first ? 0 : 250);
+  }
+  pagerIndex = idx;
+}
+window.addEventListener('scroll', () => { if (!pagerTick) { pagerTick = true; requestAnimationFrame(updatePager); } }, { passive: true });
+window.addEventListener('resize', updatePager);
+updatePager();

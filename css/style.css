@@ -386,3 +386,21 @@ body::before {
 
 /* Korean emphasis: keep upright (no faux italic), accent by color & weight */
 em.ko { font-family: var(--font-ui); font-style: normal; font-weight: 400; font-size: 1em; }
+
+/* ---------- Page indicator (좌측 하단 고정, 현재 섹션 표시) ---------- */
+.pager {
+  position: fixed; left: max(8px, calc(var(--gutter) - 14px)); bottom: 20px; z-index: 40;
+  display: flex; gap: 12px; align-items: baseline;
+  padding: 8px 16px; border-radius: 999px;
+  background: rgba(246, 241, 234, .72);
+  backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 0 0 1px var(--line);
+  font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft);
+  opacity: 0; transform: translateY(6px); pointer-events: none;
+  transition: opacity .5s var(--ease), transform .5s var(--ease), color .6s var(--ease), background .6s var(--ease);
+}
+.pager.is-visible { opacity: 1; transform: none; }
+.pager.is-dark { color: #d8d0e2; background: rgba(42, 37, 51, .6); box-shadow: 0 0 0 1px rgba(255, 255, 255, .12); }
+.pager__num { font-family: var(--font-display); font-style: italic; font-size: 15px; letter-spacing: .04em; color: inherit; }
+.pager__name { transition: opacity .3s var(--ease); }
+.pager.is-swapping .pager__name, .pager.is-swapping .pager__num { opacity: 0; }
