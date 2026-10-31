@@ -16,15 +16,15 @@
 
   // 명단 채우기
   const mk = (tag, cls, text) => { const e = document.createElement(tag); e.className = cls; if (text != null) e.textContent = text; return e; };
-  const namesEl = arr => { const l = mk('div', 'outro__names'); (arr || []).forEach(n => l.appendChild(mk('p', 'outro__name', n))); return l; };
+  const namesEl = (arr, cols) => { const l = mk('div', 'outro__names'); if (cols) l.dataset.cols = cols; (arr || []).forEach(n => l.appendChild(mk('p', 'outro__name', n))); return l; };
   const credits = window.COVE_CREDITS || [];
   let total = 0;
   credits.forEach(g => {
     const wrap = mk('div', 'outro__group');
-    wrap.appendChild(mk('p', 'outro__role', g.role));
+    if (g.role) wrap.appendChild(mk('p', 'outro__role', g.role));
     if (g.sub) g.sub.forEach(s => {
       const sub = mk('div', 'outro__sub'); sub.appendChild(mk('p', 'outro__sublabel', s.label)); sub.appendChild(namesEl(s.names)); wrap.appendChild(sub); total += (s.names || []).length;
-    }); else { wrap.appendChild(namesEl(g.names)); total += (g.names || []).length; }
+    }); else { wrap.appendChild(namesEl(g.names, g.cols)); total += (g.names || []).length; }
     slot.appendChild(wrap);
   });
   if (total > 16) slot.classList.add('is-wide');   // 이름이 많으면 두 칸 배치
