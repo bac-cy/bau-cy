@@ -28,23 +28,18 @@ float weave(vec2 p, float fade){
   float over = mod(c.x + c.y, 2.0);
   float warp = sin(f.x * 3.14159), weft = sin(f.y * 3.14159);
   float h = mix(warp, weft, over);
-  float slub = nz(vec2(c.x * 0.35, p.y * 0.04)) * .5 + nz(vec2(p.x * 0.04, c.y * 0.35)) * .5;
+  float slub = nz(p * vec2(0.25, 0.9)) * .5 + nz(p * vec2(0.9, 0.25)) * .5;
   h = (h * 0.5 + 0.5) * (0.8 + 0.4 * slub);
   return mix(0.65, h, fade);
 }
 float tri(vec3 p, vec3 n, float fr, out float fade){
   vec3 w = pow(abs(n), vec3(4.0)); w /= (w.x + w.y + w.z);
-  float px = max(length(fwidth(p * fr)), 1e-5); fade = 1.0 - smoothstep(0.35, 0.8, px);
+  float px = max(length(fwidth(p * fr)), 1e-5); fade = 1.0 - smoothstep(0.5, 1.0, px);
   return w.x * weave(p.yz * fr, fade) + w.y * weave(p.xz * fr, fade) + w.z * weave(p.xy * fr, fade);
 }`)
       .replace('#include <map_fragment>', `#include <map_fragment>
-float fdA; float hgt = tri(vObjPos, normalize(vObjN), 900.0, fdA);
-diffuseColor.rgb *= 0.88 + 0.22 * hgt;`)
-      .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
-{ float fdB; float hv = tri(vObjPos, normalize(vObjN), 900.0, fdB);
-  vec3 sx = dFdx(-vViewPosition), sy = dFdy(-vViewPosition); vec3 r1 = cross(sy, normal), r2 = cross(normal, sx);
-  float det = dot(sx, r1); vec3 grad = sign(det) * (dFdx(hv) * r1 + dFdy(hv) * r2);
-  normal = normalize(abs(det) * normal - 0.9 * fdB * grad); }`);
+float fdA; float hgt = tri(vObjPos, normalize(vObjN), 50.0, fdA);
+diffuseColor.rgb *= 0.72 + 0.42 * hgt;`);
   };
   return cache[hex] = m;
 }
