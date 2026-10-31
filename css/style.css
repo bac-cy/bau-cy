@@ -64,7 +64,7 @@ body::before {
 .section__head { margin-bottom: clamp(48px, 7vw, 96px); }
 
 .label, .eyebrow {
-  font-size: 12px; letter-spacing: .22em; text-transform: uppercase;
+  font-size: clamp(15px, 1.35vw, 20px); letter-spacing: .2em; text-transform: uppercase;
   color: var(--ink-soft); font-weight: 500; margin-bottom: 24px;
 }
 .heading {
