@@ -96,3 +96,7 @@
   opacity: 0; pointer-events: none; will-change: transform, opacity;
 }
 .intro__render { transform-origin: 50% 100%; }
+
+/* 인트로 맨 아래를 크림색으로 서서히 풀어서 About 과 경계 없이 이어지게 */
+.intro::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: clamp(110px, 18svh, 220px); z-index: 5; pointer-events: none;
+  background: linear-gradient(180deg, rgba(246, 241, 234, 0) 0%, rgba(246, 241, 234, .55) 55%, var(--bg) 100%); }
