@@ -57,3 +57,7 @@
   .outro__group .r { grid-template-columns: 7vw 1fr; column-gap: 1.3vw; }
   .outro__end { margin-top: 2.2vw; padding-left: calc(7vw + 1.3vw); }
 }
+
+/* 연구실 링크 */
+.outro__sheet a { color: inherit; text-decoration: underline; text-decoration-color: rgba(43, 39, 49, .3); text-underline-offset: .3em; transition: color .3s ease, text-decoration-color .3s ease; }
+.outro__sheet a:hover, .outro__sheet a:focus-visible { color: #5b43a6; text-decoration-color: currentColor; }
