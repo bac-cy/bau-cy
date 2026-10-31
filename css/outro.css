@@ -45,3 +45,18 @@
 @media (prefers-reduced-motion: reduce) {
   .closing.outro .outro__logo, .closing.outro .outro__event, .closing.outro .r { opacity: 1; transform: none; transition: none; }
 }
+
+/* ───── 16:9 화면 구도 (PC): 참고 이미지처럼 텍스트를 왼쪽에 두고, 오른쪽은 은은한 여백 ───── */
+@media (min-width: 901px) {
+  .closing.outro { aspect-ratio: 16 / 9; min-height: 0; padding: 0; }
+  .closing.outro > .outro__sheet {
+    position: absolute; top: 14.6%; left: 9.6vw; margin: 0; max-width: none;
+    font-size: max(10px, .95vw); line-height: 1.45;
+  }
+  .outro__logo, .outro__event { margin-left: calc(7vw + 1.3vw); }            /* 값이 시작하는 줄(화면 폭의 17.9%)에 맞춤 */
+  .outro__logo { height: 2.1vw; margin-bottom: 2.2vw; }
+  .outro__event { margin-bottom: 1.5vw; }
+  .outro__group { margin-bottom: 1.5vw; }
+  .outro__group .r { grid-template-columns: 7vw 1fr; column-gap: 1.3vw; }
+  .outro__end { margin-top: 2.2vw; padding-left: calc(7vw + 1.3vw); }
+}
