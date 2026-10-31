@@ -1,6 +1,6 @@
 /* ==========================================================
    Cove — Outro: 프로젝트 명세
-   모노스페이스 글씨로 한 줄씩 차분하게. 은은한 회색 그라데이션 위에서 줄이 차례로 나타납니다.
+   모노스페이스 글씨로 한 줄씩 차분하게. 사이트 기본 톤(크림 + 연한 라벤더·복숭아 빛) 위에서 줄이 차례로 나타납니다.
    ========================================================== */
 .closing.outro {
   position: relative; min-height: 88svh; overflow: hidden; color: var(--ink);
@@ -12,9 +12,6 @@
     var(--bg);
 }
 .closing.outro > .outro__sheet { position: relative; z-index: 1; }
-
-.outro__sheet { position: relative; z-index: 1; }
-.closing.outro { background-image: var(--grain), linear-gradient(180deg, #a7a8ac 0%, #bcbdc0 30%, #d1d1d3 70%, #dcdcde 100%); background-blend-mode: soft-light, normal; }
 
 .outro__sheet {
   max-width: 760px; margin-left: clamp(0px, 14vw, 230px); text-align: left;
