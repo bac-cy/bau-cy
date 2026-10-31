@@ -47,16 +47,26 @@
      단위는 "화면 높이(svh)"입니다. s = 1 이면 화면 한 장만큼 스크롤한 상태. */
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const easeOut = t => 1 - Math.pow(1 - t, 3);
+  const smooth = t => t * t * (3 - 2 * t);          // 시작과 끝이 부드러운 곡선
+  // 목표값을 향해 부드럽게 가속·감속하며 따라가는 스프링(튀지 않음)
+  function smoothDamp(cur, target, vel, time, dt) {
+    const w = 2 / time, x = w * dt, e = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x);
+    const d = cur - target, tmp = (vel.v + w * d) * dt;
+    vel.v = (vel.v - w * tmp) * e;
+    return target + (d + tmp) * e;
+  }
 
   // HI ↔ I'm cove 전환: 살짝만 스크롤해도 장면이 딱 넘어가고(스냅), 되돌리면 딱 돌아옵니다.
   const TRIGGER_ON = 0.10, TRIGGER_OFF = 0.05;    // 넘어가는 / 돌아오는 스크롤 위치 (히스테리시스)
-  const SNAP_SPEED = 9;                            // 클수록 더 빠르고 쫀쫀하게 전환
+  const SNAP_TIME = 0.17;                          // HI ↔ I'm cove 전환에 걸리는 시간(초) — 작을수록 쫀쫀
   // I'm cove → Cove 렌더 구간
-  const OUT_START = 0.32, OUT_SPAN = 0.14;         // I'm cove 사라지기
-  const RISE_START = 0.36, RISE_SPAN = 0.55;       // 큰 COVE 글자 + 렌더 올라오기 (전체 스크롤 약 1화면)
-  const GLIDE_SPEED = 11;                          // 휠 한 칸의 움직임이 부드럽게 이어지는 정도
+  // 휠 1칸 ≈ 0.067 (HI → I'm cove 가 1.5칸 = 0.10). 구간 길이를 칸 수로 환산해 잡았습니다.
+  const OUT_START = 0.17, OUT_SPAN = 0.06;         // I'm cove 사라지기
+  const RISE_START = 0.20, RISE_SPAN = 0.14;       // 큰 COVE 글자 + 렌더 올라오기 (약 2칸)
+  const GLIDE_TIME = 0.2;                          // 스크롤을 따라오는 시간(초) — 작을수록 쫀쫀, 클수록 부드러움
 
   let on = false, t = 0, ss = 0, last = performance.now();
+  const vt = { v: 0 }, vss = { v: 0 };
 
   function frame(now) {
     requestAnimationFrame(frame);
@@ -69,17 +79,17 @@
     if (!on && s > TRIGGER_ON) on = true;
     else if (on && s < TRIGGER_OFF) on = false;
     const goal = on ? 1 : 0;
-    t = reduced ? goal : t + (goal - t) * (1 - Math.exp(-dt * SNAP_SPEED));
-    if (Math.abs(goal - t) < 0.002) t = goal;
+    t = reduced ? goal : smoothDamp(t, goal, vt, SNAP_TIME, dt);
+    if (Math.abs(goal - t) < 0.002 && Math.abs(vt.v) < 0.01) { t = goal; vt.v = 0; }
 
     // HI는 앞쪽 절반에 빠르게 빠지고, I'm cove는 뒤이어 들어옵니다 (겹쳐 섞이지 않음)
-    const hiA = easeOut(clamp(t / 0.55));
-    const imA = easeOut(clamp((t - 0.35) / 0.65));
+    const hiA = smooth(clamp(t / 0.55));
+    const imA = smooth(clamp((t - 0.35) / 0.65));
     // 휠이 한 칸씩 끊겨 움직여도 화면은 미끄러지듯 따라오게 함 (되감기도 동일)
-    ss = reduced ? s : ss + (s - ss) * (1 - Math.exp(-dt * GLIDE_SPEED));
-    if (Math.abs(s - ss) < 0.0005) ss = s;
+    ss = reduced ? s : smoothDamp(ss, s, vss, GLIDE_TIME, dt);
+    if (Math.abs(s - ss) < 0.0003 && Math.abs(vss.v) < 0.005) { ss = s; vss.v = 0; }
     const out = clamp((ss - OUT_START) / OUT_SPAN);
-    const b = easeOut(clamp((ss - RISE_START) / RISE_SPAN));
+    const b = smooth(clamp((ss - RISE_START) / RISE_SPAN));
 
     if (t > 0.3) startIm();
     if (ss >= RISE_START && imStarted && !imDone) {      // 타이핑이 끝나기 전에 넘어가면 바로 완성
