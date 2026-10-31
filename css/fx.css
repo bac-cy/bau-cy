@@ -1,0 +1,19 @@
+/* 디테일 효과 미리보기 (주소 끝에 ?fx=1 을 붙였을 때만 적용됨) */
+.fx-grain { position: fixed; inset: -50%; z-index: 90; pointer-events: none; opacity: .07; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .2  0 0 0 0 .17  0 0 0 0 .22  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  animation: fxgrain 1.2s steps(6) infinite; }
+@keyframes fxgrain { 0% { transform: translate(0, 0); } 20% { transform: translate(-3%, 2%); } 40% { transform: translate(2%, -3%); } 60% { transform: translate(-2%, -1%); } 80% { transform: translate(3%, 3%); } 100% { transform: translate(0, 0); } }
+.fx-trail { position: fixed; inset: 0; z-index: 85; pointer-events: none; }
+.fx-ring { position: fixed; left: 0; top: 0; z-index: 95; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; pointer-events: none; opacity: 0;
+  background: rgba(184, 166, 224, .28); box-shadow: 0 0 0 1px rgba(125, 106, 168, .35); transition: opacity .25s, width .3s, height .3s, margin .3s; }
+.fx-ring.on { opacity: 1; width: 64px; height: 64px; margin: -32px 0 0 -32px; }
+/* 제목: 마스크 안에서 올라오기 */
+.fx-mask { display: block; overflow: hidden; padding-bottom: .14em; margin-bottom: -.14em; }
+.fx-mask > .fx-in { display: block; transform: translateY(112%); transition: transform 1.15s cubic-bezier(.2, .9, .2, 1); }
+.fx-mask.is-in > .fx-in { transform: none; }
+.statement.reveal.fx-t, .detail h3.fx-t, .principles span.fx-t { opacity: 1; transform: none; }
+/* 카드: 따라오는 빛 + 살짝 기울기 */
+.feature.fx-card::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; opacity: 0; transition: opacity .4s;
+  background: radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%), rgba(184, 166, 224, .30), transparent 70%); }
+.feature.fx-card:hover::after { opacity: 1; }
+.fx-mag { will-change: transform; }
