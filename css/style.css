@@ -437,3 +437,16 @@ em.ko { font-family: var(--font-ui); font-style: normal; font-weight: 400; font-
 .principles__img::after { content: none; }
 .principles__img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 @media (max-width: 760px) { .principles__img { aspect-ratio: 16 / 11; } }
+
+/* Gallery 영상 캐러셀: 옆으로 밀어서 영상 두 개를 넘겨 본다 */
+.gallery__carousel { position: relative; }
+.gallery__track { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; border-radius: var(--radius); overscroll-behavior-x: contain; }
+.gallery__track::-webkit-scrollbar { display: none; }
+.gallery__track > .gallery__film { flex: 0 0 100%; scroll-snap-align: center; }
+.gallery__track.is-dragging { scroll-snap-type: none; cursor: grabbing; }
+.gallery__nav { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 22px; }
+.gallery__arrow { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: rgba(251, 248, 244, .8); color: var(--ink); display: grid; place-items: center; cursor: pointer; transition: background .3s, color .3s, transform .3s; }
+.gallery__arrow:hover { background: var(--ink); color: #fff; }
+.gallery__dots { display: flex; gap: 10px; }
+.gallery__dots button { width: 9px; height: 9px; padding: 0; border-radius: 50%; border: 0; background: rgba(43, 39, 49, .22); cursor: pointer; transition: width .35s var(--ease), background .35s; }
+.gallery__dots button[aria-selected="true"] { width: 28px; border-radius: 99px; background: var(--ink); }

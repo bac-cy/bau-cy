@@ -9,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600&family=Noto+Sans+KR:wght@300;400;500&family=Jost:wght@200;300;400;500&family=JetBrains+Mono:wght@300;400&family=Fredoka:wdth,wght@125,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20261031q">
-  <link rel="stylesheet" href="css/intro.css?v=20261031q">
-  <link rel="stylesheet" href="css/sim.css?v=20261031q">
+  <link rel="stylesheet" href="css/style.css?v=20261031r">
+  <link rel="stylesheet" href="css/intro.css?v=20261031r">
+  <link rel="stylesheet" href="css/sim.css?v=20261031r">
 </head>
 <body>
 
@@ -207,10 +207,23 @@
         <p class="label reveal">04 — Gallery</p>
       </div>
 
-      <figure class="gallery__film reveal">
-        <video src="assets/cove-film.mp4" poster="assets/cove-film-poster.jpg" muted loop playsinline preload="metadata" aria-label="Cove 홍보 영상"></video>
-        <span class="gallery__expand" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></span>
-      </figure>
+      <div class="gallery__carousel reveal" aria-roledescription="carousel" aria-label="Cove 영상">
+        <div class="gallery__track">
+          <figure class="gallery__film">
+            <video src="assets/cove-film.mp4" poster="assets/cove-film-poster.jpg" muted loop playsinline preload="metadata" aria-label="Cove 홍보 영상"></video>
+            <span class="gallery__expand" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></span>
+          </figure>
+          <figure class="gallery__film">
+            <video src="assets/cove-ball.mp4" poster="assets/cove-ball-poster.jpg" muted loop playsinline preload="none" aria-label="Cove 공놀이 영상"></video>
+            <span class="gallery__expand" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></span>
+          </figure>
+        </div>
+        <div class="gallery__nav">
+          <button type="button" class="gallery__arrow" data-dir="-1" aria-label="이전 영상"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <div class="gallery__dots" role="tablist" aria-label="영상 선택"><button type="button" role="tab" aria-selected="true" aria-label="영상 1"></button><button type="button" role="tab" aria-selected="false" aria-label="영상 2"></button></div>
+          <button type="button" class="gallery__arrow" data-dir="1" aria-label="다음 영상"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg></button>
+        </div>
+      </div>
     </section>
 
   </main>
@@ -247,21 +260,21 @@
     <span class="pager__num">01</span><span class="pager__name">About</span>
   </div>
 
-  <script src="js/main.js?v=20261031q"></script>
-  <script src="js/intro.js?v=20261031q"></script>
+  <script src="js/main.js?v=20261031r"></script>
+  <script src="js/intro.js?v=20261031r"></script>
   <script type="importmap">
     { "imports": {
         "three": "./assets/vendor/three/build/three.module.min.js",
         "three/addons/": "./assets/vendor/three/examples/jsm/"
     } }
   </script>
-  <script type="module" src="js/sim.js?v=20261031q"></script>
-  <script type="module" src="js/cards.js?v=20261031q"></script>
-  <script type="module" src="js/intro-cove.js?v=20261031q"></script>
-  <script type="module" src="js/features.js?v=20261031q"></script>
-  <script type="module" src="js/engineering.js?v=20261031q"></script>
+  <script type="module" src="js/sim.js?v=20261031r"></script>
+  <script type="module" src="js/cards.js?v=20261031r"></script>
+  <script type="module" src="js/intro-cove.js?v=20261031r"></script>
+  <script type="module" src="js/features.js?v=20261031r"></script>
+  <script type="module" src="js/engineering.js?v=20261031r"></script>
   <!-- 디테일 효과: 필름 입자 · 자석 버튼 · 카드 빛/기울기 (되돌리려면 아래 두 줄과 css/fx.css, js/fx.js 를 지우면 됨) -->
-  <link rel="stylesheet" href="css/fx.css?v=20261031q">
-  <script src="js/fx.js?v=20261031q" defer></script>
+  <link rel="stylesheet" href="css/fx.css?v=20261031r">
+  <script src="js/fx.js?v=20261031r" defer></script>
 </body>
 </html>
