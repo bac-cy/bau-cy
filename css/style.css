@@ -196,7 +196,7 @@ body::before {
 .detail p { color: var(--ink-soft); font-weight: 300; max-width: 30em; margin-top: 8px; }
 
 .specs {
-  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: clamp(80px, 10vw, 140px); border-top: 1px solid var(--line);
 }
 .specs div { padding: 28px 16px 0 0; }
