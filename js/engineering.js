@@ -3,9 +3,8 @@
    · 투명한 몸체 위에 안쪽 부품의 윤곽선이 겹쳐 보이는 기술 도면 느낌이에요.
    · 부품(층)을 클릭하면 이름과 역할이 보여요.
    · 마우스 왼쪽 버튼을 누른 채 끌면 정면·측면·위에서 자유롭게 돌려 볼 수 있어요.
-   · 카드 위에서 마우스를 좌우로 움직이면 분해 ↔ 조립이 부드럽게 이어져요.
-     (왼쪽 = 분해, 오른쪽 = 조립. 모바일은 카드 위를 좌우로 쓸어 보세요.)
-   · 마우스를 올리기 전에는 스크롤에 맞춰 조립돼요.
+   · 카드 위에서 마우스 휠을 굴리면 분해 ↔ 조립이 부드럽게 이어져요. (휠 아래로 = 조립, 위로 = 분해 · 끝까지 가면 페이지가 이어서 스크롤돼요)
+   · 휠을 쓰기 전과 모바일에서는 페이지 스크롤에 맞춰 조립돼요.
    모델: assets/eng/cove-eng.glb — 부품 402개를 층 8개로 묶어 가볍게 줄인 것
    ========================================================== */
 const root = document.getElementById('engineering');
@@ -24,7 +23,7 @@ const SHELL = new Set(['head_top', 'head_low', 'body_top']);                    
 if (root) {
   const cv = root.querySelector('canvas'), tip = root.querySelector('.eng__tip'), hint = root.querySelector('.eng__hint');
   const reduced = false, touch = window.matchMedia('(hover: none)').matches;
-  if (hint) hint.textContent = touch ? '부품을 눌러 보세요 · 끌어서 돌려 보세요' : '부품을 눌러 보세요 · 끌어서 돌려 보세요 · 좌우로 움직이면 분해 ↔ 조립';
+  if (hint) hint.textContent = touch ? '부품을 눌러 보세요 · 끌어서 돌려 보세요' : '부품을 눌러 보세요 · 끌어서 돌려 보세요 · 휠로 분해 ↔ 조립';
   let started = false;
   new IntersectionObserver(([e]) => { if (e.isIntersecting && !started) { started = true; init().catch(err => console.warn('Engineering view unavailable:', err)); } }, { rootMargin: '900px 0px' }).observe(root);
 
@@ -68,7 +67,7 @@ if (root) {
     const box = new THREE.Box3().setFromObject(model), size = box.getSize(new THREE.Vector3());
     const camera = new THREE.PerspectiveCamera(26, 1, 0.01, 10);
 
-    let w = 0, h = 0, e = 1, eGoal = 1, yaw = -0.55, tiltEl = 0.2, baseYaw = -0.55, baseEl = 0.2, drag = null, dirty = true, visible = false, usingMouse = false, mx = 0.5, my = 0.5;
+    let w = 0, h = 0, e = 1, eGoal = 1, yaw = -0.55, tiltEl = 0.2, baseYaw = -0.55, baseEl = 0.2, drag = null, dirty = true, visible = false, usingWheel = false, wheelE = 1, mx = 0.5, my = 0.5;
     function fit() {
       w = cv.clientWidth; h = cv.clientHeight; if (!w || !h) return;
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); dirty = true;
@@ -78,15 +77,17 @@ if (root) {
 
     // 마우스를 올리기 전: 카드가 화면 아래에서 올라올 때 분해 → 가운데에 오면 조립
     function scrollGoal() { const r = root.getBoundingClientRect(), vh = window.innerHeight, c = r.top + r.height / 2; return 1 - clamp((vh * 1.0 - c) / (vh * 0.55), 0, 1); }
-    // 카드 위 좌우 위치: 왼쪽 = 분해(1), 오른쪽 = 조립(0)
-    const onMove = (ev) => {
-      const r = root.getBoundingClientRect(); mx = clamp((ev.clientX - r.left) / r.width, 0, 1); my = clamp((ev.clientY - r.top) / r.height, 0, 1);
-      usingMouse = true; dirty = true;
-    };
+    // 카드 위에서 마우스 휠: 아래로 = 조립, 위로 = 분해. 끝까지 가면 페이지 스크롤이 이어진다.
+    root.addEventListener('wheel', (ev) => {
+      if (ev.ctrlKey) return;
+      if (!usingWheel) { usingWheel = true; wheelE = e; }
+      const next = clamp(wheelE - ev.deltaY * 0.0014, 0, 1);
+      if ((ev.deltaY > 0 && wheelE <= 0.001) || (ev.deltaY < 0 && wheelE >= 0.999)) return;   // 이미 끝이면 페이지가 스크롤되게 둔다
+      wheelE = next; dirty = true; ev.preventDefault();
+    }, { passive: false });
     root.addEventListener('pointermove', (ev) => {
       if (!drag && e < 0.4) { root.style.cursor = hitLayer(ev) ? 'pointer' : 'grab'; }
       if (drag) { baseYaw = drag.yaw + (ev.clientX - drag.x) * 0.009; baseEl = clamp(drag.el + (ev.clientY - drag.y) * 0.006, -0.25, 1.35); dirty = true; return; }   // 끄는 동안: 돌려 보기
-      onMove(ev);
     });
     root.addEventListener('pointerdown', (ev) => { if (ev.button > 0) return; drag = { x: ev.clientX, y: ev.clientY, yaw: baseYaw, el: baseEl }; root.classList.add('is-grab'); try { root.setPointerCapture(ev.pointerId); } catch {} });
     const endDrag = (ev) => { const d = drag, click = d && Math.hypot(ev.clientX - d.x, ev.clientY - d.y) < 5; drag = null; root.classList.remove('is-grab'); if (click && ev.type === 'pointerup') { const k = hitLayer(ev); if (k) select(k, ev); else if (sel) select(sel, ev); } };
@@ -119,7 +120,7 @@ if (root) {
       requestAnimationFrame(loop);
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
       if (!visible) return;
-      eGoal = reduced ? 0 : usingMouse ? smooth(1 - mx) : smooth(scrollGoal());
+      eGoal = reduced ? 0 : usingWheel ? wheelE : smooth(scrollGoal());
       const ne = e + (eGoal - e) * Math.min(1, dt * 5);                       // 천천히 흐르듯 따라감
       if (Math.abs(ne - e) > 0.0004) { e = ne; dirty = true; }
       const yawGoal = baseYaw, elGoal = baseEl;
