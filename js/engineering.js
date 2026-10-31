@@ -11,7 +11,7 @@ const LAYERS = ['head_top', 'head_inner', 'head_low', 'body_top', 'board', 'ring
 const SHELL = new Set(['head_top', 'head_low', 'body_top']);                                              // 겉 껍데기 층: 은은한 라벤더 빛을 입힘
 if (root) {
   const cv = root.querySelector('canvas'), hint = root.querySelector('.eng__hint');
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches, touch = window.matchMedia('(hover: none)').matches;
+  const reduced = false, touch = window.matchMedia('(hover: none)').matches;
   if (hint) hint.textContent = touch ? '카드를 좌우로 쓸어 보세요 · 왼쪽 분해 → 오른쪽 조립' : '마우스를 좌우로 움직여 보세요 · 왼쪽 분해 → 오른쪽 조립';
   let started = false;
   new IntersectionObserver(([e]) => { if (e.isIntersecting && !started) { started = true; init().catch(err => console.warn('Engineering view unavailable:', err)); } }, { rootMargin: '900px 0px' }).observe(root);

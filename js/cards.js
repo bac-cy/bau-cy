@@ -108,7 +108,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
 
   const vis = new IntersectionObserver((es) => es.forEach(e => { const c = cards.find(k => k.slot === e.target); if (c) { c.visible = e.isIntersecting; if (e.isIntersecting && !c.started) { c.started = true; c.t = 0; } } }), { threshold: 0.15 });
   cards.forEach(c => vis.observe(c.slot));
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduced = false;   // 사용자 요청: PC의 '움직임 줄이기' 설정과 상관없이 모든 효과를 보여준다
 
   function say(c, text) { if (c.text === text) return; c.text = text; c.msg.textContent = text; }
   function goal(c) {                                                           // 카드마다 보여줄 카메라·자세·눈

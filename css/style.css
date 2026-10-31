@@ -340,11 +340,7 @@ body::before {
   .features__grid { grid-template-columns: 1fr; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
-  .reveal { opacity: 1; transform: none; }
-}
+/* (사용자 요청) '움직임 줄이기' 설정과 상관없이 효과를 그대로 보여준다 */
 
 /* Korean emphasis: keep upright (no faux italic), accent by color & weight */
 em.ko { font-family: var(--font-ui); font-style: normal; font-weight: 400; font-size: 1em; }

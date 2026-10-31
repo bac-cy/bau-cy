@@ -218,7 +218,9 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     sh.lineTo(-hw + r, hd); sh.quadraticCurveTo(-hw, hd, -hw, hd - r); sh.lineTo(-hw, -hd + r); sh.quadraticCurveTo(-hw, -hd, -hw + r, -hd);
     const g = new THREE.ExtrudeGeometry(sh, { depth: T, bevelEnabled: true, bevelSize: T * 0.25, bevelThickness: T * 0.25, bevelSegments: 3 });
     const desk = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: '#e6d8c4', roughness: 0.78, metalness: 0, envMapIntensity: 0.5 }));
-    desk.rotation.x = -Math.PI / 2; desk.position.set(center.x, box.min.y - T - 0.0004, center.z); scene.add(desk); }
+    desk.rotation.x = -Math.PI / 2; desk.position.set(center.x, box.min.y - T - 0.0004, center.z); scene.add(desk);
+    const syncDesk = () => { desk.visible = !window.matchMedia('(max-width: 760px)').matches; dirty = true; };   // 모바일(반응형)에서는 책상을 숨긴다
+    syncDesk(); window.matchMedia('(max-width: 760px)').addEventListener('change', syncDesk); }
 
   /* ───────── 끌기 / 누르기 ───────── */
   const el = renderer.domElement, ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
@@ -273,6 +275,8 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   el.addEventListener('pointerup', end); el.addEventListener('pointercancel', () => { drag = null; });
 
   viewBtns.forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+  let eyeForce = null;                                                       // (작업용) 눈 표정 고정
+  window.__coveSim = { goal, camGoal, setView, limit, setEye: (n) => { eyeForce = n; }, hideDesk: () => { scene.traverse(o => { if (o.geometry && o.geometry.type === 'ExtrudeGeometry') o.visible = false; }); }, still: () => { lastActive = 1e9; gest = null; } };
   const EXPERIENCE = ['pet', 'tickle', 'snack'];
   function setMode(m) {
     mode = m; if (m) stopClip(); else setStatus(HINT);
@@ -384,7 +388,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     const sway = { neck: a * (0.45 * Math.sin(2 * Math.PI * tNow / 3.7) + 0.25 * Math.sin(2 * Math.PI * tNow / 5.9 + 1.3)), head: a * (0.7 * Math.sin(2 * Math.PI * tNow / 4.3 + 0.6) + 0.3 * Math.sin(2 * Math.PI * tNow / 2.9 + 2.1)) };
     const shown = { ...pose }; shown.neck += sway.neck; shown.head += sway.head;
     const saved = { ...pose }; Object.assign(pose, shown); writePose(); Object.assign(pose, saved);
-    if (!clip) eyeName = gest ? gest.eye : pose.neck < 4 ? '감은 눈' : '뜬 눈';
+    if (!clip) eyeName = eyeForce || (gest ? gest.eye : pose.neck < 4 ? '감은 눈' : '뜬 눈');
     eyes.show(eyeName, gx, 0, tNow);
     // 카메라
     cam.az = smoothDamp(cam.az, camGoal.az, cv.az, 0.28, dt); cam.el = smoothDamp(cam.el, camGoal.el, cv.el, 0.28, dt); cam.zoom = smoothDamp(cam.zoom, camGoal.zoom, cv.zoom, 0.22, dt);

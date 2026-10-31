@@ -11,7 +11,7 @@ const cache = {};
 export function fabricFor(THREE, name) {
   const hex = COLORS[name] || '#ddd5c9';
   if (cache[hex]) return cache[hex];
-  const m = new THREE.MeshPhysicalMaterial({ color: hex, roughness: 0.96, metalness: 0, sheen: 0.7, sheenRoughness: 0.7, sheenColor: new THREE.Color('#fff8ee'), envMapIntensity: 0.45 });
+  const m = new THREE.MeshPhysicalMaterial({ color: hex, roughness: 0.96, metalness: 0, sheen: 1.0, sheenRoughness: 0.55, sheenColor: new THREE.Color('#fff8ee'), envMapIntensity: 0.45 });
   m.onBeforeCompile = (sh) => {
     sh.vertexShader = sh.vertexShader
       .replace('#include <common>', '#include <common>\nvarying vec3 vObjPos; varying vec3 vObjN;')
@@ -34,12 +34,12 @@ float weave(vec2 p, float fade){
 }
 float tri(vec3 p, vec3 n, float fr, out float fade){
   vec3 w = pow(abs(n), vec3(4.0)); w /= (w.x + w.y + w.z);
-  float px = max(length(fwidth(p * fr)), 1e-5); fade = 1.0 - smoothstep(0.5, 1.0, px);
+  float px = max(length(fwidth(p * fr)), 1e-5); fade = 1.0 - smoothstep(0.75, 1.6, px);
   return w.x * weave(p.yz * fr, fade) + w.y * weave(p.xz * fr, fade) + w.z * weave(p.xy * fr, fade);
 }`)
       .replace('#include <map_fragment>', `#include <map_fragment>
-float fdA; float hgt = tri(vObjPos, normalize(vObjN), 50.0, fdA);
-diffuseColor.rgb *= 0.72 + 0.42 * hgt;`);
+float fdA; float hgt = tri(vObjPos, normalize(vObjN), 105.0, fdA);
+diffuseColor.rgb *= 0.84 + 0.22 * hgt;`);
   };
   return cache[hex] = m;
 }

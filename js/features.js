@@ -88,7 +88,7 @@ function drawPressure(c, w, h, t) {
 }
 
 const ARTS = { eyes: [drawEyes, 4.0, false], body: [drawBody, 6.0, false], attention: [drawAttention, 4.0, false], pressure: [drawPressure, 4.0, false] };
-const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reduced = false;   // 사용자 요청: PC의 '움직임 줄이기' 설정과 상관없이 모든 효과를 보여준다
 const touchOnly = window.matchMedia('(hover: none)').matches;
 const dpr = () => Math.min(window.devicePixelRatio || 1, 2);
 

@@ -152,7 +152,7 @@ updateNavSpy();
 (() => {
   const fig = document.querySelector('.gallery__film'), v = fig && fig.querySelector('video');
   if (!v) return;
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = false;
   const isFull = () => document.fullscreenElement === fig || document.webkitFullscreenElement === fig || v.webkitDisplayingFullscreen;
   new IntersectionObserver(([en]) => {
     if (reduce || isFull()) return;
