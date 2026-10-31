@@ -138,7 +138,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   };
   const GUIDE = {
     greet: '인사하는 Cove를 지켜보세요', pet: '마우스로 머리를 쓰다듬어 보세요', tickle: '마우스로 몸통을 살살 문질러 보세요',
-    snack: '간식을 끌어다 Cove에게 주세요', rest: '기대어 쉬는 Cove를 지켜보세요', sleep: 'Cove가 스르르 잠들어요',
+    snack: '간식 아이콘을 끌어다 Cove에게 주세요', ball: '공을 끌어다 Cove에게 주세요. 머리 위에서 통통 가지고 놀아요', rest: '기대어 쉬는 Cove를 지켜보세요', sleep: 'Cove가 스르르 잠들어요',
   };
   let clip = null, clipT = 0, clipName = '';
   function sampleClip(c, t) {
@@ -158,7 +158,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     stepsEl.hidden = !c || !c.markers?.length;
   }
   let mode = null;                                                         // 직접 체험 중인 동작: 'pet' | 'tickle' | 'snack'
-  const treat = figure.querySelector('.sim__treat');
+  const toys = [...figure.querySelectorAll('.sim__toy')];
   let lastActive = -1e9, gest = null, nextGest = 3;                        // 사용자가 마지막으로 만진 시각 / 지금 하는 혼자 동작 / 다음 동작 시각
   figure.addEventListener('pointerdown', () => { lastActive = tNow; gest = null; }, true);
   window.addEventListener('pointerup', () => { lastActive = tNow; });
@@ -268,11 +268,11 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   viewBtns.forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
   let eyeForce = null;                                                       // (작업용) 눈 표정 고정
   window.__coveSim = { goal, camGoal, setView, limit, setEye: (n) => { eyeForce = n; }, hideDesk: () => { scene.traverse(o => { if (o.geometry && o.geometry.type === 'ExtrudeGeometry') o.visible = false; }); }, still: () => { lastActive = 1e9; gest = null; } };
-  const EXPERIENCE = ['pet', 'tickle', 'snack'];
+  const EXPERIENCE = ['pet', 'tickle', 'snack', 'ball'];
   function setMode(m) {
     mode = m; if (m) stopClip(); else setStatus(HINT);
     motionBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.motion === mode)));
-    if (m) setStatus(GUIDE[m]); if (treat) { treat.hidden = m !== 'snack'; treat.style.transform = ''; }
+    if (m) setStatus(GUIDE[m]); showToys();
   }
   motionBtns.forEach(b => b.addEventListener('click', () => {
     const n = b.dataset.motion;
@@ -288,19 +288,62 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     stroke.on = true; stroke.x = ev.clientX; stroke.y = ev.clientY;
     if (stroke.len > 220 && clipName !== mode) { stroke.len = 0; play(mode); }
   }
-  // 간식 끌어다 주기
-  if (treat) {
+  /* ───────── 간식·공: 아이콘을 끌어다 Cove에게 주기 ───────── */
+  const showToys = () => toys.forEach(t => { t.hidden = t.dataset.mode !== mode || (ball && t.dataset.mode === 'ball') || (clipName === 'snack' && t.dataset.mode === 'snack'); t.style.transform = ''; });
+  toys.forEach(t => {
     let td = null;
-    treat.addEventListener('pointerdown', (e) => { td = { x: e.clientX, y: e.clientY }; treat.setPointerCapture(e.pointerId); treat.classList.add('is-drag'); });
-    treat.addEventListener('pointermove', (e) => { if (td) treat.style.transform = `translate(${e.clientX - td.x}px, ${e.clientY - td.y}px) scale(1.08)`; });
-    const drop = (e) => {
-      if (!td) return; td = null; treat.classList.remove('is-drag');
-      if (pick(e)) { treat.hidden = true; play('snack'); const back = setInterval(() => { if (clipName !== 'snack') { clearInterval(back); if (mode === 'snack') { treat.hidden = false; treat.style.transform = ''; } } }, 400); }
-      else treat.style.transform = '';
-    };
-    treat.addEventListener('pointerup', drop); treat.addEventListener('pointercancel', () => { td = null; treat.style.transform = ''; treat.classList.remove('is-drag'); });
+    t.addEventListener('pointerdown', (e) => { td = { x: e.clientX, y: e.clientY }; t.setPointerCapture(e.pointerId); t.classList.add('is-drag'); });
+    t.addEventListener('pointermove', (e) => { if (td) t.style.transform = `translate(${e.clientX - td.x}px, ${e.clientY - td.y}px) scale(1.1)`; });
+    t.addEventListener('pointerup', (e) => {
+      if (!td) return; td = null; t.classList.remove('is-drag');
+      if (!pick(e)) { t.style.transform = ''; return; }
+      if (t.dataset.mode === 'snack') { play('snack'); showToys(); const back = setInterval(() => { if (clipName !== 'snack') { clearInterval(back); showToys(); } }, 400); }
+      else startBall(t.dataset.kind);
+      showToys();
+    });
+    t.addEventListener('pointercancel', () => { td = null; t.style.transform = ''; t.classList.remove('is-drag'); });
+  });
+
+  /* ───────── 공놀이: 공을 주면 머리 위에서 통통 튕기며 가지고 놀아요 ───────── */
+  let ball = null, bob = 0;
+  function ballTexture(kind) {
+    const c = document.createElement('canvas'); c.width = 256; c.height = 128; const g = c.getContext('2d');
+    g.fillStyle = kind === 'base' ? '#f4efe6' : '#fff7ee'; g.fillRect(0, 0, 256, 128);
+    if (kind === 'base') { g.strokeStyle = '#c4574d'; g.lineWidth = 3; g.setLineDash([5, 5]);
+      for (const x0 of [64, 192]) { g.beginPath(); for (let y = 0; y <= 128; y += 4) { const x = x0 + Math.sin(y / 128 * Math.PI) * 26 * (x0 < 100 ? 1 : -1); y ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); } }
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
   }
-  figure.querySelector('[data-act="reset"]')?.addEventListener('click', () => { setMode(null); stopClip(false); setView('persp'); camGoal.zoom = 1; });
+  function startBall(kind) {
+    if (ball) { scene.remove(ball.mesh); ball = null; }
+    stopClip(); gest = null; lastActive = tNow;
+    const r = kind === 'base' ? 0.03 : 0.02;
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(r, 32, 24), new THREE.MeshStandardMaterial({ map: ballTexture(kind), roughness: kind === 'base' ? 0.7 : 0.35, metalness: 0 }));
+    const bb = new THREE.Box3().setFromObject(head), c = bb.getCenter(new THREE.Vector3());
+    mesh.position.set(c.x + 0.03, bb.max.y + 0.09, c.z); scene.add(mesh);
+    ball = { mesh, r, kind, p: mesh.position, v: new THREE.Vector3(0, 0, 0), t: 0, hits: 0, end: false };
+    eyeForce = '반짝 눈'; setStatus('통통! 공을 가지고 놀아요', 'on');
+  }
+  function endBall() { if (!ball) return; scene.remove(ball.mesh); ball.mesh.geometry.dispose(); ball = null; eyeForce = null; showToys(); setStatus(mode ? GUIDE[mode] : HINT); }
+  const _bb = new THREE.Box3(), _c = new THREE.Vector3();
+  function updateBall(dt) {
+    if (!ball) return;
+    ball.t += dt; lastActive = tNow;
+    _bb.setFromObject(head); _bb.getCenter(_c);
+    const top = _bb.max.y, hr = Math.max(_bb.max.x - _bb.min.x, _bb.max.z - _bb.min.z) * 0.42, b = ball;
+    b.v.y -= 2.6 * dt;
+    if (!b.end) { b.v.x += (_c.x - b.p.x) * 7 * dt; b.v.z += (_c.z - b.p.z) * 7 * dt; b.v.x *= 0.995; b.v.z *= 0.995; }
+    b.p.addScaledVector(b.v, dt);
+    const dx = b.p.x - _c.x, dz = b.p.z - _c.z;
+    if (!b.end && b.v.y < 0 && b.p.y - b.r < top && b.p.y > top - 0.05 && Math.hypot(dx, dz) < hr) {      // 머리 위에서 튕김
+      b.p.y = top + b.r; b.v.y = Math.max(0.5, Math.min(0.66, -b.v.y * 0.95)) + 0.03; b.hits++; bob = 1;
+      b.v.x += (Math.random() - 0.5) * 0.18; b.v.z += (Math.random() - 0.5) * 0.18;
+    }
+    if (b.t > 13 && !b.end) { b.end = true; b.v.x += 0.35; b.v.y = 0.8; setStatus('신나게 놀았어요!', 'on'); }          // 마지막엔 옆으로 또르르 굴러 떨어짐
+    b.mesh.rotation.x += dt * 5; b.mesh.rotation.z += dt * 3;
+    if (b.end) { const s = Math.max(0, 1 - Math.max(0, b.t - 13.6) * 1.4); b.mesh.scale.setScalar(s); if (s <= 0.02 || b.p.y < _bb.min.y - 0.1) endBall(); }
+  }
+  bob = 0;
+  figure.querySelector('[data-act="reset"]')?.addEventListener('click', () => { setMode(null); endBall(); stopClip(false); setView('persp'); camGoal.zoom = 1; });
 
   /* 확대·축소: + − 버튼, Ctrl(⌘)+휠 또는 트랙패드 핀치, 터치 두 손가락 핀치, 빈 곳을 두 번 누르면 원래 크기.
      그냥 휠은 페이지 스크롤에 쓰이도록 그대로 둔다. */
@@ -377,7 +420,8 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     // 서 있을 때는 숨 쉬듯 아주 조금 흔들린다
     const g = clamp((pose.neck - 2) / 10, 0, 1), a = g * g * (3 - 2 * g);
     const sway = { neck: a * (0.45 * Math.sin(2 * Math.PI * tNow / 3.7) + 0.25 * Math.sin(2 * Math.PI * tNow / 5.9 + 1.3)), head: a * (0.7 * Math.sin(2 * Math.PI * tNow / 4.3 + 0.6) + 0.3 * Math.sin(2 * Math.PI * tNow / 2.9 + 2.1)) };
-    const shown = { ...pose }; shown.neck += sway.neck; shown.head += sway.head;
+    updateBall(dt); bob *= Math.exp(-7 * dt);
+    const shown = { ...pose }; shown.neck += sway.neck - bob * 3.5; shown.head += sway.head + bob * 2.5;
     const saved = { ...pose }; Object.assign(pose, shown); writePose(); Object.assign(pose, saved);
     if (!clip) eyeName = eyeForce || (gest ? gest.eye : pose.neck < 4 ? '감은 눈' : '뜬 눈');
     eyes.show(eyeName, gx, 0, tNow);
