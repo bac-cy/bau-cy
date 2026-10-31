@@ -7,7 +7,7 @@
   --intro-peach: #fbe3cf;
   --intro-word: #f2ead8;          /* 배경 속 큰 COVE 글자색 */
   position: relative;
-  height: 140svh;                 /* 한 화면 + 스크롤 거리 40svh (장면 전환 구간 + 마지막 장면 머무름) */
+  height: 160svh;                 /* 한 화면 + 스크롤 거리 60svh (장면 전환 구간 + 마지막 장면 머무름) */
   background: #fff;
 }
 .intro__stage {

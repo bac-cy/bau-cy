@@ -50,7 +50,7 @@ body {
 img, video { display: block; width: 100%; height: 100%; object-fit: cover; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
-em { font-family: var(--font-display); font-style: italic; font-weight: 400; }
+em { font-family: var(--font-display); font-style: normal; font-weight: 400; }
 
 /* soft film grain for premium feel */
 body::before {
@@ -172,7 +172,7 @@ body::before {
 .feature:nth-child(2) { transition-delay: .08s; }
 .feature:nth-child(3) { transition-delay: .16s; }
 .feature:nth-child(4) { transition-delay: .24s; }
-.feature__num { font-family: var(--font-display); font-style: italic; font-size: 40px; color: #8a7aa8; position: relative; }
+.feature__num { font-family: "Jost", "Futura", system-ui, sans-serif; font-style: normal; font-weight: 300; font-size: 40px; color: #8a7aa8; position: relative; }
 .feature h3 { font-weight: 500; font-size: 19px; margin-top: auto; padding-top: 48px; position: relative; }
 .feature p { color: var(--ink-soft); font-size: 14px; font-weight: 300; margin-top: 12px; position: relative; }
 
@@ -361,7 +361,7 @@ em.ko { font-family: var(--font-ui); font-style: normal; font-weight: 400; font-
 }
 .pager.is-visible { opacity: 1; transform: none; }
 .pager.is-dark { color: #d8d0e2; background: rgba(42, 37, 51, .6); box-shadow: 0 0 0 1px rgba(255, 255, 255, .12); }
-.pager__num { font-family: var(--font-display); font-style: italic; font-size: 15px; letter-spacing: .04em; color: inherit; }
+.pager__num { font-family: "Jost", "Futura", system-ui, sans-serif; font-style: normal; font-size: 15px; letter-spacing: .04em; color: inherit; }
 .pager__name { transition: opacity .3s var(--ease); }
 .pager.is-swapping .pager__name, .pager.is-swapping .pager__num { opacity: 0; }
 
