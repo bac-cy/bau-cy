@@ -62,10 +62,12 @@
   // 휠 1칸 ≈ 0.067 (HI → I'm cove 가 1.5칸 = 0.10). 구간 길이를 칸 수로 환산해 잡았습니다.
   const OUT_START = 0.17, OUT_SPAN = 0.06;         // I'm cove 사라지기
   const RISE_START = 0.20, RISE_SPAN = 0.14;       // 큰 COVE 글자 + 렌더 올라오기 (약 2칸)
+  const P1_TIME = 0.42;                            // HI → I'm cove 가 녹아들듯 넘어가는 시간(초) — 클수록 더 부드럽고 느긋
   const GLIDE_TIME = 0.2;                          // 스크롤을 따라오는 시간(초) — 작을수록 쫀쫀, 클수록 부드러움
 
   let ss = 0, last = performance.now();
-  const vss = { v: 0 };
+  const vss = { v: 0 }, vp1 = { v: 0 };
+  let pp1 = 0;
 
   function frame(now) {
     requestAnimationFrame(frame);
@@ -78,11 +80,14 @@
     // 휠이 한 칸씩 끊겨 움직여도 화면은 미끄러지듯 따라오게 함 (되감기도 동일)
     ss = reduced ? s : smoothDamp(ss, s, vss, GLIDE_TIME, dt);
     if (Math.abs(s - ss) < 0.0003 && Math.abs(vss.v) < 0.005) { ss = s; vss.v = 0; }
-    const p1 = clamp(ss / STEP1);                      // HI → I'm cove 진행도 (0 → 1, 스크롤과 연속 연동)
+    // HI → I'm cove 진행도: 스크롤 목표를 향해 천천히 따라가서, 휠 한 칸에도 부드럽게 녹아들듯 넘어감
+    pp1 = reduced ? clamp(s / STEP1) : smoothDamp(pp1, clamp(s / STEP1), vp1, P1_TIME, dt);
+    if (Math.abs(clamp(s / STEP1) - pp1) < 0.002 && Math.abs(vp1.v) < 0.01) { pp1 = clamp(s / STEP1); vp1.v = 0; }
+    const p1 = pp1;
 
     // HI가 위로 사라지는 동안 I'm cove가 아래에서 올라와 자연스럽게 겹쳐 바뀝니다
-    const hiA = smooth(clamp(p1 / 0.6));
-    const imA = smooth(clamp((p1 - 0.4) / 0.6));
+    const hiA = smooth(clamp(p1 / 0.8));
+    const imA = smooth(clamp((p1 - 0.2) / 0.8));
     const out = clamp((ss - OUT_START) / OUT_SPAN);
     const b = smooth(clamp((ss - RISE_START) / RISE_SPAN));
 
@@ -94,7 +99,8 @@
 
     // Scene 1
     lineHi.style.opacity = 1 - hiA;
-    lineHi.style.transform = `translate3d(0, ${-hiA * 28}px, 0)`;
+    lineHi.style.transform = `translate3d(0, ${-hiA * 34}px, 0)`;
+    lineHi.style.filter = hiA > 0.01 ? `blur(${(hiA * 7).toFixed(1)}px)` : 'none';   // 번지듯 사라짐
 
     // Scene 2 — 그라디언트 위치 계산
     const idle = !pointer.active || now - pointer.t > 2500;
@@ -110,7 +116,8 @@
     peach.style.opacity = b;
 
     lineIm.style.opacity = imA * (1 - out);
-    lineIm.style.transform = `translate3d(0, ${(1 - imA) * 18 - out * 40}px, 0)`;
+    lineIm.style.transform = `translate3d(0, ${(1 - imA) * 26 - out * 40}px, 0)`;
+    lineIm.style.filter = imA < 0.99 ? `blur(${((1 - imA) * 7).toFixed(1)}px)` : 'none';   // 번지듯 나타남
 
     // Scene 3
     word.style.opacity = clamp(b * 2.4);
