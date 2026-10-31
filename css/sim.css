@@ -22,19 +22,15 @@
 .sim__status { margin: 0; min-height: 1.4em; font-size: 12.5px; letter-spacing: .02em; color: var(--ink-soft); text-align: center; transition: color .3s; }
 .sim__status[data-k="play"] { color: #5b43a6; }
 
-/* 3D 칸은 카드 전체를 덮는다 (확대 연출이 잘리지 않도록) */
-.design__visual.has-3d .cove-3d { inset: 0; }
+/* 캔버스는 시뮬레이터가 있을 때 화면을 더 넓게 사용 */
+.design__visual.has-3d .cove-3d { inset: 8% 4% 14%; }
 .design__visual.has-3d figcaption { left: 20px; bottom: 14px; }
 @media (max-width: 760px) {
   .sim__motions button { padding: 7px 11px; font-size: 12px; }
+  .design__visual.has-3d .cove-3d { inset: 11% 2% 20%; }
 }
 
 /* 화면 높이가 낮은 노트북에서도 아래 동작 버튼이 보이도록, 고정되는 칸의 높이를 화면 안으로 제한 */
 @media (min-width: 761px) {
   .design__visual { max-height: calc(100svh - 124px); min-height: 520px; }
-}
-
-/* 마지막 카드(Motion)가 화면 가운데에 있을 때도 왼쪽 시뮬레이터가 고정되어 있도록 아래에 여유를 둔다 */
-@media (min-width: 761px) {
-  .design__details { padding-bottom: 28svh; }
 }
