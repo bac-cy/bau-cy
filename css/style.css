@@ -424,3 +424,21 @@ em.ko { font-family: var(--font-ui); font-style: normal; font-weight: 400; font-
 .gallery__expand { right: 16px; top: 16px; bottom: auto; width: 40px; height: 40px; padding: 0; justify-content: center; gap: 0; border-radius: 50%; }
 .gallery__expand i { display: none; }
 .gallery__film[controls], .gallery__film:has(video[controls]) .gallery__expand { top: 16px; }
+
+/* 푸터 정리: 왼쪽 로고 · 오른쪽 크레딧(한 줄 맞춤) · 아래 한 줄(메뉴 / 저작권) */
+.footer { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: start; column-gap: clamp(32px, 6vw, 96px); row-gap: clamp(40px, 5vw, 64px); }
+.footer__brand { grid-column: 1; grid-row: 1; }
+.footer__credits { grid-column: 2; grid-row: 1; padding-top: 6px; }
+.footer__event { margin: 0 0 14px; padding-bottom: 14px; border-bottom: 1px solid var(--line); letter-spacing: .14em; }
+.footer__credits dl { gap: 8px; }
+.footer__credits dl > div { grid-template-columns: clamp(84px, 8vw, 112px) 1fr; align-items: baseline; }
+.footer__credits dt { text-align: left; }
+.footer__links { grid-column: 1; grid-row: 2; align-self: center; padding-top: 24px; border-top: 1px solid var(--line); }
+.footer__copy { grid-column: 2; grid-row: 2; align-self: center; text-align: right; padding-top: 24px; border-top: 1px solid var(--line); }
+@media (max-width: 900px) {
+  .footer { grid-template-columns: 1fr; }
+  .footer__brand, .footer__credits, .footer__links, .footer__copy { grid-column: 1; grid-row: auto; }
+  .footer__copy { text-align: left; border-top: 0; padding-top: 0; }
+}
+.footer__links { margin-right: calc(-1 * clamp(32px, 6vw, 96px)); }
+@media (max-width: 900px) { .footer__links { margin-right: 0; } }
