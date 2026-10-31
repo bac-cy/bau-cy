@@ -160,14 +160,19 @@ updateNavSpy();
   }, { threshold: [0, 0.5] }).observe(v);
   if (reduce) v.controls = true;
 
+  // 전체 화면에서는 조작 막대가 바로 숨고, 마우스를 움직이거나 화면을 누르면 잠깐 나타났다 다시 숨는다
+  let hideT = 0;
+  const showBar = () => { if (!isFull()) return; v.controls = true; fig.style.cursor = ''; clearTimeout(hideT); hideT = setTimeout(hideBar, 1500); };
+  const hideBar = () => { if (!isFull() || v.paused) return; v.controls = false; fig.style.cursor = 'none'; };
+  ['pointermove', 'pointerdown', 'touchstart'].forEach(t => fig.addEventListener(t, showBar, { passive: true }));
   const enter = () => {
-    v.currentTime = 0; v.muted = false; v.controls = true; fig.classList.add('is-full');
+    v.currentTime = 0; v.muted = false; v.controls = false; fig.classList.add('is-full'); setTimeout(hideBar, 300);
     const req = fig.requestFullscreen || fig.webkitRequestFullscreen;
     if (req) { const r = req.call(fig); if (r && r.catch) r.catch(() => exitUI()); }
     else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen();                  // iPhone Safari
     const p = v.play(); if (p && p.catch) p.catch(() => {});
   };
-  const exitUI = () => { fig.classList.remove('is-full'); v.muted = true; v.controls = reduce; const p = v.play(); if (p && p.catch && !reduce) p.catch(() => {}); };
+  const exitUI = () => { clearTimeout(hideT); fig.style.cursor = ''; fig.classList.remove('is-full'); v.muted = true; v.controls = reduce; const p = v.play(); if (p && p.catch && !reduce) p.catch(() => {}); };
   fig.addEventListener('click', (e) => {
     if (isFull()) { if (e.target === fig) (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }   // 전체 화면에서는 영상 조작 막대를 쓴다
     enter();
