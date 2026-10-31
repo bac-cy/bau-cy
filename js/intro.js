@@ -13,6 +13,12 @@
   const dots = $('.intro__dots');
   const word = $('.intro__bigword'), render = $('.intro__render');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // 큰 COVE 글자는 한 글자씩 따로 움직이고, 도착하는 순간 퍼지는 빛을 둔다
+  word.innerHTML = [...'COVE'].map(ch => `<span class="intro__ch">${ch}</span>`).join('');
+  const chars = [...word.querySelectorAll('.intro__ch')];
+  const burst = document.createElement('div'); burst.className = 'intro__burst'; burst.setAttribute('aria-hidden', 'true');
+  word.parentNode.insertBefore(burst, word);
+  const backOut = t => { const c1 = 1.70158, c3 = c1 + 1, u = t - 1; return 1 + c3 * u * u * u + c1 * u * u; };   // 살짝 지나쳤다 돌아오는 곡선
 
   /* ---------- 타이핑 ---------- */
   // 타이핑 전에 글자가 잠깐 보였다 사라지는 깜빡임을 막기 위해 먼저 비워 둡니다.
@@ -103,8 +109,8 @@
 
     // Scene 1
     lineHi.style.opacity = 1 - hiA;
-    lineHi.style.transform = `translate3d(0, ${-hiA * 34}px, 0)`;
-    lineHi.style.filter = hiA > 0.01 ? `blur(${(hiA * 7).toFixed(1)}px)` : 'none';   // 번지듯 사라짐
+    lineHi.style.transform = `translate3d(0, ${-hiA * 34}px, 0) scale(${(1 + hiA * 0.16).toFixed(3)})`;   // 커지면서
+    lineHi.style.filter = hiA > 0.01 ? `blur(${(hiA * 11).toFixed(1)}px)` : 'none';   // 번지듯 사라짐
 
     // Scene 2 — 그라디언트 위치 계산
     const idle = !pointer.active || now - pointer.t > 2500;
@@ -112,22 +118,32 @@
     const ty = idle ? .45 + Math.cos(now / 4600) * .12 : pointer.y;
     cur.x += (tx - cur.x) * .045; cur.y += (ty - cur.y) * .045;
     const ax = cur.x * W, ay = cur.y * H;
-    blobA.style.transform = `translate3d(${ax}px, ${ay}px, 0)`;
-    blobB.style.transform = `translate3d(${W - ax * .8}px, ${H - ay * .7}px, 0)`;
+    const bump = Math.sin(Math.PI * clamp((b - 0.45) / 0.55));                    // 도착 직전에 가장 큰 값
+    const sa = (0.55 + 0.45 * imA) * (1 + 0.5 * bump), sb = (0.6 + 0.4 * imA) * (1 + 0.35 * bump);   // 빛 덩어리가 부풀어 오름
+    blobA.style.transform = `translate3d(${ax}px, ${ay}px, 0) scale(${sa.toFixed(3)})`;
+    blobB.style.transform = `translate3d(${W - ax * .8}px, ${H - ay * .7}px, 0) scale(${sb.toFixed(3)})`;
     const glow = imA * (1 - .55 * b);
     blobA.style.opacity = glow; blobB.style.opacity = glow;
     dots.style.opacity = imA * .55;
     peach.style.opacity = b;
 
     lineIm.style.opacity = imA * (1 - out);
-    lineIm.style.transform = `translate3d(0, ${(1 - imA) * 26 - out * 40}px, 0)`;
-    lineIm.style.filter = imA < 0.99 ? `blur(${((1 - imA) * 7).toFixed(1)}px)` : 'none';   // 번지듯 나타남
+    lineIm.style.transform = `translate3d(0, ${(1 - imA) * 26 - out * 24}px, 0) scale(${(0.94 + 0.06 * imA + out * 0.2).toFixed(3)})`;   // 나타날 때 안착, 사라질 때 앞으로 다가옴
+    lineIm.style.filter = (imA < 0.99 || out > 0.01) ? `blur(${((1 - imA) * 8 + out * 14).toFixed(1)}px)` : 'none';   // 번지듯 나타나고, 흩어지듯 사라짐
 
     // Scene 3
-    word.style.opacity = clamp(b * 2.4);
-    word.style.transform = `translate3d(0, ${(1 - b) * H * 0.55}px, 0)`;
+    word.style.opacity = 1;
+    word.style.transform = `scale(${(1 + (1 - b) * 0.22).toFixed(3)})`;                // 카메라가 뒤로 물러나듯 줄어듦
+    chars.forEach((el, i) => {                                                          // 글자마다 시차를 두고 튀어 오르듯 내려앉음
+      const q = clamp(b * 1.55 - i * 0.17), e = backOut(q);
+      el.style.opacity = clamp(q * 2.6);
+      el.style.transform = `translate3d(0, ${((1 - e) * H * 0.42).toFixed(1)}px, 0)`;
+      el.style.filter = q < 0.98 ? `blur(${((1 - q) * 12).toFixed(1)}px)` : 'none';
+    });
+    burst.style.opacity = (0.95 * bump).toFixed(3);                                      // 도착하는 순간 퍼지는 빛
+    burst.style.transform = `scale(${(0.45 + 1.15 * clamp((b - 0.35) / 0.65)).toFixed(3)})`;
     render.style.opacity = clamp(b * 3);
-    render.style.transform = `translate3d(0, ${(1 - b) * H * 0.95}px, 0)`;
+    render.style.transform = `translate3d(0, ${(1 - backOut(b)) * H * 0.95}px, 0) scale(${(0.7 + 0.3 * backOut(b)).toFixed(3)})`;   // 커지며 올라오다 살짝 지나쳤다 안착
 
   }
   requestAnimationFrame(frame);

@@ -87,3 +87,12 @@
 /* 마우스를 따라 일어나는 3D Cove: 준비되면 같은 자리의 렌더 이미지를 대신한다 */
 .intro__render.is-live img { visibility: hidden; }
 .intro__render .intro__live { display: block; }
+
+/* 더 극적인 연출: 글자별 움직임 · 도착하는 빛 · 커지며 올라오는 Cove */
+.intro__ch { display: inline-block; will-change: transform, opacity, filter; }
+.intro__burst {
+  position: absolute; left: 50%; top: 64%; width: 92vmin; height: 92vmin; margin: -46vmin 0 0 -46vmin; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 238, 210, .95), rgba(255, 214, 190, .55) 42%, rgba(217, 205, 242, 0) 76%);
+  opacity: 0; pointer-events: none; will-change: transform, opacity;
+}
+.intro__render { transform-origin: 50% 100%; }

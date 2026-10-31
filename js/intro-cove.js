@@ -84,6 +84,7 @@ async function init() {
   const AWAKE = { neck: 25, head: -34 }, IDLE_MS = 9000;
   const pose = { neck: 0, head: 0, tilt: 0, body: 0 }, vel = { neck: { v: 0 }, head: { v: 0 }, tilt: { v: 0 }, body: { v: 0 } };
   let gaze = { x: 0, y: 0 }, tNow = 0, last = performance.now(), shown = false;
+  let autoFrom = 0, autoUntil = -1, autoDone = false;                       // 도착하면 마우스가 없어도 스스로 한 번 일어나 두리번거린다
   const visible = () => { const r = figure.getBoundingClientRect(); return +getComputedStyle(figure).opacity > 0.4 && r.bottom > 0 && r.top < innerHeight; };
 
   function frame(now) {
@@ -91,11 +92,16 @@ async function init() {
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     if (!visible()) return;
     tNow += dt;
-    const awake = ptr.seen && now - ptr.at < IDLE_MS;
+    const op = +getComputedStyle(figure).opacity;
+    if (op < 0.3) autoDone = false;                                              // 장면을 벗어났다 돌아오면 다시
+    if (!autoDone && op > 0.97) { autoDone = true; autoFrom = tNow + 0.5; autoUntil = tNow + 6.8; }
+    const pAwake = ptr.seen && now - ptr.at < IDLE_MS, aAwake = !pAwake && tNow >= autoFrom && tNow < autoUntil;
+    const awake = pAwake || aAwake;
     const r = figure.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height * 0.5;
     // 마우스가 Cove 기준 어디에 있는지 (-1 ~ 1)
     let dx = clamp((ptr.x - cx) / (innerWidth * 0.5), -1, 1), dy = clamp((ptr.y - cy) / (innerHeight * 0.5), -1, 1);
-    if (!awake) { dx = 0; dy = 0; }
+    if (aAwake) { const u = tNow - autoFrom; dx = 0.8 * Math.sin(u * 1.25); dy = -0.12 + 0.2 * Math.sin(u * 0.8); }   // 좌우로 천천히 둘러봄
+    else if (!awake) { dx = 0; dy = 0; }
     gaze.x += (dx - gaze.x) * Math.min(1, dt * 5); gaze.y += (dy - gaze.y) * Math.min(1, dt * 5);
     const goal = { neck: 0, head: 0, tilt: 0, body: 0 };
     if (awake) {
