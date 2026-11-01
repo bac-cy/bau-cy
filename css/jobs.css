@@ -37,3 +37,6 @@
 .jobs-end__text p { margin: 0; font-family: "Jost", "Noto Sans KR", sans-serif; font-weight: 300; font-size: clamp(28px, 4.6vw, 72px); letter-spacing: -.025em; opacity: 0; transform: translateY(16px); transition: opacity 1.4s, transform 1.4s; }
 .jobs-end__text small { display: block; margin-top: 16px; font-size: clamp(12px, 1.1vw, 16px); letter-spacing: .2em; text-transform: uppercase; color: #a1a1a6; opacity: 0; transition: opacity 1.6s .6s; }
 .jobs-end.in .jobs-end__text p, .jobs-end.in .jobs-end__text small { opacity: 1; transform: none; }
+
+/* 큰 숫자 스펙이 기존의 작은 규격 표를 대체함 */
+.specs { display: none !important; }
