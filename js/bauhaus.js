@@ -21,7 +21,7 @@
   about && about.after(shapes);
   const cv = shapes.querySelector('canvas'), cx = cv.getContext('2d'), caps = [...shapes.querySelectorAll('.bh-cap p')];
   function rr(c, x, y, w, h, r) { r = Math.min(r, w / 2, h / 2); c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
-  function fit() { const d = Math.min(devicePixelRatio, 2), w = cv.clientWidth, h = cv.clientHeight; if (cv.width !== Math.round(w * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); } cx.setTransform(cv.width / 1000, 0, 0, cv.height / 700, 0, 0); }
+  function fit() { const d = Math.min(devicePixelRatio, 2), w = cv.clientWidth, h = cv.clientHeight; if (cv.width !== Math.round(w * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); } const k = Math.min(cv.width / 1000, cv.height / 700); cx.setTransform(k, 0, 0, k, (cv.width - 1000 * k) / 2, (cv.height - 700 * k) / 2); }
   // 부품: [시작 {x,y,w,h,r}, 끝 {x,y,w,h,r}, 색]
   const P = [
     { a: { x: 230, y: 380, w: 250, h: 250, r: 125 }, b: { x: 500, y: 520, w: 360, h: 124, r: 58 }, c: PEACH, label: '몸통 · 타원' },     // 원 → 몸통(납작한 타원)

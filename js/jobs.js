@@ -17,7 +17,8 @@
     rr(c, x, y, w, h, r); const g = c.createLinearGradient(0, y, 0, y + h); g.addColorStop(0, light ? '#f3eee6' : '#e6dfd4'); g.addColorStop(1, light ? '#d9d0c2' : '#c4baa9'); c.fillStyle = g; c.fill(); c.lineWidth = 2; c.strokeStyle = 'rgba(125,106,168,.55)'; c.stroke();
   }
   function eyes(c, cx, cy, gap, closed) { c.fillStyle = '#2b2731'; c.strokeStyle = '#2b2731'; c.lineWidth = 4; c.lineCap = 'round'; for (const s of [-1, 1]) { const x = cx + s * gap; if (closed) { c.beginPath(); c.moveTo(x - 11, cy); c.lineTo(x + 11, cy); c.stroke(); } else { c.beginPath(); c.arc(x, cy, 7, 0, 7); c.fill(); } } }
-  function fit(cv, cx) { const d = Math.min(devicePixelRatio, 2), w = cv.clientWidth, h = cv.clientHeight; if (cv.width !== Math.round(w * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); } cx.setTransform(cv.width / 1000, 0, 0, cv.height / 700, 0, 0); }
+  function fit(cv, cx) { const d = Math.min(devicePixelRatio, 2), w = cv.clientWidth, h = cv.clientHeight; if (cv.width !== Math.round(w * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); }
+    const k = Math.min(cv.width / 1000, cv.height / 700); cx.setTransform(k, 0, 0, k, (cv.width - 1000 * k) / 2, (cv.height - 700 * k) / 2); }   // 가로세로 비율을 지키며 가운데에 맞춤(세로로 긴 모바일 화면에서 찌그러지지 않게)
   function drawPress(p, t) {
     // Key Features의 Pressure for Rest 카드와 같은 모습: 바닥선 · 몸통 · 몸통만큼 넓은 라벤더 패드 · 머리. 눌리면 패드가 얇은 선처럼 납작해지고 동심 타원 파동이 퍼짐
     fit(pc, px); px.clearRect(0, 0, 1000, 700);

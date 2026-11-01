@@ -39,3 +39,9 @@ html.bh-grid-on .bh-grid { opacity: 1; }
 .bh-blue .pop { opacity: 0; transition: opacity .8s 1.4s; }
 .bh-blue.in .pop { opacity: 1; }
 .about > .bh-shape, .features > .bh-shape { position: absolute; z-index: 0; }
+
+@media (max-width: 760px) {
+  .bh-shapes { height: 230vh; } .bh-shapes canvas { width: 96vw; height: 50svh; } .bh-cap { bottom: 14svh; } .bh-label { top: 12svh; }
+  .bh-cap p { font-size: clamp(20px, 5.6vw, 28px); }
+  .bh-blue { padding-top: 72px; padding-bottom: 72px; } .bh-grid i:nth-child(n+5):nth-child(-n+8) { border-left-color: transparent; }
+}

@@ -8,7 +8,7 @@
 .jobs-tag.in small { opacity: 1; }
 
 .jobs-press { position: relative; height: 320vh; }
-.jobs-press__stick { position: sticky; top: 0; height: 100vh; overflow: hidden; display: grid; place-items: center; }
+.jobs-press__stick { position: sticky; top: 0; height: 100svh; overflow: hidden; display: grid; place-items: center; }
 .jobs-press__veil { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(70% 60% at 50% 55%, rgba(40, 30, 70, 0) 0%, rgba(40, 30, 70, .34) 100%); opacity: 0; }
 .jobs-press canvas { width: min(92vw, 1100px); height: min(64vh, 720px); display: block; }
 .jobs-press__text { position: absolute; left: 0; right: 0; bottom: 9vh; text-align: center; padding: 0 var(--gutter); }
@@ -31,7 +31,7 @@
 @media (max-width: 760px) { .jobs-spec__grid { grid-template-columns: 1fr; } }
 
 .jobs-end { position: relative; height: 230vh; background: linear-gradient(180deg, rgba(23, 20, 31, 0) 0%, #17141f 22%, #17141f 78%, rgba(23, 20, 31, 0) 100%); }
-.jobs-end__stick { position: sticky; top: 0; height: 100vh; overflow: hidden; display: grid; place-items: center; color: #f5f5f7; }
+.jobs-end__stick { position: sticky; top: 0; height: 100svh; overflow: hidden; display: grid; place-items: center; color: #f5f5f7; }
 .jobs-end canvas { width: min(70vw, 620px); height: min(40vh, 340px); display: block; }
 .jobs-end__text { position: absolute; left: 0; right: 0; bottom: 12vh; text-align: center; padding: 0 var(--gutter); }
 .jobs-end__text p { margin: 0; font-family: "Jost", "Noto Sans KR", sans-serif; font-weight: 300; font-size: clamp(28px, 4.6vw, 72px); letter-spacing: -.025em; opacity: 0; transform: translateY(16px); transition: opacity 1.4s, transform 1.4s; }
@@ -40,3 +40,22 @@
 
 /* 큰 숫자 스펙이 기존의 작은 규격 표를 대체함 */
 .specs { display: none !important; }
+
+/* ───── 모바일: 스크롤 길이·글자 크기·겹침 정리 ───── */
+@media (max-width: 760px) {
+  .jobs-tag { min-height: 70svh; padding: 14svh var(--gutter); }
+  .jobs-tag p { font-size: clamp(34px, 10.4vw, 52px); line-height: 1.18; }
+  .jobs-press { height: 230vh; }
+  .jobs-press canvas { width: 96vw; height: 52svh; }
+  .jobs-press__label { top: 12svh; }
+  .jobs-press__text { bottom: 16svh; }
+  .jobs-press__text p { font-size: clamp(21px, 6vw, 30px); }
+  .jobs-spec { padding-top: 72px; padding-bottom: 72px; }
+  .jobs-spec__num { font-size: clamp(44px, 15vw, 72px); }
+  .jobs-spec__item { padding: 20px 0 16px; }
+  .jobs-end { height: 170vh; }
+  .jobs-end canvas { width: 86vw; height: 34svh; }
+  .jobs-end__text { bottom: 18svh; }
+  .jobs-end__text p { font-size: clamp(24px, 7vw, 36px); }
+  .footer { padding-bottom: 96px; }                                  /* 왼쪽 아래 페이지 표시가 저작권 문구를 가리지 않게 */
+}
