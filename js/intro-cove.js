@@ -87,6 +87,30 @@ async function init() {
   resize(); new ResizeObserver(resize).observe(figure);
 
   const AWAKE = { neck: 25, head: -34 }, IDLE_MS = 9000;
+  /* 콕 누르기 반응: 머리를 누르면 깜짝 놀람, 몸통을 누르면 윙크, 연속으로 누르면 좋아함·속상함 (시뮬레이터와 같은 동작) */
+  const REACT = {
+    startle: { dur: 2.7, keys: [[0, 25, -34, 0, 0], [0.12, 34, -46, 0, 0], [0.7, 33, -44, 0, 0], [1.1, 30, -38, 0, 14], [1.7, 30, -38, 0, -14], [2.2, 27, -35, 0, 4], [2.7, 25, -34, 0, 0]], eyes: [[0, '놀란 눈'], [1.0, '뜬 눈']] },
+    wink: { dur: 2.0, keys: [[0, 25, -34, 0, 0], [0.18, 24, -32, 5, -6], [0.5, 27, -36, 5, -6], [1.4, 27, -36, 3, -3], [2.0, 25, -34, 0, 0]], eyes: [[0, '놀란 눈'], [0.25, '윙크'], [1.5, '뜬 눈']] },
+    happy: { dur: 3.2, keys: [[0, 25, -34, 0, 0], [0.3, 29, -38, 7, 14], [0.7, 29, -38, -7, -14], [1.1, 29, -38, 7, 14], [1.5, 29, -38, -7, -14], [1.9, 29, -38, 7, 12], [2.4, 28, -37, -5, -8], [3.2, 25, -34, 0, 0]], eyes: [[0, '하트 눈'], [1.6, '별 눈'], [2.8, '뜬 눈']] },
+    upset: { dur: 3.0, keys: [[0, 25, -34, 0, 0], [0.5, 12, -14, 0, 0], [1.0, 12, -14, 0, 42], [2.2, 12, -14, 0, 42], [3.0, 25, -34, 0, 0]], eyes: [[0, '속상한 눈'], [2.6, '뜬 눈']] },
+  };
+  let react = null; const pokes = [];
+  const sampleKeys = (K, t) => { if (t <= K[0][0]) return K[0]; for (let i = 1; i < K.length; i++) if (t <= K[i][0]) { const a = K[i - 1], b = K[i], f = (t - a[0]) / (b[0] - a[0] || 1); return a.map((v, m) => v + (b[m] - v) * f); } return K[K.length - 1]; };
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  const isHeadObj = (o) => { for (; o; o = o.parent) if (o === head) return true; return false; };
+  function hitKind(ev) {                                                   // 어디를 눌렀는지: 'head' · 'body' · null(Cove가 아닌 곳)
+    const r = cv.getBoundingClientRect(); if (!r.width) return null;
+    ndc.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, camera);
+    const h = ray.intersectObject(model, true).find(i => i.object.isMesh && i.object.visible); return h ? (isHeadObj(h.object) ? 'head' : 'body') : null;
+  }
+  function poke(kind) {
+    const now = performance.now(); pokes.push(now); while (pokes.length && now - pokes[0] > 4200) pokes.shift();
+    const n = pokes.length; const name = n >= 6 ? 'upset' : n >= 3 ? 'happy' : kind === 'head' ? 'startle' : 'wink';
+    react = { name, t0: tNow }; if (n >= 6) pokes.length = 0;
+  }
+  window.addEventListener('pointerdown', (e) => { if (e.button > 0 || !visible() || e.target.closest('a, button, nav')) return; const k = hitKind(e); if (k) poke(k); });
+  let hoverAt = 0;
+  window.addEventListener('pointermove', (e) => { if (e.pointerType === 'touch' || performance.now() - hoverAt < 80 || !visible()) return; hoverAt = performance.now(); document.documentElement.style.cursor = hitKind(e) ? 'pointer' : ''; }, { passive: true });
   const pose = { neck: 0, head: 0, tilt: 0, body: 0 }, vel = { neck: { v: 0 }, head: { v: 0 }, tilt: { v: 0 }, body: { v: 0 } };
   let gaze = { x: 0, y: 0 }, tNow = 0, last = performance.now(), shown = false;
   let autoFrom = 0, autoUntil = -1, autoDone = false;                       // 도착하면 마우스가 없어도 스스로 한 번 일어나 두리번거린다
@@ -101,7 +125,9 @@ async function init() {
     if (op < 0.3) autoDone = false;                                              // 장면을 벗어났다 돌아오면 다시
     if (!autoDone && op > 0.97) { autoDone = true; if (!REDUCED) { autoFrom = tNow + 0.5; autoUntil = tNow + 6.8; } }
     const pAwake = ptr.seen && now - ptr.at < IDLE_MS, aAwake = !pAwake && tNow >= autoFrom && tNow < autoUntil;
-    const awake = pAwake || aAwake;
+    const reacting = react && tNow - react.t0 < REACT[react.name].dur;
+    if (!reacting) react = null;
+    const awake = pAwake || aAwake || reacting;
     const r = figure.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height * 0.5;
     // 마우스가 Cove 기준 어디에 있는지 (-1 ~ 1)
     let dx = clamp((ptr.x - cx) / (innerWidth * 0.26), -1, 1), dy = clamp((ptr.y - cy) / (innerHeight * 0.3), -1, 1);   // Cove 주변 가까운 범위에서 최대로 반응
@@ -114,7 +140,13 @@ async function init() {
       goal.body = clamp(gaze.x * 70, -75, 75);                                               // 커서 쪽으로 몸통을 크게 돌림
       const [lo, hi] = tiltRange(goal.head); goal.tilt = clamp(gaze.x * 15, lo, hi);         // 가능한 만큼 갸웃
     }
-    const T = { neck: awake ? 0.45 : 0.9, head: awake ? 0.4 : 0.9, tilt: 0.3, body: awake ? 0.35 : 0.8 };
+    let reactEye = null;
+    if (reacting) {                                                          // 반응 중에는 정해진 동작을 그대로
+      const R = REACT[react.name], u = tNow - react.t0, s = sampleKeys(R.keys, u);
+      goal.neck = s[1]; goal.head = s[2]; const [lo, hi] = tiltRange(goal.head); goal.tilt = clamp(s[3], lo, hi); goal.body = s[4];
+      reactEye = R.eyes.filter(e => e[0] <= u).pop()[1];
+    }
+    const T = reacting ? { neck: 0.12, head: 0.12, tilt: 0.12, body: 0.14 } : { neck: awake ? 0.45 : 0.9, head: awake ? 0.4 : 0.9, tilt: 0.3, body: awake ? 0.35 : 0.8 };
     for (const j of ['neck', 'head', 'tilt', 'body']) pose[j] = smoothDamp(pose[j], goal[j], vel[j], T[j], dt);
     const up = clamp((pose.neck - 2) / 10, 0, 1), sway = up * up * (3 - 2 * up);
     spin(col, AXZ, pose.neck + sway * 0.4 * Math.sin(2 * Math.PI * tNow / 3.7));
@@ -123,7 +155,7 @@ async function init() {
     eyes.group.visible = true;
     const near = ptr.seen && now - ptr.at < IDLE_MS + 3000;
     const gx = Math.round(clamp((ptr.x - cx) / (innerWidth * 0.5), -1, 1) * (near ? 2 : 0)), gy = Math.round(gaze.y * 1.4);
-    eyes.show(awake && Math.abs(gaze.x) + Math.abs(gaze.y) > 0.9 ? '반짝 눈' : '뜬 눈', awake ? Math.round(clamp(gaze.x * 2.6, -2, 2)) : gx, gy, tNow);
+    eyes.show(reactEye || (awake && Math.abs(gaze.x) + Math.abs(gaze.y) > 0.9 ? '반짝 눈' : '뜬 눈'), awake ? Math.round(clamp(gaze.x * 2.6, -2, 2)) : gx, gy, tNow);
     renderer.render(scene, camera);
     if (!shown) { shown = true; figure.classList.add('is-live'); mark('live'); }
   }
