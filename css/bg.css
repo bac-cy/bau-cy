@@ -16,3 +16,17 @@ html.bgfx-on body { background: transparent; }
 .bgfx-on .nav.is-scrolled { background: rgba(255, 255, 255, .5); -webkit-backdrop-filter: blur(20px) saturate(1.5); backdrop-filter: blur(20px) saturate(1.5); }
 .bgfx-on.bg-b { --bgblur: 50px; --glass: .36; }
 @media (max-width: 760px) { .bgfx i { filter: blur(40px); } .bgfx-on .feature, .bgfx-on .principles__img, .bgfx-on .design__details .slot { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); } }
+
+/* ───── C안: 애플풍 — 차갑고 깨끗한 진주빛 바탕, 얇고 선명한 유리, 또렷한 글자 ───── */
+html.bg-c { --bg: #f5f5f7; --bg-soft: #f0f0f4; --ink: #1d1d1f; --ink-soft: #6e6e73; --ink-faint: #a1a1a6; --line: rgba(0, 0, 0, .08); }
+html.bg-c, html.bg-c body { background-color: #f5f5f7; }
+.bgfx-on.bg-c { --bgblur: 70px; --glass: .66; }
+.bgfx-on.bg-c .feature, .bgfx-on.bg-c .gallery__film, .bgfx-on.bg-c .principles__img, .bgfx-on.bg-c .design__details .slot, .bgfx-on.bg-c .design__visual {
+  -webkit-backdrop-filter: blur(34px) saturate(1.9); backdrop-filter: blur(34px) saturate(1.9);
+  border: 1px solid rgba(255, 255, 255, .9); box-shadow: 0 0 0 .5px rgba(0, 0, 0, .06), 0 14px 44px -18px rgba(0, 0, 0, .12), inset 0 1px 0 rgba(255, 255, 255, .95); }
+.bgfx-on.bg-c h1, .bgfx-on.bg-c h2, .bgfx-on.bg-c h3, .bgfx-on.bg-c .statement { letter-spacing: -.022em; }
+.bgfx-on.bg-c .label, .bgfx-on.bg-c .eyebrow { letter-spacing: .12em; color: #6e6e73; }
+.bgfx-on.bg-c .nav.is-scrolled { background: rgba(245, 245, 247, .72); -webkit-backdrop-filter: blur(24px) saturate(1.8); backdrop-filter: blur(24px) saturate(1.8); box-shadow: 0 .5px 0 rgba(0, 0, 0, .12); }
+.bgfx-on.bg-c .sim__motions button, .bgfx-on.bg-c .sim__views button { background: rgba(255, 255, 255, .72); box-shadow: 0 0 0 .5px rgba(0, 0, 0, .1), 0 2px 8px -2px rgba(0, 0, 0, .08); }
+.bgfx-on.bg-c .sim__ui button[aria-pressed="true"] { background: #1d1d1f; color: #fff; }
+.bgfx-on.bg-c .statement em, .bgfx-on.bg-c em { color: #6b5bd6; }

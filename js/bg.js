@@ -1,6 +1,6 @@
 /* 배경 통일 미리보기: 라일락·복숭아 빛이 섹션마다 아주 천천히 색을 바꾸며 이어짐 (?bg=a 은은하게 / ?bg=b 또렷하게) */
 (() => {
-  const mode = /[?&]bg=b/.test(location.search) ? 'b' : 'a', K = mode === 'b' ? 1 : 0.55;       // 색 진하기
+  const mode = /[?&]bg=c/.test(location.search) ? 'c' : /[?&]bg=b/.test(location.search) ? 'b' : 'a', K = mode === 'a' ? 0.55 : mode === 'c' ? 1.35 : 1;       // 색 진하기
   document.documentElement.classList.add('bgfx-on'); document.body.classList.add('bg-' + mode); document.documentElement.classList.add('bg-' + mode);
   const bg = document.createElement('div'); bg.className = 'bgfx'; bg.innerHTML = '<i></i><i></i><i></i>'; document.body.prepend(bg);
   const P = {   // [빛1(왼쪽 위), 빛2(오른쪽 아래), 빛3(가운데)] 각각 [r,g,b,a]
@@ -10,6 +10,13 @@
     gallery:  [[226, 220, 240, .5], [255, 214, 190, .38], [245, 238, 250, .35]],
     footer:   [[198, 180, 244, .6], [255, 204, 178, .5], [236, 226, 250, .35]],
   };
+  if (mode === 'c') Object.assign(P, {   // 애플풍: 채도를 낮춘 진주빛(은은한 라벤더·핑크·스카이)
+    about:    [[214, 218, 246, .7], [246, 222, 226, .55], [232, 236, 250, .5]],
+    features: [[246, 224, 224, .6], [210, 220, 246, .55], [240, 236, 248, .5]],
+    design:   [[226, 226, 238, .6], [236, 224, 232, .5], [244, 244, 250, .5]],
+    gallery:  [[228, 230, 242, .55], [244, 230, 232, .45], [244, 244, 250, .4]],
+    footer:   [[212, 216, 246, .65], [246, 220, 226, .55], [234, 236, 250, .45]],
+  });
   const ids = ['about', 'features', 'design', 'gallery'], els = ids.map(i => document.getElementById(i)), foot = document.querySelector('.footer');
   const mix = (a, b, t) => a.map((v, k) => v + (b[k] - v) * t);
   const rgba = (c) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${(c[3] * K).toFixed(3)})`;
