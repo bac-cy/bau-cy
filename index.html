@@ -5,21 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cove — Desktop Home Robot</title>
   <meta name="description" content="책상 위, 가장 가까운 거리에서 함께하는 작은 존재. 데스크탑 홈 로봇 Cove.">
-  <meta name="theme-color" content="#f6f1ea">
+  <meta name="theme-color" content="#f5f5f7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600&family=Noto+Sans+KR:wght@300;400;500&family=Jost:wght@200;300;400;500&family=JetBrains+Mono:wght@300;400&family=Fredoka:wdth,wght@125,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20261102d">
-  <link rel="stylesheet" href="css/intro.css?v=20261102d">
-  <link rel="stylesheet" href="css/sim.css?v=20261102d">
-  <script>
-    /* 시작 화면 미리보기: 주소 끝에 ?loader=1 을 붙였을 때만 (기본 화면에는 영향 없음) */
-    if (/[?&]loader=1/.test(location.search)) { document.documentElement.classList.add('loader-on'); document.write('<link rel="stylesheet" href="css/loader.css?v=1">'); }
-  </script>
-  <script>
-    /* 작은 디테일 미리보기: 주소 끝에 ?detail=1 (선택색·스크롤바·버튼 상태·파비콘) */
-    if (/[?&]detail=1/.test(location.search)) { document.write('<link rel="stylesheet" href="css/detail.css?v=1">'); }
-  </script>
+  <link rel="stylesheet" href="css/style.css?v=20261102k">
+  <link rel="stylesheet" href="css/intro.css?v=20261102k">
+  <link rel="stylesheet" href="css/sim.css?v=20261102k">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="favicon-32.png" type="image/png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="COVE — Desktop Home Robot">
+  <meta property="og:description" content="로봇에게 기대어 쉬어 보세요. 책상 위에서 손이나 팔을 지그시 눌러 휴식을 돕는 데스크탑 홈 로봇 Cove.">
+  <meta property="og:image" content="https://bac-cy.github.io/bau-cy/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://bac-cy.github.io/bau-cy/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://bac-cy.github.io/bau-cy/assets/og-image.png">
+  <link rel="stylesheet" href="css/detail.css?v=2">
+  <link rel="stylesheet" href="css/loader.css?v=3">
+  <script>document.documentElement.classList.add('loader-on');</script>   <!-- 시작 화면: 불러오는 동안 어두운 화면으로 가림 -->
 </head>
 <body>
 
@@ -267,34 +274,29 @@
   </div>
 
   <script src="assets/vendor/lenis/lenis.min.js"></script>
-  <script src="js/smooth.js?v=20261102d"></script>
-  <script src="js/main.js?v=20261102d"></script>
-  <script src="js/intro.js?v=20261102d"></script>
+  <script src="js/smooth.js?v=20261102k"></script>
+  <script src="js/main.js?v=20261102k"></script>
+  <script src="js/intro.js?v=20261102k"></script>
   <script type="importmap">
     { "imports": {
         "three": "./assets/vendor/three/build/three.module.min.js",
         "three/addons/": "./assets/vendor/three/examples/jsm/"
     } }
   </script>
-  <script type="module" src="js/sim.js?v=20261102d"></script>
-  <script type="module" src="js/cards.js?v=20261102d"></script>
-  <script type="module" src="js/intro-cove.js?v=20261102d"></script>
-  <script type="module" src="js/features.js?v=20261102d"></script>
-  <script type="module" src="js/engineering.js?v=20261102d"></script>
+  <script type="module" src="js/sim.js?v=20261102k"></script>
+  <script type="module" src="js/cards.js?v=20261102k"></script>
+  <script type="module" src="js/intro-cove.js?v=20261102k"></script>
+  <script type="module" src="js/features.js?v=20261102k"></script>
+  <script type="module" src="js/engineering.js?v=20261102k"></script>
   <!-- 디테일 효과: 필름 입자 · 자석 버튼 · 카드 빛/기울기 (되돌리려면 아래 두 줄과 css/fx.css, js/fx.js 를 지우면 됨) -->
-  <link rel="stylesheet" href="css/fx.css?v=20261102d">
-  <script src="js/fx.js?v=20261102d" defer></script>
+  <link rel="stylesheet" href="css/fx.css?v=20261102k">
+  <script src="js/fx.js?v=20261102k" defer></script>
   <!-- 배경 통일 + 유리 카드 (C안, 애플풍). 되돌리려면 아래 두 줄을 지우면 됨 -->
-  <link rel="stylesheet" href="css/bg.css?v=20261102d">
-  <script src="js/bg.js?v=20261102d" defer></script>
+  <link rel="stylesheet" href="css/bg.css?v=20261102k">
+  <script src="js/bg.js?v=20261102k" defer></script>
   <!-- 잡스 제안 4가지(한 줄 약속·압력 시연·큰 숫자 스펙·One more thing). 되돌리려면 아래 두 줄을 지우면 됨 -->
-  <link rel="stylesheet" href="css/jobs.css?v=20261102d">
-  <script src="js/jobs.js?v=20261102d" defer></script>
-  <script>
-    if (/[?&]loader=1/.test(location.search)) { const s = document.createElement('script'); s.src = 'js/loader.js?v=1'; document.body.appendChild(s); }
-  </script>
-  <script>
-    if (/[?&]detail=1/.test(location.search)) { const s = document.createElement('script'); s.src = 'js/detail.js?v=1'; document.body.appendChild(s); }
-  </script>
+  <link rel="stylesheet" href="css/jobs.css?v=20261102k">
+  <script src="js/jobs.js?v=20261102k" defer></script>
+  <script src="js/loader.js?v=2"></script>   <!-- 시작 화면 (눈 LED가 깜빡이다 열림) -->
 </body>
 </html>

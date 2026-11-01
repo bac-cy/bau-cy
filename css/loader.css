@@ -14,7 +14,7 @@ html.loader-on::before { content: ""; position: fixed; inset: 0; background: #17
 @keyframes cvBlink { 0%, 38%, 44%, 100% { transform: scaleY(1); } 41% { transform: scaleY(.08); } 70% { transform: scaleY(1); } 73% { transform: scaleY(.08); } 76% { transform: scaleY(1); } }
 @keyframes cvLook { 0%, 100% { translate: 0 0; } 30% { translate: -10px 0; } 62% { translate: 10px 0; } }
 @keyframes cvHappy { 0% { opacity: 1; } 100% { opacity: 1; transform: scaleY(.16) translateY(-8px); height: clamp(40px, 6.4vw, 64px); } }
-.cv-load__mark { width: clamp(70px, 9vw, 108px); aspect-ratio: 400.4 / 94.4; background: #8d849c; -webkit-mask: url(assets/cove-logo.svg) center / contain no-repeat; mask: url(assets/cove-logo.svg) center / contain no-repeat; opacity: 0; animation: cvMark .9s 1s ease forwards; }
+.cv-load__mark { width: clamp(70px, 9vw, 108px); aspect-ratio: 400.4 / 94.4; background: #8d849c; -webkit-mask: url(../assets/cove-logo.svg) center / contain no-repeat; mask: url(../assets/cove-logo.svg) center / contain no-repeat; opacity: 0; animation: cvMark .9s 1s ease forwards; }
 @keyframes cvMark { to { opacity: .55; } }
 .cv-load__bar { width: clamp(90px, 12vw, 150px); height: 2px; background: rgba(255, 255, 255, .12); border-radius: 2px; overflow: hidden; opacity: 0; animation: cvMark .6s 1.2s ease forwards; }
 .cv-load__bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #b8a6e0, #f6c9a8); transition: width .5s ease; }

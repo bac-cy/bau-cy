@@ -56,24 +56,5 @@
   spec.querySelectorAll('.jobs-spec__item').forEach(i => io.observe(i));
   const io2 = new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }), { threshold: 0.45 }); io2.observe(tag);
 
-  /* 4) One more thing: 화면이 어두워지며 Cove가 스르르 잠들고 문구 한 줄 */
-  const end = $(`<section class="jobs-end" aria-label="마무리"><div class="jobs-end__stick"><canvas aria-hidden="true"></canvas><div class="jobs-end__text"><p>ROBOTWORLD 2026에서 만나요.</p><small>HIDE LAB · Hongik University</small></div></div></section>`);
-  foot && foot.before(end);
-  const ec = end.querySelector('canvas'), ex = ec.getContext('2d'), etext = end.querySelector('.jobs-end__text');
-  function drawEnd(p, t) {
-    fit(ec, ex); ex.clearRect(0, 0, 1000, 700);
-    const sleep = ez((p - 0.3) / 0.25), breath = Math.sin(t * 1.3) * 0.5 + 0.5, base = 520, cx = 500;
-    ex.fillStyle = 'rgba(0,0,0,.35)'; ex.beginPath(); ex.ellipse(cx, base + 6, 250, 18, 0, 0, 7); ex.fill();
-    const g = ex.createLinearGradient(0, base - 150, 0, base); g.addColorStop(0, '#6c6573'); g.addColorStop(1, '#4a4452');
-    const bodyY = base - 130, headLow = 4 + 16 * sleep;                                                                     // 잠들면서 머리가 몸통 쪽으로 내려앉음
-    rr(ex, cx - 220, bodyY, 440, 130, 62); ex.fillStyle = g; ex.fill(); ex.strokeStyle = 'rgba(184,166,224,.35)'; ex.lineWidth = 2; ex.stroke();
-    const hy = bodyY - 98 + headLow - breath * 3 * sleep; rr(ex, cx - 160, hy, 320, 108, 54); const g2 = ex.createLinearGradient(0, hy, 0, hy + 108); g2.addColorStop(0, '#8d8697'); g2.addColorStop(1, '#6c6573'); ex.fillStyle = g2; ex.fill(); ex.stroke();
-    const glow = 1 - sleep * 0.92; ex.save(); ex.shadowColor = `rgba(255,220,190,${0.7 * glow})`; ex.shadowBlur = 24; ex.strokeStyle = `rgba(255,236,220,${0.35 + 0.65 * glow})`; ex.lineWidth = 6; ex.lineCap = 'round';
-    for (const s of [-1, 1]) { const x = cx + s * 58, y = hy + 54; ex.beginPath(); if (sleep > 0.5) { ex.moveTo(x - 16, y); ex.lineTo(x + 16, y); } else { ex.moveTo(x, y - 10 * (1 - sleep)); ex.lineTo(x, y + 10 * (1 - sleep)); } ex.stroke(); } ex.restore();
-  }
-  function updEnd(now) {
-    const r = end.getBoundingClientRect(), total = r.height - innerHeight, p = clamp(-r.top / total);
-    if (r.bottom > -50 && r.top < innerHeight + 50) { drawEnd(p, now / 1000); if (p > 0.55) end.classList.add('in'); else end.classList.remove('in'); }
-  }
-  (function loop(now) { requestAnimationFrame(loop); updPress(now); updEnd(now); })(performance.now());
+  (function loop(now) { requestAnimationFrame(loop); updPress(now); })(performance.now());
 })();
