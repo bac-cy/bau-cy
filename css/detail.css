@@ -1,0 +1,20 @@
+/* 작은 디테일 미리보기 (?detail=1 / detail-preview.html): 선택한 글자색 · 스크롤바 · 링크와 버튼 상태 · 파비콘 */
+::selection { background: #d9cdf2; color: #1d1d1f; }
+::-moz-selection { background: #d9cdf2; color: #1d1d1f; }
+html { scrollbar-width: thin; scrollbar-color: #b8a6e0 transparent; -webkit-tap-highlight-color: transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cfc3ec; border-radius: 99px; border: 3px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: #b8a6e0; background-clip: content-box; }
+/* 포커스(키보드): 모든 요소에 같은 라벤더 링 */
+:where(a, button, [role="button"], input, textarea, select, summary, [tabindex]):focus-visible { outline: 2px solid #6b5bd6; outline-offset: 3px; border-radius: 12px; }
+:where(a, button, [role="button"]):focus:not(:focus-visible) { outline: none; }
+/* 링크: 호버 시 밑줄이 왼쪽에서 그려짐, 색은 라벤더 진한색 */
+.nav__links a, .footer__links a { background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: background-size .35s cubic-bezier(.2, .9, .2, 1), color .25s; padding-bottom: 3px; }
+.nav__links a:hover, .footer__links a:hover { background-size: 100% 1px; color: #6b5bd6; }
+/* 버튼: 호버 · 눌림 · 비활성 규칙 통일 */
+:where(.sim__ui button, .gallery__arrow, .gallery__dots button) { transition: transform .2s cubic-bezier(.2, .9, .2, 1), background .25s, color .25s, box-shadow .25s, opacity .25s; }
+:where(.sim__ui button, .gallery__arrow):hover { transform: translateY(-1px); }
+:where(.sim__ui button, .gallery__arrow):active { transform: translateY(0) scale(.96); }
+:where(button, [role="button"]):disabled, [aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
+:where(a, button, [role="button"], summary) { cursor: pointer; }

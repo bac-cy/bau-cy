@@ -12,6 +12,14 @@
   <link rel="stylesheet" href="css/style.css?v=20261102d">
   <link rel="stylesheet" href="css/intro.css?v=20261102d">
   <link rel="stylesheet" href="css/sim.css?v=20261102d">
+  <script>
+    /* 시작 화면 미리보기: 주소 끝에 ?loader=1 을 붙였을 때만 (기본 화면에는 영향 없음) */
+    if (/[?&]loader=1/.test(location.search)) { document.documentElement.classList.add('loader-on'); document.write('<link rel="stylesheet" href="css/loader.css?v=1">'); }
+  </script>
+  <script>
+    /* 작은 디테일 미리보기: 주소 끝에 ?detail=1 (선택색·스크롤바·버튼 상태·파비콘) */
+    if (/[?&]detail=1/.test(location.search)) { document.write('<link rel="stylesheet" href="css/detail.css?v=1">'); }
+  </script>
 </head>
 <body>
 
@@ -282,5 +290,11 @@
   <!-- 잡스 제안 4가지(한 줄 약속·압력 시연·큰 숫자 스펙·One more thing). 되돌리려면 아래 두 줄을 지우면 됨 -->
   <link rel="stylesheet" href="css/jobs.css?v=20261102d">
   <script src="js/jobs.js?v=20261102d" defer></script>
+  <script>
+    if (/[?&]loader=1/.test(location.search)) { const s = document.createElement('script'); s.src = 'js/loader.js?v=1'; document.body.appendChild(s); }
+  </script>
+  <script>
+    if (/[?&]detail=1/.test(location.search)) { const s = document.createElement('script'); s.src = 'js/detail.js?v=1'; document.body.appendChild(s); }
+  </script>
 </body>
 </html>
