@@ -97,17 +97,18 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     shadow.rotation.x = -Math.PI / 2; shadow.position.set(center.x, box.min.y - 0.001, center.z); scene.add(shadow);
 
     const cv = document.createElement('canvas'); cv.className = 'slot__scene'; cv.setAttribute('role', 'img');
-    cv.setAttribute('aria-label', { form: 'Cove의 두 개의 둥근 볼륨', material: 'Cove의 소재가 만나는 이음선', motion: 'Cove가 몸통을 돌리고 갸웃하는 모습' }[slot.dataset.scene]);
+    cv.setAttribute('aria-label', { form: 'Cove의 두 개의 둥근 볼륨', material: 'Cove의 소재가 만나는 이음선', motion: 'Cove가 몸통을 돌리고 갸웃하는 모습', close: '앉아 있던 Cove가 머리를 앞으로 내밀며 다가오는 모습', calm: 'Cove가 고개를 들었다 내리며 폼을 지그시 누르는 모습', kind: 'Cove가 몸통을 돌리고 고개를 갸웃하며 반응하는 모습' }[slot.dataset.scene]);
     const msg = document.createElement('span'); msg.className = 'slot__msg'; msg.setAttribute('aria-live', 'off');
     slot.append(cv, msg);
     const camera = new THREE.PerspectiveCamera(28, 1.6, 0.01, 10);
-    return { slot, kind: slot.dataset.scene, scene, root3, camera, cv, msg, ctx: cv.getContext('2d'), setPose, eyes, FRONT, RIGHT, center, sphere, seam,
+    return { slot, kind: slot.dataset.scene, scene, root3, foam: by['새_하부_폼'], foam0: by['새_하부_폼'] ? by['새_하부_폼'].scale.y : 1, camera, cv, msg, ctx: cv.getContext('2d'), setPose, eyes, FRONT, RIGHT, center, sphere, seam,
       cam: { az: 35, el: 14, zoom: 1, tx: 0, ty: 0, tz: 0 }, cvel: { az: { v: 0 }, el: { v: 0 }, zoom: { v: 0 }, tx: { v: 0 }, ty: { v: 0 }, tz: { v: 0 } },
       t: 0, rest: 0, visible: false, text: '', w: 0, h: 0 };
   });
 
   const vis = new IntersectionObserver((es) => es.forEach(e => { const c = cards.find(k => k.slot === e.target); if (c) { c.visible = e.isIntersecting; if (e.isIntersecting && !c.started) { c.started = true; c.t = 0; } } }), { threshold: 0.15 });
   cards.forEach(c => vis.observe(c.slot));
+  cards.forEach(c => { if (['close', 'calm', 'kind'].includes(c.kind)) { const replay = () => { c.t0 = c.t; }; c.slot.addEventListener('pointerenter', replay); c.slot.addEventListener('pointerdown', replay); } });
   const reduced = false;   // 사용자 요청: PC의 '움직임 줄이기' 설정과 상관없이 모든 효과를 보여준다
 
   function say(c, text) { if (c.text === text) return; c.text = text; c.msg.textContent = text; }
@@ -120,6 +121,28 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     } else if (c.kind === 'material') {
       g = { az: 40 + 16 * Math.sin(t * 0.55), el: 8, zoom: 2.5, tx: c.seam.x, ty: c.seam.y, tz: c.seam.z };
       say(c, '소재가 만나는 이음선');
+    } else if (c.kind === 'close') {                                            // Close: 앉아 있다가 머리가 천천히 앞으로 나와 다가오고, 잠깐 멈췄다가 다시 앉음 (한 번 4초)
+      const p = c.t - (c.t0 || 0), ez = (u) => { u = Math.min(1, Math.max(0, u)); return u * u * (3 - 2 * u); };
+      const out = ez((p - 0.5) / 1.6) * (1 - ez((p - 2.9) / 1.1));              // 0 → 1(다가옴) → 0(다시 앉음)
+      pose = [32 * out, -24 * out, 0, 0];
+      eye = p < 1.3 || p > 3.8 ? '감은 눈' : p > 3.3 ? '졸린 눈' : '반짝 눈';
+      g = { az: 0, el: -3, zoom: 1.0 + 0.16 * out, tx: 0, ty: 0.012 * out, tz: 0 };
+      say(c, '');
+    } else if (c.kind === 'calm') {                                             // Calm: 고개를 천천히 들었다가 우레탄 폼 위로 아주 천천히 내려와 지그시 누름 (한 번 5.6초)
+      const p = c.t - (c.t0 || 0), ez = (u) => { u = Math.min(1, Math.max(0, u)); return u * u * (3 - 2 * u); };
+      const up = ez((p - 0.2) / 1.6) * (1 - ez((p - 2.2) / 1.9));               // 고개 들기 → 천천히 내림
+      const touch = ez((p - 3.4) / 0.9) * (1 - ez((p - 4.9) / 0.7)), press = touch;       // 폼에 닿아 누르는 정도
+      pose = [18 + 12 * up - 15 * touch, -20 - 18 * up + 18 * touch, 0, 0];
+      eye = p > 3.5 && p < 5.0 ? '편안한 눈' : '뜬 눈';
+      g = { az: 78, el: 6, zoom: 1.12, tx: 0, ty: 0, tz: 0 }; c.press = press;
+      say(c, '');
+    } else if (c.kind === 'kind') {                                             // Kind: 몸통을 보는 사람 쪽으로 돌리고, 머리를 한쪽으로 갸웃했다가 반대쪽으로 갸웃 (한 번 4.2초)
+      const p = c.t - (c.t0 || 0), ez = (u) => { u = Math.min(1, Math.max(0, u)); return u * u * (3 - 2 * u); };
+      const turn = 1 - ez(p / 0.9), tilt = 9 * ez((p - 0.9) / 0.5) * (1 - ez((p - 1.9) / 0.4)) - 9 * ez((p - 1.9) / 0.5) * (1 - ez((p - 3.0) / 0.5));
+      pose = [24, -30, tilt, -42 * turn];
+      eye = p < 1.9 ? '하트 눈' : p < 3.6 ? '신난 눈' : '뜬 눈';
+      g = { az: 0, el: 4, zoom: 1.05, tx: 0, ty: 0, tz: 0 };
+      say(c, '');
     } else {
       const cyc = TOUR_LEN + TOUR_REST, p = t % cyc, q = Math.min(p, TOUR_LEN);
       pose = tourAt(q); eye = last(TOUR_EYES, q)[1]; g = { az: 24, el: 10, zoom: 0.85, tx: 0, ty: 0, tz: 0 };
@@ -138,6 +161,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
       if (w !== c.w || h !== c.h) { c.w = w; c.h = h; c.cv.width = Math.round(w * PR); c.cv.height = Math.round(h * PR); c.camera.aspect = w / h; c.camera.updateProjectionMatrix(); }
       c.t += reduced ? 0 : dt;
       const { g, pose, eye } = goal(c);
+      if (c.foam) c.foam.scale.y = c.foam0 * (1 - 0.035 * (c.kind === 'calm' ? (c.press || 0) : 0));          // Calm: 폼이 아주 조금 눌려 보임
       for (const k of ['az', 'el', 'zoom', 'tx', 'ty', 'tz']) c.cam[k] = reduced ? g[k] : smoothDamp(c.cam[k], g[k], c.cvel[k], k === 'zoom' ? 0.5 : 0.34, dt);
       const sway = c.kind === 'motion' ? 0 : 1, tt = c.t;
       c.setPose([pose[0] + sway * (0.45 * Math.sin(2 * Math.PI * tt / 3.7)), pose[1] + sway * (0.7 * Math.sin(2 * Math.PI * tt / 4.3 + 0.6)), pose[2], pose[3]]);

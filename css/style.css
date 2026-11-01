@@ -463,3 +463,7 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
 .lenis.lenis-stopped { overflow: hidden; }
+
+/* About Close: 3D 장면이 뜨면 정지 이미지는 감춤 */
+.principles__img > .slot__scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.principles__img.has-scene > img { visibility: hidden; }
