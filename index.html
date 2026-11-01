@@ -282,12 +282,5 @@
   <!-- 잡스 제안 4가지(한 줄 약속·압력 시연·큰 숫자 스펙·One more thing). 되돌리려면 아래 두 줄을 지우면 됨 -->
   <link rel="stylesheet" href="css/jobs.css?v=20261102d">
   <script src="js/jobs.js?v=20261102d" defer></script>
-  <!-- 바우하우스 미리보기: 주소 끝에 ?bauhaus=1 을 붙였을 때만 불러옴 (기본 화면에는 영향 없음) -->
-  <script>
-    if (/[?&]bauhaus=1/.test(location.search)) {
-      const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'css/bauhaus.css?v=20261102h'; document.head.appendChild(l);
-      const s = document.createElement('script'); s.src = 'js/bauhaus.js?v=20261102h'; s.async = false; document.body.appendChild(s);
-    }
-  </script>
 </body>
 </html>
