@@ -39,14 +39,18 @@ async function init(host) {
   /* ───────── 장면 ───────── */
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.08;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.VSMShadowMap;      // 머리가 몸통에 드리우는 부드러운 그림자 — 렌더 이미지 같은 입체감
   host.appendChild(renderer.domElement);
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   scene.add(new THREE.HemisphereLight(0xfff4e8, 0xd8c8c0, 1.5));
-  const key = new THREE.DirectionalLight(0xfff1e2, 0.9); key.position.set(-1.2, 2, 1.5); scene.add(key);
-  const fill = new THREE.DirectionalLight(0xe4dbf5, 0.55); fill.position.set(2, .6, -1); scene.add(fill);
+  const key = new THREE.DirectionalLight(0xfff0e0, 1.35); key.position.set(-0.45, 2.5, 0.95);
+  key.castShadow = true; key.shadow.mapSize.set(innerWidth <= 760 ? 1024 : 2048, innerWidth <= 760 ? 1024 : 2048); key.shadow.bias = -0.0006; key.shadow.normalBias = 0.003; key.shadow.radius = 9; key.shadow.blurSamples = 20;
+  Object.assign(key.shadow.camera, { left: -0.45, right: 0.45, top: 0.45, bottom: -0.45, near: 0.3, far: 5 }); key.target.position.set(0, 0.12, 0); scene.add(key, key.target);
+  const fill = new THREE.DirectionalLight(0xe4dbf5, 0.5); fill.position.set(2, .6, -1); scene.add(fill);
+  const rim = new THREE.DirectionalLight(0xffe9d6, 0.7); rim.position.set(1.2, 1.2, -1.6); scene.add(rim);            // 가장자리에 은은한 빛줄기(윤곽이 또렷해짐)
 
   const loader = new GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder);
   const gltf = await loader.loadAsync(host.dataset.model);
@@ -75,6 +79,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   const matrices = [], shells = [], pickables = [];
   model.traverse(o => {
     if (!o.isMesh) return;
+    o.castShadow = true; o.receiveShadow = true;
     if (FABRIC.includes(o.name)) o.material = fabricFor(THREE, o.name); else if (PIPING.includes(o.name)) o.material = piping;
     else if (ALU.includes(o.name)) { o.material = aluminum; layerUV(THREE, o); } else if (RUBBER.includes(o.name)) o.material = rubber;
     if (/KeyStudio-HT16K33-8x8-LED-Matrix/.test(o.name)) { matrices.push(o); o.visible = false; return; }   // 눈 위치 계산용 (화면에는 안 보임)
@@ -226,9 +231,11 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   /* ───────── 바닥 그림자 ───────── */
   const c2 = document.createElement('canvas'); c2.width = c2.height = 128;
   const g2 = c2.getContext('2d'), gr = g2.createRadialGradient(64, 64, 0, 64, 64, 64);
-  gr.addColorStop(0, 'rgba(110,80,120,.26)'); gr.addColorStop(1, 'rgba(110,80,120,0)'); g2.fillStyle = gr; g2.fillRect(0, 0, 128, 128);
+  gr.addColorStop(0, 'rgba(110,80,120,.12)'); gr.addColorStop(1, 'rgba(110,80,120,0)'); g2.fillStyle = gr; g2.fillRect(0, 0, 128, 128);
   const shadow = new THREE.Mesh(new THREE.PlaneGeometry(sphere.radius * 1.9, sphere.radius * 1.9), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c2), transparent: true, depthWrite: false }));
   shadow.rotation.x = -Math.PI / 2; shadow.position.set(center.x, box.min.y + 0.0006, center.z); scene.add(shadow);
+  { const g = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShadowMaterial({ color: 0x3a2f4a, opacity: 0.17 })); g.rotation.x = -Math.PI / 2; g.position.set(center.x, box.min.y + 0.0003, center.z); g.receiveShadow = true; scene.add(g); }   // 바닥에 지는 실제 그림자
+  key.target.position.set(center.x, center.y, center.z);
   // (사용자 요청) 바닥의 책상 상판은 없앴다 — 은은한 그림자만 남김
   /* ───────── 끌기 / 누르기 ───────── */
   const el = renderer.domElement, ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
