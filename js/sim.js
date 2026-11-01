@@ -87,6 +87,22 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     if (o.name === '눈_LED_가이드') o.visible = true;
     pickables.push(o);
   });
+  /* 미리보기(?style=line): 일러스트·도형처럼 단정한 '라인 3D' — 파스텔 평면 음영 + 얇은 윤곽선 (Engineering 카드와 같은 도면 느낌) */
+  if (/[?&]style=line/.test(location.search)) {
+    const grad = new THREE.DataTexture(new Uint8Array([150, 150, 150, 255, 205, 205, 205, 255, 255, 255, 255, 255]), 3, 1, THREE.RGBAFormat); grad.needsUpdate = true; grad.minFilter = grad.magFilter = THREE.NearestFilter;
+    const TONE = { '새_헤드_상판': '#d9cfbf', '새_하부_쉘': '#d4c9b9', '새_쿠션': '#f3eee4', '새_하부_폼': '#f5f0e7', '새_헤드_하부판': '#ffffff', '새_하부_덮개판': '#ffffff' };
+    const outlineMat = new THREE.MeshBasicMaterial({ color: 0x5f5478, side: THREE.BackSide });
+    outlineMat.onBeforeCompile = (sh) => { sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed += normalize(normal) * 0.011;'); };
+    const outlines = [];
+    model.traverse(o => {
+      if (!o.isMesh || !o.visible || /KeyStudio|눈_LED/.test(o.name)) return;
+      const col = TONE[o.name] || (ALU.includes(o.name) ? '#cfc4d8' : '#cfc9c0');
+      o.material = new THREE.MeshToonMaterial({ color: col, gradientMap: grad });
+      if (!o.geometry.attributes.normal) return;
+      const ol = new THREE.Mesh(o.geometry, outlineMat); ol.position.copy(o.position); ol.quaternion.copy(o.quaternion); ol.scale.copy(o.scale); ol.castShadow = false; outlines.push([o.parent, ol]);
+    });
+    outlines.forEach(([p, ol]) => p && p.add(ol));
+  }
   const col = by['기둥'], head = by['머리'], tilt = Object.values(by).find(o => /^머리_갸웃/.test(o.name)), root = by['COVE_리그'] || model;
   const ring = by['새_미끄럼방지_고무링'];
   if (ring) scene.attach(ring);                 // 바닥에 닿는 고무링은 몸통이 돌아도 제자리에 둠
@@ -208,7 +224,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   const viewBtns = [...figure.querySelectorAll('[data-view]')];
   // 3D 칸은 카드 전체를 덮는다(확대해도 가장자리가 보이지 않음). 모델은 그 안의 "안전 영역"에 맞춰 놓는다.
   const mobileMQ = window.matchMedia('(max-width: 760px)');
-  const safe = () => (mobileMQ.matches ? { w: 0.96, h: 0.54, cy: 0.39 } : { w: 0.92, h: 0.78, cy: 0.47 });
+  const safe = () => (mobileMQ.matches ? { w: 0.96, h: 0.54, cy: 0.39 } : { w: 0.9, h: 0.64, cy: 0.40 });
   function fitDistance() {
     const s = safe(), vf = camera.fov * D2R, tv = Math.tan(vf / 2), th = tv * camera.aspect;
     const vv = 2 * Math.atan(tv * s.h), hv = 2 * Math.atan(th * s.w);
