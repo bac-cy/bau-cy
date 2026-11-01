@@ -33,7 +33,7 @@
   const rfit = () => { const d = Math.min(devicePixelRatio, 2); rw = rcv.clientWidth; rh = rcv.clientHeight; rcv.width = rw * d; rcv.height = rh * d; rx.setTransform(d, 0, 0, d, 0, 0); }; rfit(); addEventListener('resize', rfit);
   addEventListener('pointermove', (e) => {
     if (e.pointerType === 'touch') return; const st = intro.querySelector('.intro__stage').getBoundingClientRect(); const x = e.clientX - st.left, y = e.clientY - st.top;
-    if (Math.hypot(x - lastR.x, y - lastR.y) > 46) { lastR = { x, y }; rings.push({ x, y, t: 0 }); if (rings.length > 14) rings.shift(); }
+    if (Math.hypot(x - lastR.x, y - lastR.y) > 34) { lastR = { x, y }; rings.push({ x, y, t: 0 }); if (rings.length > 22) rings.shift(); }
   }, { passive: true });
   const backOut = t => { const c1 = 1.70158, c3 = c1 + 1, u = t - 1; return 1 + c3 * u * u * u + c1 * u * u; };   // 살짝 지나쳤다 돌아오는 곡선
 
@@ -176,18 +176,18 @@
       st.hx += ((clamp((ax - r.left) / r.width, -.2, 1.2) * 100) - st.hx) * k; st.hy += ((clamp((ay - r.top) / r.height, -.2, 1.2) * 100) - st.hy) * k;
       inner.style.setProperty('--hx', st.hx.toFixed(1) + '%'); inner.style.setProperty('--hy', st.hy.toFixed(1) + '%'); inner.style.setProperty('--hp', (0.35 + 0.55 * prox).toFixed(3));
     });
-    // 파문 그리기 (큰 COVE 글자가 보이는 동안만)
+    // 커서 빛 번짐 그리기 (큰 COVE 글자가 보이는 동안만)
     rx.clearRect(0, 0, rw, rh);
     if (bl > 0.5 && rings.length) {
       rx.globalCompositeOperation = 'screen';
       for (let i = rings.length - 1; i >= 0; i--) {
         const g = rings[i]; g.t += dt / 1.9; if (g.t >= 1) { rings.splice(i, 1); continue; }
-        const e = 1 - Math.pow(1 - g.t, 2.2), rad = 10 + e * 190, al = Math.pow(1 - g.t, 1.6);
-        const gr = rx.createRadialGradient(g.x, g.y, rad * 0.55, g.x, g.y, rad);
-        gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(0.82, `rgba(236,226,255,${(0.22 * al).toFixed(3)})`); gr.addColorStop(1, 'rgba(255,255,255,0)');
+        // 선이 아니라 부드러운 그라데이션 빛: 커서가 지나간 자리에서 라일락·복숭아 빛이 번지며 사라짐
+        const e = 1 - Math.pow(1 - g.t, 1.8), rad = 50 + e * 190, al = Math.sin(Math.PI * Math.min(1, g.t * 1.15)) * Math.pow(1 - g.t, 0.6);
+        const warm = i % 2 === 0, c0 = warm ? '255,214,196' : '206,190,248', c1 = warm ? '255,236,226' : '240,232,255';
+        const gr = rx.createRadialGradient(g.x, g.y, 0, g.x, g.y, rad);
+        gr.addColorStop(0, `rgba(${c1},${(0.5 * al).toFixed(3)})`); gr.addColorStop(0.45, `rgba(${c0},${(0.26 * al).toFixed(3)})`); gr.addColorStop(1, `rgba(${c0},0)`);
         rx.fillStyle = gr; rx.beginPath(); rx.arc(g.x, g.y, rad, 0, 7); rx.fill();
-        rx.lineWidth = 2.2; rx.strokeStyle = `rgba(255,255,255,${(0.8 * al).toFixed(3)})`; rx.beginPath(); rx.arc(g.x, g.y, rad * 0.97, 0, 7); rx.stroke();
-        rx.lineWidth = 1.2; rx.strokeStyle = `rgba(196,176,240,${(0.55 * al).toFixed(3)})`; rx.beginPath(); rx.arc(g.x, g.y, rad * 0.8, 0, 7); rx.stroke();
       }
       rx.globalCompositeOperation = 'source-over';
     }
