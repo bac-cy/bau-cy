@@ -19,10 +19,10 @@
   // 리퀴드 글라스: 글자 모양으로 오려낸 반투명 유리(뒤의 빛이 번져 보임) + 가장자리 빛과 은은한 그림자
   word.innerHTML = GLYPHS.map((g, i) => {
     const mask = encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${g.vb}"><path d="${g.d}" fill="#000"/></svg>`);
-    return `<span class="intro__ch"><i class="intro__glass" style="--m:url('data:image/svg+xml;utf8,${mask}')"></i><svg viewBox="${g.vb}" aria-hidden="true"><defs>
+    return `<span class="intro__ch"><span class="intro__chi"><i class="intro__glass" style="--m:url('data:image/svg+xml;utf8,${mask}')"></i><svg viewBox="${g.vb}" aria-hidden="true"><defs>
       <linearGradient id="lgf${i}" x1="0" y1="0" x2="0.7" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".62"/><stop offset=".45" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#e8dcff" stop-opacity=".3"/></linearGradient>
       <linearGradient id="lgs${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".5" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#cdbdf2" stop-opacity=".75"/></linearGradient></defs>
-      <path d="${g.d}" fill="url(#lgf${i})"/><path d="${g.d}" fill="none" stroke="url(#lgs${i})" stroke-width="1.7" stroke-linejoin="round"/></svg></span>`;
+      <path d="${g.d}" fill="url(#lgf${i})"/><path d="${g.d}" fill="none" stroke="url(#lgs${i})" stroke-width="1.7" stroke-linejoin="round"/></svg></span></span>`;
   }).join('');
   const chars = [...word.querySelectorAll('.intro__ch')];
   const burst = document.createElement('div'); burst.className = 'intro__burst'; burst.setAttribute('aria-hidden', 'true');
@@ -152,6 +152,21 @@
       el.style.opacity = clamp(q * 2.6);
       el.style.transform = `translate3d(0, ${((1 - e) * H * 0.42).toFixed(1)}px, 0)`;
       el.style.filter = q < 0.98 ? `blur(${((1 - q) * 12).toFixed(1)}px)` : 'none';
+    });
+    // 리퀴드 글라스 반응: 마우스(없으면 천천히 떠다니는 가상의 빛)를 따라 글자가 기울고, 가까울수록 살짝 부풀며, 빛 반사가 따라다님
+    if (b > 0.02) chars.forEach((el, i) => {
+      const inner = el.firstChild, r = el.getBoundingClientRect(); if (!r.width) return;
+      const ccx = r.left + r.width / 2, ccy = r.top + r.height / 2, dx = ax - ccx, dy = ay - ccy, dist = Math.hypot(dx, dy);
+      const st = inner._s || (inner._s = { tx: 0, ty: 0, rx: 0, ry: 0, sc: 1, hx: 50, hy: 30 });
+      const prox = Math.exp(-Math.pow(dist / (W * 0.22), 2));
+      const k = 1 - Math.exp(-dt * 9);
+      st.ry += (clamp(dx / W, -.6, .6) * 26 - st.ry) * k; st.rx += (-clamp(dy / H, -.6, .6) * 20 - st.rx) * k;
+      st.tx += (clamp(dx / W, -.6, .6) * 16 - st.tx) * k; st.ty += (clamp(dy / H, -.6, .6) * 10 - st.ty) * k;
+      st.sc += ((1 + 0.085 * prox) - st.sc) * k;
+      const jx = 1 + 0.014 * Math.sin(now / 900 + i * 1.7), jy = 1 + 0.014 * Math.cos(now / 1100 + i * 1.1);           // 젤리처럼 살짝 출렁
+      inner.style.transform = `translate3d(${st.tx.toFixed(1)}px, ${st.ty.toFixed(1)}px, 0) rotateX(${st.rx.toFixed(2)}deg) rotateY(${st.ry.toFixed(2)}deg) scale(${(st.sc * jx).toFixed(4)}, ${(st.sc * jy).toFixed(4)})`;
+      st.hx += ((clamp((ax - r.left) / r.width, -.2, 1.2) * 100) - st.hx) * k; st.hy += ((clamp((ay - r.top) / r.height, -.2, 1.2) * 100) - st.hy) * k;
+      inner.style.setProperty('--hx', st.hx.toFixed(1) + '%'); inner.style.setProperty('--hy', st.hy.toFixed(1) + '%'); inner.style.setProperty('--hp', (0.35 + 0.55 * prox).toFixed(3));
     });
     burst.style.opacity = (0.95 * bump).toFixed(3);                                      // 도착하는 순간 퍼지는 빛
     burst.style.transform = `scale(${(0.45 + 1.15 * br).toFixed(3)})`;
