@@ -457,3 +457,9 @@ em.ko { font-family: var(--font-ui); font-style: normal; font-weight: 400; font-
   .design__layout { gap: 36px; }
   .detail h3 { margin-top: 20px; }
 }
+
+/* 부드러운 스크롤(Lenis) 기본 규칙 */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }

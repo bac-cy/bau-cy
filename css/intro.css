@@ -7,7 +7,7 @@
   --intro-peach: #fbe3cf;
   --intro-word: #f2ead8;          /* 배경 속 큰 COVE 글자색 */
   position: relative;
-  height: 195svh;                 /* 한 화면 + 스크롤 거리 60svh (장면 전환 구간 + 마지막 장면 머무름) */
+  height: 215svh;                 /* 한 화면 + 스크롤 거리 60svh (장면 전환 구간 + 마지막 장면 머무름) */
   background: #fff;
 }
 .intro__stage {
@@ -59,7 +59,7 @@
 .intro__bigword {
   position: absolute; left: 0; right: 0; top: 48%; translate: 0 -50%;
   display: flex; justify-content: center; align-items: center; gap: 3.4vw; user-select: none;
-  opacity: 0; will-change: transform, opacity;
+  opacity: 0; will-change: transform;
 }
 .intro__render {
   /* Hero의 로봇과 같은 자리·크기: 화면 하단 중앙. 크기는 Hero 로봇 영역(min(480px, 82vw, 48svh))을 기준으로 함 */
@@ -85,8 +85,11 @@
 .intro__render .intro__live { display: block; }
 
 /* 더 극적인 연출: 글자별 움직임 · 도착하는 빛 · 커지며 올라오는 Cove */
-.intro__ch { display: inline-block; will-change: transform, opacity, filter; }
-.intro__ch svg { display: block; height: 19vw; width: auto; filter: drop-shadow(0 .4vw .8vw rgba(150, 110, 80, .22)); }
+.intro__ch { display: inline-block; position: relative; will-change: transform; }
+.intro__glass { position: absolute; inset: 0; display: block; -webkit-mask: var(--m) center / 100% 100% no-repeat; mask: var(--m) center / 100% 100% no-repeat;
+  -webkit-backdrop-filter: blur(14px) saturate(1.9) brightness(1.1); backdrop-filter: blur(14px) saturate(1.9) brightness(1.1); background: linear-gradient(160deg, rgba(255,255,255,.5), rgba(255,255,255,.16) 55%, rgba(236,226,255,.34)); }
+.intro__ch svg { position: relative; display: block; height: 19vw; width: auto; }
+.intro__ch::before { content: ""; position: absolute; inset: 6% 3% -2% 3%; background: radial-gradient(closest-side, rgba(120, 96, 170, .22), transparent 75%); filter: blur(1.2vw); z-index: -1; }
 .intro__burst {
   position: absolute; left: 50%; top: 64%; width: 92vmin; height: 92vmin; margin: -46vmin 0 0 -46vmin; border-radius: 50%;
   background: radial-gradient(closest-side, rgba(255, 238, 210, .95), rgba(255, 214, 190, .55) 42%, rgba(217, 205, 242, 0) 76%);
