@@ -113,6 +113,6 @@
   .sim__motions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; width: 100%; }
   .sim__motions button, .sim__ui .sim__motions button { min-height: 46px; padding: 8px 4px; font-size: 13px; letter-spacing: 0; line-height: 1.2; white-space: nowrap; }
   .sim__toy { width: 58px; height: 58px; left: 4%; }
-  .sim__toy[data-kind="snack"], .sim__toy[data-kind="ping"] { top: 20% !important; }
+  .sim__toy[data-kind="snack"] { top: 20% !important; }
   .design__visual figcaption { left: 16px; bottom: 12px; font-size: 10px; }
 }
