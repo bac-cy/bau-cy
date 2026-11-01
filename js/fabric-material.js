@@ -8,17 +8,18 @@ const COLORS = {   // 같은 원단, 색만 두 가지
 };
 export const FABRIC_NAMES = Object.keys(COLORS);
 const cache = {};
-export function fabricFor(THREE, name) {
+export function fabricFor(THREE, name, freq = 105) {
   const hex = COLORS[name] || '#ddd5c9';
-  if (cache[hex]) return cache[hex];
+  const ck = hex + '|' + freq; if (cache[ck]) return cache[ck];
   const m = new THREE.MeshPhysicalMaterial({ color: hex, roughness: 0.96, metalness: 0, sheen: 1.0, sheenRoughness: 0.55, sheenColor: new THREE.Color('#fff8ee'), envMapIntensity: 0.45 });
   m.onBeforeCompile = (sh) => {
+    sh.uniforms.uFr = { value: freq };
     sh.vertexShader = sh.vertexShader
       .replace('#include <common>', '#include <common>\nvarying vec3 vObjPos; varying vec3 vObjN;')
       .replace('#include <begin_vertex>', '#include <begin_vertex>\nvObjPos = position; vObjN = normal;');
     sh.fragmentShader = sh.fragmentShader
       .replace('#include <common>', `#include <common>
-varying vec3 vObjPos; varying vec3 vObjN;
+varying vec3 vObjPos; varying vec3 vObjN; uniform float uFr;
 float hh(vec2 p){ p = fract(p * vec2(.1031, .1030)); p += dot(p, p.yx + 33.33); return fract((p.x + p.y) * p.x); }
 float nz(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f);
   return mix(mix(hh(i), hh(i + vec2(1,0)), f.x), mix(hh(i + vec2(0,1)), hh(i + vec2(1,1)), f.x), f.y); }
@@ -38,8 +39,9 @@ float tri(vec3 p, vec3 n, float fr, out float fade){
   return w.x * weave(p.yz * fr, fade) + w.y * weave(p.xz * fr, fade) + w.z * weave(p.xy * fr, fade);
 }`)
       .replace('#include <map_fragment>', `#include <map_fragment>
-float fdA; float hgt = tri(vObjPos, normalize(vObjN), 105.0, fdA);
+float fdA; float hgt = tri(vObjPos, normalize(vObjN), uFr, fdA);
 diffuseColor.rgb *= 0.84 + 0.22 * hgt;`);
   };
-  return cache[hex] = m;
+  m.customProgramCacheKey = () => 'fabric' + freq;
+  return cache[ck] = m;
 }

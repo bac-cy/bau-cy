@@ -30,13 +30,17 @@ async function init() {
   ]);
   const D2R = Math.PI / 180, clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.08;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.VSMShadowMap;      // 렌더 이미지처럼 부드러운 그림자
   const cv = renderer.domElement; cv.className = 'intro__live'; cv.setAttribute('aria-hidden', 'true');
   const scene = new THREE.Scene();
   scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
   scene.add(new THREE.HemisphereLight(0xfff4e8, 0xd8c8c0, 1.5));
-  const key = new THREE.DirectionalLight(0xfff1e2, 0.9); key.position.set(-1.2, 2, 1.5); scene.add(key);
-  const fill = new THREE.DirectionalLight(0xe4dbf5, 0.55); fill.position.set(2, .6, -1); scene.add(fill);
+  const key = new THREE.DirectionalLight(0xfff0e0, 1.3); key.position.set(-0.55, 2.3, 1.3);
+  key.castShadow = true; key.shadow.mapSize.set(innerWidth <= 760 ? 1024 : 2048, innerWidth <= 760 ? 1024 : 2048); key.shadow.bias = -0.0006; key.shadow.normalBias = 0.003; key.shadow.radius = 9; key.shadow.blurSamples = 20;
+  Object.assign(key.shadow.camera, { left: -0.45, right: 0.45, top: 0.45, bottom: -0.45, near: 0.3, far: 5 }); key.target.position.set(0, 0.12, 0); scene.add(key, key.target);
+  const fill = new THREE.DirectionalLight(0xe4dbf5, 0.5); fill.position.set(2, .6, -1); scene.add(fill);
+  const rim = new THREE.DirectionalLight(0xffe9d6, 0.75); rim.position.set(1.2, 1.2, -1.6); scene.add(rim);            // 가장자리 빛줄기
 
   const loader = new GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder);
   const model = (await loader.loadAsync('assets/cove-rig.glb')).scene; scene.add(model);
@@ -48,7 +52,8 @@ async function init() {
   const by = {}, matrices = [], shells = [];
   model.traverse(o => {
     by[o.name] = o; if (!o.isMesh) return;
-    if (FABRIC_NAMES.includes(o.name)) o.material = fabricFor(THREE, o.name); else if (BODY.includes(o.name)) o.material = white; else if (ALU.includes(o.name)) { o.material = aluminum; layerUV(THREE, o); }
+    o.castShadow = true; o.receiveShadow = true;
+    if (FABRIC_NAMES.includes(o.name)) o.material = fabricFor(THREE, o.name, 125); else if (BODY.includes(o.name)) o.material = white; else if (ALU.includes(o.name)) { o.material = aluminum; layerUV(THREE, o); }
     if (/KeyStudio-HT16K33-8x8-LED-Matrix/.test(o.name)) { matrices.push(o); o.visible = false; }
     if (['새_헤드_상판', '새_쿠션', '새_헤드_하부판'].includes(o.name)) shells.push(o);
   });
@@ -66,9 +71,10 @@ async function init() {
 
   // 그림자
   const c2 = document.createElement('canvas'); c2.width = c2.height = 128; const g2 = c2.getContext('2d'), gr = g2.createRadialGradient(64, 64, 0, 64, 64, 64);
-  gr.addColorStop(0, 'rgba(110,80,120,.30)'); gr.addColorStop(1, 'rgba(110,80,120,0)'); g2.fillStyle = gr; g2.fillRect(0, 0, 128, 128);
+  gr.addColorStop(0, 'rgba(110,80,120,.14)'); gr.addColorStop(1, 'rgba(110,80,120,0)'); g2.fillStyle = gr; g2.fillRect(0, 0, 128, 128);
   const shadow = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.34), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c2), transparent: true, depthWrite: false }));
   shadow.rotation.x = -Math.PI / 2; shadow.position.y = -0.0069; scene.add(shadow);
+  { const g = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShadowMaterial({ color: 0x3a2f4a, opacity: 0.14 })); g.rotation.x = -Math.PI / 2; g.position.y = -0.0067; g.receiveShadow = true; scene.add(g); }   // 바닥에 지는 실제 그림자
 
   // 카메라: 인트로 렌더 이미지와 같은 정면 시점. 캔버스는 이미지보다 크게 잡아서 일어나도 잘리지 않게 한다.
   const FRONT = eyes.front.clone().setY(0).normalize(), RIGHT = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), FRONT).normalize();
