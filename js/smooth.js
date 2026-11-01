@@ -2,7 +2,7 @@
    터치 스크롤은 기기 기본 동작을 그대로 쓰고, 카드 안의 휠 조작(Engineering)·확대(시뮬레이터 Ctrl+휠)는 그대로 동작해요. */
 (() => {
   if (!window.Lenis) return;
-  const lenis = new Lenis({ lerp: 0.085, wheelMultiplier: 0.95, smoothWheel: true, syncTouch: false });
+  const lenis = new Lenis({ lerp: 0.11, wheelMultiplier: 0.55, smoothWheel: true, syncTouch: false });
   window.__lenis = lenis;
   const raf = (t) => { lenis.raf(t); requestAnimationFrame(raf); }; requestAnimationFrame(raf);
   // 메뉴·링크의 #이동도 같은 부드러움으로
