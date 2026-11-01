@@ -1,6 +1,6 @@
-/* 배경 통일 미리보기: 라일락·복숭아 빛이 섹션마다 아주 천천히 색을 바꾸며 이어짐 (?bg=a 은은하게 / ?bg=b 또렷하게) */
+/* 배경 통일(기본 C안 · 애플풍; 주소 끝에 ?bg=a / ?bg=b 를 붙이면 다른 안): 라일락·복숭아 빛이 섹션마다 아주 천천히 색을 바꾸며 이어짐 (?bg=a 은은하게 / ?bg=b 또렷하게) */
 (() => {
-  const mode = /[?&]bg=c/.test(location.search) ? 'c' : /[?&]bg=b/.test(location.search) ? 'b' : 'a', K = mode === 'a' ? 0.55 : mode === 'c' ? 1.35 : 1;       // 색 진하기
+  const mode = /[?&]bg=a/.test(location.search) ? 'a' : /[?&]bg=b/.test(location.search) ? 'b' : 'c', K = mode === 'a' ? 0.55 : mode === 'c' ? 1.35 : 1;       // 색 진하기
   document.documentElement.classList.add('bgfx-on'); document.body.classList.add('bg-' + mode); document.documentElement.classList.add('bg-' + mode);
   const bg = document.createElement('div'); bg.className = 'bgfx'; bg.innerHTML = '<i></i><i></i><i></i>'; document.body.prepend(bg);
   const P = {   // [빛1(왼쪽 위), 빛2(오른쪽 아래), 빛3(가운데)] 각각 [r,g,b,a]
