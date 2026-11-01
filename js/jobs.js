@@ -9,7 +9,7 @@
   intro && intro.after(tag);
 
   /* 2) 압력 시연: 스크롤을 따라 팔(점선 캡슐)이 내려와 머리를 누르고, 머리와 몸통 사이의 라벤더 패드가 지그시 눌림 */
-  const press = $(`<section class="jobs-press" aria-label="압력으로 쉬는 시연"><div class="jobs-press__stick"><div class="jobs-press__veil"></div><span class="jobs-press__label">Pressure for Rest</span><canvas aria-hidden="true"></canvas><div class="jobs-press__text"><p data-s="0">손이나 팔을 올려 두면,</p><p data-s="1">Cove가 지그시 눌러 줘요.</p><p data-s="2">그 압력이, 쉬는 순간을 도와요.</p></div></div></section>`);
+  const press = $(`<section class="jobs-press" aria-label="압력으로 쉬는 시연"><div class="jobs-press__stick"><div class="jobs-press__veil"></div><span class="jobs-press__label">Pressure for Rest</span><canvas aria-hidden="true"></canvas><div class="jobs-press__text"><p data-s="0">손이나 팔을 올려 기대면,</p><p data-s="1">Cove가 지그시 눌러 줘요.</p><p data-s="2">그 압력이, 쉬는 순간을 도와요.</p></div></div></section>`);
   feats && feats.before(press);
   const pc = press.querySelector('canvas'), px = pc.getContext('2d'), veil = press.querySelector('.jobs-press__veil'), lines = [...press.querySelectorAll('.jobs-press__text p')];
   function rr(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
@@ -19,22 +19,17 @@
   function eyes(c, cx, cy, gap, closed) { c.fillStyle = '#2b2731'; c.strokeStyle = '#2b2731'; c.lineWidth = 4; c.lineCap = 'round'; for (const s of [-1, 1]) { const x = cx + s * gap; if (closed) { c.beginPath(); c.moveTo(x - 11, cy); c.lineTo(x + 11, cy); c.stroke(); } else { c.beginPath(); c.arc(x, cy, 7, 0, 7); c.fill(); } } }
   function fit(cv, cx) { const d = Math.min(devicePixelRatio, 2), w = cv.clientWidth, h = cv.clientHeight; if (cv.width !== Math.round(w * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); } cx.setTransform(cv.width / 1000, 0, 0, cv.height / 700, 0, 0); }
   function drawPress(p, t) {
-    // 사람의 손·팔(추상, 라벤더 점선 캡슐)이 머리와 몸통 사이로 들어와 놓이면, Cove가 머리를 내려 그 위를 지그시 눌러 줌
+    // Key Features의 Pressure for Rest 카드와 같은 그림: 머리와 몸통 사이에 라벤더 패드가 있고, 머리가 내려와 패드를 지그시 눌렀다 놓음 (팔은 그리지 않음)
     fit(pc, px); px.clearRect(0, 0, 1000, 700);
-    const enter = ez((p - 0.12) / 0.2), push = ez((p - 0.42) / 0.3), rel = ez((p - 0.86) / 0.12), pr = push * (1 - rel), out = ez((p - 0.88) / 0.1);
+    const push = ez((p - 0.3) / 0.35), rel = ez((p - 0.86) / 0.12), pr = push * (1 - rel);
     const base = 580, bodyH = 124, bodyW = 340, cx = 500, bodyTop = base - bodyH;
-    px.fillStyle = 'rgba(80,60,120,.12)'; px.beginPath(); px.ellipse(cx, base + 4, 210, 16, 0, 0, 7); px.fill();
-    pebble(px, cx - bodyW / 2, bodyTop, bodyW, bodyH, 56, false);                                                            // 몸통
-    const armH0 = 64, armH = armH0 - 20 * pr, gap0 = 92, gap = gap0 - 38 * pr, headH = 104;                                    // 머리와 몸통 사이 틈이 눌리며 좁아짐
-    const headY = bodyTop - gap - headH + 6;
-    const armW = 420 + 26 * pr, armX = cx - armW / 2 + (1 - enter + out) * 640, armY = bodyTop - armH + 6;                     // 옆에서 들어와 몸통 위에 놓임
-    // 눌림이 번지는 파동 (팔 아래 몸통 위로)
-    for (let k = 0; k < 3; k++) { const ph = ((t * 0.5 + k / 3) % 1), r = 170 + ph * 120; px.strokeStyle = `rgba(125,106,168,${(0.34 * (1 - ph) * pr).toFixed(3)})`; px.lineWidth = 2; px.beginPath(); px.ellipse(cx, bodyTop + 4, r, r * 0.16, 0, 0, 7); px.stroke(); }
-    px.globalAlpha = clamp(enter * 1.4) * (1 - out);   // 옆에서 들어올 때 서서히 나타남
-    rr(px, armX, armY, armW, armH, armH / 2); const ag = px.createLinearGradient(0, armY, 0, armY + armH); ag.addColorStop(0, 'rgba(214,202,246,.92)'); ag.addColorStop(1, 'rgba(176,156,228,.9)'); px.fillStyle = ag; px.fill(); px.lineWidth = 2.4; px.setLineDash([10, 8]); px.strokeStyle = 'rgba(125,106,168,.95)'; px.stroke(); px.setLineDash([]); px.globalAlpha = 1;   // 올려 둔 손·팔
-    pebble(px, cx - 130 - 4 * pr, headY, 260 + 8 * pr, headH, 50, true);                                                    // 머리: 내려와서 지그시 누름
+    px.fillStyle = 'rgba(80,60,120,.12)'; px.beginPath(); px.ellipse(cx, base + 4, 210 + pr * 10, 16, 0, 0, 7); px.fill();
+    pebble(px, cx - bodyW / 2 - 5 * pr, bodyTop, bodyW + 10 * pr, bodyH * (1 - 0.05 * pr), 56, false);                       // 몸통
+    const bt = bodyTop + bodyH * 0.05 * pr, padH = 62 - 40 * pr, padW = 270 + 30 * pr, padY = bt - padH + 6, headH = 104, headY = padY - headH + 4;
+    for (let k = 0; k < 3; k++) { const ph = ((t * 0.5 + k / 3) % 1), r = 170 + ph * 120; px.strokeStyle = `rgba(125,106,168,${(0.34 * (1 - ph) * pr).toFixed(3)})`; px.lineWidth = 2; px.beginPath(); px.ellipse(cx, padY + padH / 2, r, r * 0.16, 0, 0, 7); px.stroke(); }
+    rr(px, cx - padW / 2, padY, padW, padH, Math.min(26, padH / 2 + 4)); px.fillStyle = 'rgba(184,166,224,.82)'; px.fill(); px.lineWidth = 2.4; px.setLineDash([10, 8]); px.strokeStyle = 'rgba(125,106,168,.95)'; px.stroke(); px.setLineDash([]);   // 라벤더 패드
+    pebble(px, cx - 130 - 4 * pr, headY, 260 + 8 * pr, headH, 50, true);                                                    // 머리
     eyes(px, cx, headY + headH / 2 + 2, 46, pr > 0.5);
-    if (pr > 0.05) { px.fillStyle = `rgba(125,106,168,${(0.5 * pr).toFixed(3)})`; for (let i = -2; i <= 2; i++) { px.beginPath(); px.moveTo(cx + i * 40 - 7, headY + headH + 14); px.lineTo(cx + i * 40 + 7, headY + headH + 14); px.lineTo(cx + i * 40, headY + headH + 26); px.fill(); } }     // 아래로 누르는 작은 화살표
   }
   function updPress(now) {
     const r = press.getBoundingClientRect(), total = r.height - innerHeight, p = clamp(-r.top / total);
