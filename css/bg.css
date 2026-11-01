@@ -1,0 +1,18 @@
+/* 배경 통일 + 유리 카드 미리보기 (주소 끝에 ?bg=a 또는 ?bg=b 를 붙였을 때만 적용됨) */
+html.bgfx-on { background: var(--bg); }
+html.bgfx-on body { background: transparent; }
+.bgfx { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.bgfx i { position: absolute; border-radius: 50%; will-change: transform; filter: blur(var(--bgblur, 60px)); transition: background 1.2s ease; }
+.bgfx i:nth-child(1) { width: 78vmax; height: 78vmax; left: -22vmax; top: -26vmax; background: radial-gradient(closest-side, var(--c1), transparent 72%); }
+.bgfx i:nth-child(2) { width: 70vmax; height: 70vmax; right: -24vmax; bottom: -28vmax; background: radial-gradient(closest-side, var(--c2), transparent 72%); }
+.bgfx i:nth-child(3) { width: 56vmax; height: 56vmax; left: 34vw; top: 28vh; background: radial-gradient(closest-side, var(--c3), transparent 72%); }
+/* 섹션 자체 배경은 투명하게 해서 한 장의 그라데이션이 이어지게 */
+.bgfx-on .features, .bgfx-on .footer { background: transparent !important; }
+/* 유리 카드: 반투명 흰색 + 배경 흐림 + 얇은 흰 테두리 */
+.bgfx-on .feature, .bgfx-on .gallery__film, .bgfx-on .principles__img, .bgfx-on .design__details .slot, .bgfx-on .design__visual {
+  background-color: rgba(255, 255, 255, var(--glass, .42)); -webkit-backdrop-filter: blur(22px) saturate(1.5); backdrop-filter: blur(22px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, .75); box-shadow: 0 24px 70px -34px rgba(90, 70, 130, .35), inset 0 1px 0 rgba(255, 255, 255, .8); }
+.bgfx-on .feature { background-image: none; }
+.bgfx-on .nav.is-scrolled { background: rgba(255, 255, 255, .5); -webkit-backdrop-filter: blur(20px) saturate(1.5); backdrop-filter: blur(20px) saturate(1.5); }
+.bgfx-on.bg-b { --bgblur: 50px; --glass: .36; }
+@media (max-width: 760px) { .bgfx i { filter: blur(40px); } .bgfx-on .feature, .bgfx-on .principles__img, .bgfx-on .design__details .slot { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); } }
