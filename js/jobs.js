@@ -19,17 +19,18 @@
   function eyes(c, cx, cy, gap, closed) { c.fillStyle = '#2b2731'; c.strokeStyle = '#2b2731'; c.lineWidth = 4; c.lineCap = 'round'; for (const s of [-1, 1]) { const x = cx + s * gap; if (closed) { c.beginPath(); c.moveTo(x - 11, cy); c.lineTo(x + 11, cy); c.stroke(); } else { c.beginPath(); c.arc(x, cy, 7, 0, 7); c.fill(); } } }
   function fit(cv, cx) { const d = Math.min(devicePixelRatio, 2), w = cv.clientWidth, h = cv.clientHeight; if (cv.width !== Math.round(w * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); } cx.setTransform(cv.width / 1000, 0, 0, cv.height / 700, 0, 0); }
   function drawPress(p, t) {
-    // Key Features의 Pressure for Rest 카드와 같은 그림: 머리와 몸통 사이에 라벤더 패드가 있고, 머리가 내려와 패드를 지그시 눌렀다 놓음 (팔은 그리지 않음)
+    // Key Features의 Pressure for Rest 카드와 같은 모습: 바닥선 · 몸통 · 몸통만큼 넓은 라벤더 패드 · 머리. 눌리면 패드가 얇은 선처럼 납작해지고 동심 타원 파동이 퍼짐
     fit(pc, px); px.clearRect(0, 0, 1000, 700);
     const push = ez((p - 0.3) / 0.35), rel = ez((p - 0.86) / 0.12), pr = push * (1 - rel);
-    const base = 580, bodyH = 124, bodyW = 340, cx = 500, bodyTop = base - bodyH;
-    px.fillStyle = 'rgba(80,60,120,.12)'; px.beginPath(); px.ellipse(cx, base + 4, 210 + pr * 10, 16, 0, 0, 7); px.fill();
-    pebble(px, cx - bodyW / 2 - 5 * pr, bodyTop, bodyW + 10 * pr, bodyH * (1 - 0.05 * pr), 56, false);                       // 몸통
-    const bt = bodyTop + bodyH * 0.05 * pr, padH = 62 - 40 * pr, padW = 270 + 30 * pr, padY = bt - padH + 6, headH = 104, headY = padY - headH + 4;
-    for (let k = 0; k < 3; k++) { const ph = ((t * 0.5 + k / 3) % 1), r = 170 + ph * 120; px.strokeStyle = `rgba(125,106,168,${(0.34 * (1 - ph) * pr).toFixed(3)})`; px.lineWidth = 2; px.beginPath(); px.ellipse(cx, padY + padH / 2, r, r * 0.16, 0, 0, 7); px.stroke(); }
-    rr(px, cx - padW / 2, padY, padW, padH, Math.min(26, padH / 2 + 4)); px.fillStyle = 'rgba(184,166,224,.82)'; px.fill(); px.lineWidth = 2.4; px.setLineDash([10, 8]); px.strokeStyle = 'rgba(125,106,168,.95)'; px.stroke(); px.setLineDash([]);   // 라벤더 패드
-    pebble(px, cx - 130 - 4 * pr, headY, 260 + 8 * pr, headH, 50, true);                                                    // 머리
-    eyes(px, cx, headY + headH / 2 + 2, 46, pr > 0.5);
+    const base = 580, bodyH = 124, bodyW = 360, cx = 500, bodyTop = base - bodyH;
+    px.strokeStyle = 'rgba(125,106,168,.35)'; px.lineWidth = 2; px.beginPath(); px.moveTo(110, base + 8); px.lineTo(890, base + 8); px.stroke();   // 바닥선
+    px.fillStyle = 'rgba(80,60,120,.12)'; px.beginPath(); px.ellipse(cx, base + 6, 200 + pr * 12, 14, 0, 0, 7); px.fill();
+    const bh = bodyH * (1 - 0.06 * pr); pebble(px, cx - bodyW / 2 - 6 * pr, base - bh, bodyW + 12 * pr, bh, 58, false);                  // 몸통
+    const padW = bodyW + 6, padH = 64 - 50 * pr, padY = base - bh - padH + 6, headH = 108, headW = 270, headY = padY - headH + 4;
+    for (let k = 0; k < 3; k++) { const ph = ((t * 0.55 + k / 3) % 1), r = 220 + ph * 250; px.strokeStyle = `rgba(125,106,168,${(0.55 * (1 - ph) * (0.25 + 0.75 * pr)).toFixed(3)})`; px.lineWidth = 2.2; px.beginPath(); px.ellipse(cx, padY + padH / 2 + 8, r, r * 0.26, 0, 0, 7); px.stroke(); }   // 퍼지는 동심 파동
+    rr(px, cx - padW / 2, padY, padW, padH, Math.min(28, padH / 2 + 3)); px.fillStyle = 'rgba(184,166,224,.9)'; px.fill(); px.lineWidth = 2.4; px.strokeStyle = 'rgba(125,106,168,.95)'; px.stroke();   // 라벤더 패드
+    pebble(px, cx - headW / 2, headY, headW, headH, 52, true);                                                              // 머리
+    eyes(px, cx, headY + headH / 2 + 2, 44, false);
   }
   function updPress(now) {
     const r = press.getBoundingClientRect(), total = r.height - innerHeight, p = clamp(-r.top / total);
