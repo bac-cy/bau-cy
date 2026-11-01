@@ -9,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600&family=Noto+Sans+KR:wght@300;400;500&family=Jost:wght@200;300;400;500&family=JetBrains+Mono:wght@300;400&family=Fredoka:wdth,wght@125,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20261101p">
-  <link rel="stylesheet" href="css/intro.css?v=20261101p">
-  <link rel="stylesheet" href="css/sim.css?v=20261101p">
+  <link rel="stylesheet" href="css/style.css?v=20261101q">
+  <link rel="stylesheet" href="css/intro.css?v=20261101q">
+  <link rel="stylesheet" href="css/sim.css?v=20261101q">
 </head>
 <body>
 
@@ -136,8 +136,7 @@
             </div>
             <ol class="sim__steps" hidden aria-label="지금 상황"></ol>
             <div class="sim__toy" data-mode="snack" data-kind="snack" hidden role="button" aria-label="간식 — Cove에게 끌어다 주세요" style="top:40%"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="#f2c79a"/><circle cx="24" cy="24" r="19" fill="none" stroke="#d9a574" stroke-width="2"/><circle cx="17" cy="19" r="2.4" fill="#8a5a3c"/><circle cx="29" cy="17" r="2.2" fill="#8a5a3c"/><circle cx="31" cy="29" r="2.6" fill="#8a5a3c"/><circle cx="19" cy="31" r="2.2" fill="#8a5a3c"/><circle cx="25" cy="24" r="1.8" fill="#8a5a3c"/></svg></div>
-            <div class="sim__toy" data-mode="ball" data-kind="ping" hidden role="button" aria-label="탁구공 — Cove에게 끌어다 주세요" style="top:33%"><svg viewBox="0 0 48 48" aria-hidden="true"><defs><radialGradient id="pg" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eadfce"/></radialGradient></defs><circle cx="24" cy="24" r="17" fill="url(#pg)"/><circle cx="24" cy="24" r="17" fill="none" stroke="#d8cbb8" stroke-width="1.6"/></svg></div>
-            <div class="sim__toy" data-mode="ball" data-kind="base" hidden role="button" aria-label="야구공 — Cove에게 끌어다 주세요" style="top:50%"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="#f7f2ea"/><circle cx="24" cy="24" r="19" fill="none" stroke="#d8cbb8" stroke-width="1.6"/><path d="M13 9c6 5 6 25 0 30M35 9c-6 5-6 25 0 30" fill="none" stroke="#c4574d" stroke-width="1.8" stroke-dasharray="2.4 2.4"/></svg></div>
+            <div class="sim__toy" data-mode="ball" data-kind="ping" hidden role="button" aria-label="탁구공 — Cove에게 끌어다 주세요" style="top:40%"><svg viewBox="0 0 48 48" aria-hidden="true"><defs><radialGradient id="pg" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eadfce"/></radialGradient></defs><circle cx="24" cy="24" r="17" fill="url(#pg)"/><circle cx="24" cy="24" r="17" fill="none" stroke="#d8cbb8" stroke-width="1.6"/></svg></div>
             <div class="sim__bottom">
               <p class="sim__status" aria-live="polite"></p>
               <div class="sim__motions" role="group" aria-label="동작">
@@ -261,25 +260,25 @@
   </div>
 
   <script src="assets/vendor/lenis/lenis.min.js"></script>
-  <script src="js/smooth.js?v=20261101p"></script>
-  <script src="js/main.js?v=20261101p"></script>
-  <script src="js/intro.js?v=20261101p"></script>
+  <script src="js/smooth.js?v=20261101q"></script>
+  <script src="js/main.js?v=20261101q"></script>
+  <script src="js/intro.js?v=20261101q"></script>
   <script type="importmap">
     { "imports": {
         "three": "./assets/vendor/three/build/three.module.min.js",
         "three/addons/": "./assets/vendor/three/examples/jsm/"
     } }
   </script>
-  <script type="module" src="js/sim.js?v=20261101p"></script>
-  <script type="module" src="js/cards.js?v=20261101p"></script>
-  <script type="module" src="js/intro-cove.js?v=20261101p"></script>
-  <script type="module" src="js/features.js?v=20261101p"></script>
-  <script type="module" src="js/engineering.js?v=20261101p"></script>
+  <script type="module" src="js/sim.js?v=20261101q"></script>
+  <script type="module" src="js/cards.js?v=20261101q"></script>
+  <script type="module" src="js/intro-cove.js?v=20261101q"></script>
+  <script type="module" src="js/features.js?v=20261101q"></script>
+  <script type="module" src="js/engineering.js?v=20261101q"></script>
   <!-- 디테일 효과: 필름 입자 · 자석 버튼 · 카드 빛/기울기 (되돌리려면 아래 두 줄과 css/fx.css, js/fx.js 를 지우면 됨) -->
-  <link rel="stylesheet" href="css/fx.css?v=20261101p">
-  <script src="js/fx.js?v=20261101p" defer></script>
+  <link rel="stylesheet" href="css/fx.css?v=20261101q">
+  <script src="js/fx.js?v=20261101q" defer></script>
   <!-- 배경 통일 + 유리 카드 (C안, 애플풍). 되돌리려면 아래 두 줄을 지우면 됨 -->
-  <link rel="stylesheet" href="css/bg.css?v=20261101p">
-  <script src="js/bg.js?v=20261101p" defer></script>
+  <link rel="stylesheet" href="css/bg.css?v=20261101q">
+  <script src="js/bg.js?v=20261101q" defer></script>
 </body>
 </html>

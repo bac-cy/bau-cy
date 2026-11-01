@@ -348,49 +348,54 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
       if (!td) return; td = null; t.classList.remove('is-drag');
       if (!pick(e)) { t.style.transform = ''; return; }
       if (t.dataset.mode === 'snack') { play('snack'); showToys(); const back = setInterval(() => { if (clipName !== 'snack') { clearInterval(back); showToys(); } }, 400); }
-      else startBall(t.dataset.kind);
+      else startBall();
       showToys();
     });
     t.addEventListener('pointercancel', () => { td = null; t.style.transform = ''; t.classList.remove('is-drag'); });
   });
 
-  /* ───────── 공놀이: 영상 속 장면처럼 — 공이 굴러오고, 머리 위로 띄워 통통 균형을 잡고, 옆으로 굴러 떨어져요 ───────── */
-  let ball = null, bob = 0;
-  function ballTexture(kind) {
-    const c = document.createElement('canvas'); c.width = 256; c.height = 128; const g = c.getContext('2d');
-    g.fillStyle = kind === 'base' ? '#f4efe6' : '#fff7ee'; g.fillRect(0, 0, 256, 128);
-    if (kind === 'base') { g.strokeStyle = '#c4574d'; g.lineWidth = 3; g.setLineDash([5, 5]);
-      for (const x0 of [64, 192]) { g.beginPath(); for (let y = 0; y <= 128; y += 4) { const x = x0 + Math.sin(y / 128 * Math.PI) * 26 * (x0 < 100 ? 1 : -1); y ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); } }
-    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
-  }
-  function startBall(kind) {
+  /* ───────── 공놀이(탁구공): 공이 굴러와 → 머리를 숙였다 튕겨 올려 → 머리 위에서 자연스럽게 통통 → 옆으로 굴러 떨어지면 눈과 몸이 따라가요 ───────── */
+  let ball = null, bob = 0, ballGx = 0;
+  const BH = [0.062, 0.048, 0.058, 0.036, 0.05, 0.03, 0.042, 0.026, 0.046, 0.028, 0.036, 0.022];   // 통통 튀는 높이(m) — 높이가 달라서 박자도 조금씩 달라져요
+  const GRAV = 2.6, bounceDur = (h) => Math.sqrt(8 * h / GRAV);
+  function startBall() {
     stopClip(); endBall(); gest = null; lastActive = tNow;
-    const r = kind === 'base' ? 0.03 : 0.022;
-    const mesh = new THREE.Mesh(new THREE.SphereGeometry(r, 32, 24), new THREE.MeshStandardMaterial({ map: ballTexture(kind), roughness: kind === 'base' ? 0.7 : 0.35, metalness: 0 }));
-    mesh.visible = false; scene.add(mesh); ball = { mesh, r, kind, lastBounce: -1 };
+    const r = 0.022;
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(r, 32, 24), new THREE.MeshStandardMaterial({ color: 0xfffaf2, roughness: 0.32, metalness: 0 }));
+    mesh.castShadow = true; mesh.visible = false; scene.add(mesh); ball = { mesh, r, lastBounce: -1, sx: 0.5, hs: 0, vis: false };
     play('ball'); showToys();
   }
-  function endBall() { if (!ball) return; scene.remove(ball.mesh); ball.mesh.geometry.dispose(); ball = null; showToys(); }
+  function endBall() { if (!ball) return; scene.remove(ball.mesh); ball.mesh.geometry.dispose(); ball = null; ballGx = 0; showToys(); }
   const _bb = new THREE.Box3(), _hc = new THREE.Vector3();
-  const lerp = (a, b, u) => a + (b - a) * u, ease3 = (u) => u * u * (3 - 2 * u);
+  const lerp = (a, b, u) => a + (b - a) * u, ease3 = (u) => u * u * (3 - 2 * u), easeOut = (u) => 1 - Math.pow(1 - u, 3);
   function updateBall(t) {                                                   // t: 공놀이 시작 후 시간(초)
     if (!ball) return; const b = ball;
     _bb.setFromObject(head); _bb.getCenter(_hc);
-    const floorY = box.min.y + b.r, topY = _bb.max.y + b.r, hx = _hc.x, hz = _hc.z, cx = center.x, cz = center.z;
-    const along = (sx, y) => b.mesh.position.set(cx + RIGHT.x * sx + FRONT.x * 0.02, y, cz + RIGHT.z * sx + FRONT.z * 0.02);   // 몸통 옆(좌우) 위치
-    let sx, y;
-    if (t < 1.6) { const u = ease3(t / 1.6); sx = lerp(0.52, 0.19, u); y = floorY; }                                   // 오른쪽에서 굴러옴
-    else if (t < 3.2) { const w = t - 1.6; sx = 0.19 - 0.015 * Math.sin(w * 3); y = floorY + 0.02 * Math.abs(Math.sin(w * 5)); }       // 곁에서 살짝 통통
-    else if (t < 4.1) { const u = (t - 3.2) / 0.9; const hxs = (hx - cx) * RIGHT.x + (hz - cz) * RIGHT.z; sx = lerp(0.19, hxs, ease3(u)); y = lerp(floorY, topY, ease3(u)) + 0.07 * Math.sin(Math.PI * u); }   // 머리 위로 쏙
-    else if (t < 11) {                                                       // 머리 위에서 통통 균형 잡기
-      const w = t - 4.1, P = 0.62, ph = (w % P) / P, hxs = (hx - cx) * RIGHT.x + (hz - cz) * RIGHT.z, amp = lerp(0.045, 0.025, Math.min(1, w / 6));
-      sx = hxs + 0.05 * Math.sin(w * 2.6); y = topY + amp * 4 * ph * (1 - ph);
-      const n = Math.floor(w / P); if (n !== b.lastBounce) { b.lastBounce = n; bob = 1; }
-    } else if (t < 12.4) { const u = (t - 11) / 1.4, hxs = (hx - cx) * RIGHT.x + (hz - cz) * RIGHT.z; sx = lerp(hxs + 0.04, -0.17, ease3(u)); y = lerp(topY, floorY, u * u) + 0.03 * Math.abs(Math.sin(u * 9)) * u; }   // 옆으로 굴러 떨어짐
-    else { const u = Math.min(1, (t - 12.4) / 2.2); sx = lerp(-0.17, -0.58, ease3(u)); y = floorY + 0.012 * Math.abs(Math.sin(u * 14)) * (1 - u); }                                           // 바닥을 굴러 멀어짐
-    along(sx, y); b.mesh.visible = true;
-    b.mesh.rotation.z = -sx * 20; b.mesh.rotation.x = t * 2;
+    const floorY = box.min.y + b.r, topY = _bb.max.y + b.r, hxs = (_hc.x - center.x) * RIGHT.x + (_hc.z - center.z) * RIGHT.z, cx = center.x, cz = center.z;
+    let sx, y, spin = 0;
+    if (t < 1.7) { const u = easeOut(t / 1.7); sx = lerp(0.54, 0.19, u); y = floorY; spin = (0.54 - sx) / b.r; }                         // 점점 느려지며 굴러옴 (굴러간 거리만큼 회전)
+    else if (t < 3.3) { const w = t - 1.7; sx = 0.19 + 0.05 * Math.sin(Math.PI * Math.min(1, w / 0.9)) * Math.exp(-w * 1.2); y = floorY + 0.014 * Math.abs(Math.sin(w * 6.5)) * Math.exp(-w * 1.6); spin = (0.54 - 0.19) / b.r - w * 1.2; }   // 몸통에 톡 부딪혀 살짝 튕김
+    else if (t < 4.2) { const u = (t - 3.3) / 0.9; sx = lerp(0.19, hxs, ease3(u)); y = lerp(floorY, topY, ease3(u)) + 0.08 * Math.sin(Math.PI * u) * (1 - 0.3 * u); spin = 10 + u * 6; }   // 머리를 숙였다 튕겨 올림
+    else if (t < 11.2) {                                                      // 머리 위에서 통통 (높이·박자가 조금씩 다름, 공은 머리 위를 천천히 굴러다님)
+      const w = t - 4.2; let acc = 0, k = 0, h = BH[0], d = bounceDur(h);
+      while (w >= acc + d && k < 200) { acc += d; k++; h = BH[k % BH.length]; d = bounceDur(h); }
+      const u = (w - acc) / d; y = topY + 4 * h * u * (1 - u);
+      if (k !== b.lastBounce) { b.lastBounce = k; bob = Math.min(1, 0.5 + h * 9); }
+      sx = hxs + 0.034 * Math.sin(w * 1.45) + 0.018 * Math.sin(w * 2.7 + 1.2); spin = w * 2.2;
+    } else if (t < 12.6) { const u = (t - 11.2) / 1.4, w0 = 11.2; sx = lerp(hxs + 0.03, -0.17, ease3(u)); y = lerp(topY, floorY, u * u) + 0.03 * Math.abs(Math.sin(u * 8)) * u * (1 - u * 0.5); spin = 20 + u * 8; }   // 옆으로 굴러 떨어짐
+    else { const u = Math.min(1, (t - 12.6) / 2.4); sx = lerp(-0.17, -0.6, easeOut(u)); y = floorY + 0.012 * Math.abs(Math.sin(u * 12)) * (1 - u); spin = 28 + u * 10; }
+    b.sx = sx; b.hs = sx - hxs; b.y = y; b.vis = true;
+    b.mesh.position.set(cx + RIGHT.x * sx + FRONT.x * 0.02, y, cz + RIGHT.z * sx + FRONT.z * 0.02); b.mesh.visible = true;
+    b.mesh.rotation.z = -spin; b.mesh.rotation.x = t * 1.5;
   }
+  // 공을 눈과 몸이 따라가요: 바닥에 있을 땐 그쪽으로 몸을 돌리고, 머리 위에 있을 땐 머리가 공 쪽으로 살짝 갸웃
+  function ballTrack() {
+    if (!ball || !ball.vis) return; const t = clipT, b = ball;
+    if (t < 3.0 || t >= 11.2) { const k = Math.min(1, Math.max(0, t) / 1.2) * (t >= 11.2 ? 1 : 1); goal.body = clamp(b.sx * 130 * k, -55, 55); ballGx = Math.round(clamp(b.sx / 0.12, -2, 2)); }
+    else if (t >= 4.2) { const [lo, hi] = tiltRange(goal.head); goal.tilt = clamp(clamp(b.hs * 170, -11, 11), lo, hi); ballGx = Math.round(clamp(b.hs / 0.03, -1, 1)); }
+    else ballGx = 0;
+  }
+
   figure.querySelector('[data-act="reset"]')?.addEventListener('click', () => { setMode(null); endBall(); stopClip(false); setView('persp'); camGoal.zoom = 1; });
 
   /* 확대·축소: + − 버튼, Ctrl(⌘)+휠 또는 트랙패드 핀치, 터치 두 손가락 핀치, 빈 곳을 두 번 누르면 원래 크기.
@@ -445,6 +450,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
       clipT += dt;
       const t = clamp(clipT, 0, clip.duration), s = sampleClip(clip, t);
       Object.assign(goal, limit({ neck: s[1], head: s[2], tilt: s[3] ?? 0, body: s[4] ?? 0 }));
+      if (clipName === 'ball') ballTrack();
       eyeName = eyeAt(clip.eyes, t);
       const mi = clip.markers.reduce((r, x, i) => (x.t <= t + 1e-6 ? i : r), -1); const m = clip.markers[mi]; if (m) setStatus(m.label, 'play');
       if (mi !== stepIdx && stepsEl) { stepIdx = mi; [...stepsEl.children].forEach((li, i) => li.classList.toggle('cur', i === mi)); }
@@ -473,7 +479,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     const shown = { ...pose }; shown.neck += sway.neck - bob * 3.5; shown.head += sway.head + bob * 2.5;
     const saved = { ...pose }; Object.assign(pose, shown); writePose(); Object.assign(pose, saved);
     if (!clip) eyeName = eyeForce || reactEye || (gest ? gest.eye : pose.neck < 4 ? '감은 눈' : '뜬 눈');
-    eyes.show(eyeName, gx, 0, tNow);
+    eyes.show(eyeName, clip && clipName === 'ball' ? ballGx : gx, 0, tNow);
     // 카메라
     cam.az = smoothDamp(cam.az, camGoal.az, cv.az, 0.28, dt); cam.el = smoothDamp(cam.el, camGoal.el, cv.el, 0.28, dt); cam.zoom = smoothDamp(cam.zoom, camGoal.zoom, cv.zoom, 0.22, dt);
     placeCamera();
