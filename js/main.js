@@ -211,3 +211,14 @@ updateNavSpy();
     v.addEventListener('webkitendfullscreen', exitUI);
   });
 })();
+
+
+/* ---------- 맨 위로 올라가기 버튼 ---------- */
+{
+  const btn = document.getElementById('totop');
+  if (btn) {
+    const upd = () => btn.classList.toggle('is-on', window.scrollY > window.innerHeight * 1.2);
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+    btn.addEventListener('click', () => { const l = window.__lenis; if (l && l.scrollTo) l.scrollTo(0, { duration: 1.6 }); else window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  }
+}

@@ -176,7 +176,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   };
   const GUIDE = {
     greet: '인사하는 Cove를 지켜보세요', pet: '마우스로 머리를 쓰다듬어 보세요', tickle: '마우스로 몸통을 살살 문질러 보세요',
-    snack: '간식 아이콘을 끌어다 Cove에게 주세요', ball: '원하는 곳을 눌러 공을 떨어뜨려 보세요. 머리 위는 통통, 몸통 위는 덥석!', rest: '기대어 쉬는 Cove를 지켜보세요', sleep: 'Cove가 스르르 잠들어요',
+    snack: '간식 아이콘을 끌어다 Cove에게 주세요', ball: '원하는 곳을 눌러 공을 떨어뜨려 보세요. 머리 위는 통통, 얼굴과 몸통은 앙앙앙!', rest: '기대어 쉬는 Cove를 지켜보세요', sleep: 'Cove가 스르르 잠들어요',
   };
   let clip = null, clipT = 0, clipName = '';
   function sampleClip(c, t) {
@@ -356,6 +356,31 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
       reactEye = dz.on || a > 0.55 ? '어지러운 눈' : '졸린 눈'; if (statusEl && dz.on && statusEl.textContent !== '어지러워요~') setStatus('어지러워요~', 'play');
     } else { if (reactEye) { reactEye = null; if (!clip && !mode) setStatus(HINT); } }
   }
+  /* ───────── 간식: 쿠키를 가져다 대면 Cove가 먹고, 먹는 만큼 쿠키가 조금씩 줄어듦 ───────── */
+  const ez = (u) => u * u * (3 - 2 * u);
+  const BITES = [6.2, 7.7, 9.1, 10.4, 11.6];                                 // 냠냠 구간(시나리오 14~27초 중 20~25초 부분)에서 한 입씩 베어 무는 시각(재생 시각 초)
+  const SCALES = [1, 0.84, 0.66, 0.48, 0.3, 0.12];                          // 먹은 입 수에 따른 남은 크기
+  const cookieEl = document.createElement('div'); cookieEl.className = 'sim__cookie'; cookieEl.hidden = true; cookieEl.setAttribute('aria-hidden', 'true');
+  cookieEl.innerHTML = '<svg viewBox="0 0 48 48"><defs><mask id="cookieMask"><rect width="48" height="48" fill="#fff"/>' + [[8, 14], [41, 12], [41, 36], [9, 37], [25, 4]].map((b, i) => `<circle class="bite" cx="${b[0]}" cy="${b[1]}" r="0"/>`).join('') + '</mask></defs><g mask="url(#cookieMask)"><circle cx="24" cy="24" r="19" fill="#f2c79a"/><circle cx="24" cy="24" r="19" fill="none" stroke="#d9a574" stroke-width="2"/><circle cx="17" cy="19" r="2.4" fill="#8a5a3c"/><circle cx="29" cy="17" r="2.2" fill="#8a5a3c"/><circle cx="31" cy="29" r="2.6" fill="#8a5a3c"/><circle cx="19" cy="31" r="2.2" fill="#8a5a3c"/><circle cx="25" cy="24" r="1.8" fill="#8a5a3c"/></g></svg>';
+  figure.appendChild(cookieEl);
+  const biteEls = [...cookieEl.querySelectorAll('.bite')], biteR = [0, 0, 0, 0, 0]; let cookieDrop = null, cookieScale = 1, cookieA = 0; const _cv = new THREE.Vector3();
+  function updateCookie(dt) {
+    const on = clipName === 'snack' && clip;
+    if (!on) { cookieEl.hidden = true; cookieDrop = null; cookieScale = 1; cookieA = 0; biteR.fill(0); biteEls.forEach(b => b.setAttribute('r', 0)); return; }
+    const t = clipT, eaten = BITES.filter(b => t >= b).length;
+    const fr = figure.getBoundingClientRect(), er = el.getBoundingClientRect();
+    head.getWorldPosition(_cv); _cv.addScaledVector(FRONT, 0.03); _cv.project(camera);
+    const mx = er.left - fr.left + (_cv.x + 1) / 2 * er.width, my = er.top - fr.top + (1 - _cv.y) / 2 * er.height + er.height * 0.045;   // 머리 앞쪽 아래(입 높이)
+    const arrive = ez(clamp((t + 0.9) / 2.6, 0, 1)), d = cookieDrop || { x: mx, y: my };
+    const x = d.x + (mx - d.x) * arrive, y = d.y + (my - d.y) * arrive;
+    cookieScale += (SCALES[eaten] - cookieScale) * Math.min(1, dt * 9);
+    cookieA += ((eaten >= 5 && t > BITES[4] + 0.5 ? 0 : 1) - cookieA) * Math.min(1, dt * 8);
+    biteEls.forEach((b, i) => { biteR[i] += ((i < eaten ? 9 : 0) - biteR[i]) * Math.min(1, dt * 14); b.setAttribute('r', biteR[i].toFixed(2)); });
+    const chew = eaten > 0 && eaten < 5 ? Math.sin(t * 16) * 1.6 : 0;
+    cookieEl.style.opacity = cookieA.toFixed(3);
+    cookieEl.style.transform = `translate(${(x - 28).toFixed(1)}px, ${(y - 28 + chew).toFixed(1)}px) scale(${cookieScale.toFixed(3)})`;
+    cookieEl.hidden = cookieA < 0.02;
+  }
   /* ───────── 간식·공: 아이콘을 끌어다 Cove에게 주기 ───────── */
   const showToys = () => toys.forEach(t => { t.hidden = t.dataset.mode !== mode || (ball && t.dataset.mode === 'ball') || (clipName === 'snack' && t.dataset.mode === 'snack'); t.style.transform = ''; });
   toys.forEach(t => {
@@ -365,7 +390,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     t.addEventListener('pointerup', (e) => {
       if (!td) return; td = null; t.classList.remove('is-drag');
       if (!pick(e)) { t.style.transform = ''; return; }
-      if (t.dataset.mode === 'snack') { play('snack'); showToys(); const back = setInterval(() => { if (clipName !== 'snack') { clearInterval(back); showToys(); } }, 400); }
+      if (t.dataset.mode === 'snack') { const fr = figure.getBoundingClientRect(); play('snack'); cookieDrop = { x: e.clientX - fr.left, y: e.clientY - fr.top }; showToys(); const back = setInterval(() => { if (clipName !== 'snack') { clearInterval(back); showToys(); } }, 400); }
       else {}
       showToys();
     });
@@ -384,13 +409,18 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   const lerp = (a, b, u) => a + (b - a) * u;
   function dropBall(ev) {                                                    // 누른 자리 위에서 공이 떨어짐
     const r = el.getBoundingClientRect(); ndc.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, camera);
-    const h = ray.intersectObjects(pickables, false)[0]; let p;
-    if (h) p = h.point.clone(); else { p = ray.ray.intersectPlane(plane, _hit) ? _hit.clone() : new THREE.Vector3(center.x, FLOOR, center.z); p.x = clamp(p.x, center.x - 0.55, center.x + 0.55); p.z = clamp(p.z, center.z - 0.55, center.z + 0.55); }
+    const h = ray.intersectObjects(pickables, false)[0]; let p, chomp = false;
+    if (h) {
+      p = h.point.clone();
+      if (!isHead(h.object)) chomp = true;                                    // 몸통을 누름 → 머리와 몸통 사이에 넣고 앙앙앙
+      else { const nrm = h.face ? h.face.normal.clone().transformDirection(h.object.matrixWorld) : new THREE.Vector3(0, 1, 0); if (nrm.y < 0.55) chomp = true; }   // 머리 윗면이면 드리블, 얼굴·옆면이면 앙앙앙
+    } else { p = ray.ray.intersectPlane(plane, _hit) ? _hit.clone() : new THREE.Vector3(center.x, FLOOR, center.z); p.x = clamp(p.x, center.x - 0.55, center.x + 0.55); p.z = clamp(p.z, center.z - 0.55, center.z + 0.55); }
     endBall(false);
     const mesh = new THREE.Mesh(new THREE.SphereGeometry(BR, 32, 24), new THREE.MeshStandardMaterial({ color: 0xfffaf2, roughness: 0.32, metalness: 0 })); mesh.castShadow = true; scene.add(mesh);
     mesh.position.set(p.x, Math.max(p.y, FLOOR) + 0.3, p.z);
     ball = { mesh, p: mesh.position, v: new THREE.Vector3(), state: 'fall', t: 0, still: 0, spin: 0, hold: 0 };
-    lastActive = tNow; setStatus(GUIDE.ball);
+    if (chomp) { ball.state = 'chomp'; ball.hold = 0; mesh.position.set(center.x + FRONT.x * 0.05, BODY_TOP + BR, center.z + FRONT.z * 0.05); }
+    lastActive = tNow; setStatus(chomp ? '공을 사이에 넣고 앙앙앙 물어요' : GUIDE.ball);
   }
   function endBall(restore = true) { if (!ball) return; scene.remove(ball.mesh); ball.mesh.geometry.dispose(); ball = null; ballGx = 0; ballEye = null; }
   const horiz = (p, c) => Math.hypot(p.x - c.x, p.z - c.z);
@@ -406,6 +436,16 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     _bb.setFromObject(head); _bb.getCenter(_hc);
     const headTop = _bb.max.y, headR = Math.max(_bb.max.x - _bb.min.x, _bb.max.z - _bb.min.z) * 0.4, rel = sideOf(p) - sideOf(_hc);
     b.t += dt;
+    if (b.state === 'chomp') {                                                 // 머리와 몸통 사이에 공을 넣고 머리를 빠르게 위아래로 앙앙앙
+      const tc = b.hold += dt, ON = 4.8, cyc = 0.36, active = tc < ON;
+      const down = active ? 0.5 - 0.5 * Math.cos(2 * Math.PI * tc / cyc) : 0;
+      goal.neck = lerp(19, 7, down); goal.head = lerp(-25, -7, down); goal.body = active ? Math.sin(tc * 2.6) * 7 : 0; goal.tilt = active ? Math.sin(tc * 5.1) * 3 : 0;
+      ballEye = active ? (Math.floor(tc / 0.72) % 2 ? '하트 눈' : '신난 눈') : '반짝 눈'; ballGx = 0;
+      p.set(center.x + FRONT.x * 0.05, BODY_TOP + BR * (1 - 0.22 * down), center.z + FRONT.z * 0.05);
+      b.mesh.scale.set(1 + 0.12 * down, 1 - 0.24 * down, 1 + 0.12 * down); b.mesh.position.copy(p);
+      if (tc >= ON + 0.25) { b.mesh.scale.set(1, 1, 1); b.state = 'fall'; v.set(FRONT.x * 0.45 + (Math.random() - 0.5) * 0.2, 0.9, FRONT.z * 0.45 + (Math.random() - 0.5) * 0.2); p.y = BODY_TOP + BR + 0.02; bob = 1; }   // 다 놀면 퉁 하고 튕겨 내보냄
+      return;
+    }
     if (b.state === 'bite') {                                                  // 몸통에 떨어진 공: 머리를 숙여 덥석 물었다가 던져 올림
       const tb = b.hold += dt, ang = clamp(Math.atan2(sideOf(b.rest), Math.abs(frontOf(b.rest)) + 0.12) * 57.3, -70, 70);
       goal.body = tb < 2.7 ? ang : 0;
@@ -539,6 +579,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     // 카메라
     cam.az = smoothDamp(cam.az, camGoal.az, cv.az, 0.28, dt); cam.el = smoothDamp(cam.el, camGoal.el, cv.el, 0.28, dt); cam.zoom = smoothDamp(cam.zoom, camGoal.zoom, cv.zoom, 0.22, dt);
     placeCamera();
+    updateCookie(dt);
     renderer.render(scene, camera);
   }
   let eyeName = '뜬 눈';

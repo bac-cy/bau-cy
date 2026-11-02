@@ -116,3 +116,9 @@
   .sim__toy[data-kind="snack"] { top: 20% !important; }
   .design__visual figcaption { left: 16px; bottom: 12px; font-size: 10px; }
 }
+
+/* 간식: Cove에게 가져다 대면 머리 앞에서 한 입씩 줄어드는 쿠키 */
+.sim__cookie { position: absolute; left: 0; top: 0; z-index: 5; width: 56px; height: 56px; pointer-events: none; transform-origin: 28px 28px; will-change: transform, opacity; filter: drop-shadow(0 6px 8px rgba(90, 60, 40, .25)); }
+.sim__cookie[hidden] { display: none; }
+.sim__cookie svg { width: 100%; height: 100%; display: block; }
+.sim__cookie .bite { fill: #000; }

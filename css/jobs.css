@@ -59,3 +59,11 @@
 .engspec .jobs-spec__num { font-size: clamp(30px, 3.8vw, 64px); }
 @media (max-width: 900px) { .engspec__grid { grid-template-columns: 1fr; } }
 @media (max-width: 520px) { .engspec .jobs-spec__grid { grid-template-columns: 1fr; } }
+
+/* Engineering 그룹 정리: 왼쪽은 분해도 카드만, 오른쪽에 제목·설명 → 큰 숫자 스펙 순서로 */
+.engspec__grid { align-items: start; }
+.engspec__eng { margin: 0; }
+.engspec__side { display: grid; gap: clamp(36px, 5vw, 72px); align-content: start; }
+.engspec__copy h3 { margin: 0; font-weight: 400; letter-spacing: .01em; font-size: clamp(32px, 3.4vw, 44px); }
+.engspec__copy p { color: var(--ink-soft); font-weight: 300; max-width: 34em; margin: 14px 0 0; line-height: 1.75; }
+@media (min-width: 901px) { .engspec__side { position: sticky; top: 14vh; } }
