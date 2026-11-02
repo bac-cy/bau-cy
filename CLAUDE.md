@@ -150,3 +150,4 @@
 - **Engineering 그룹 레이아웃 정리**(사용자 요청): 왼쪽은 분해도 카드만, 오른쪽에 제목·설명 → 큰 숫자 스펙 2×2 순서(PC에서 오른쪽은 스크롤 중 따라 붙음), 900px 이하는 위아래(css/jobs.css 끝, index.html #engspec).
 - **맨 위로 올라가기 버튼**(사용자 요청): 우측 하단 동그란 유리 버튼, 화면 1.2장 이상 내려가면 나타나고 누르면 부드럽게(Lenis) 맨 위로(index.html #totop, css/style.css 끝, js/main.js 끝).
 - **새로고침하면 맨 위(눈 시작 화면)로**(사용자 요청): 브라우저가 이전 스크롤 위치를 기억하지 않게(history.scrollRestoration=manual) 해서 F5·Ctrl+R 하면 항상 맨 위에서 눈 LED 시작 화면부터 다시 나옴.
+- **글꼴 조합 = Google Sans Flex + Jost**(사용자 요청, 귀엽지만 세련되게; 위 '원래대로 되돌림'·주아 항목은 대체됨, 주아 파일은 삭제): css/font.css(index.html에 링크). 본문·제목은 Google Sans Flex(둥근 기하학, assets/fonts/google-sans-flex-latin·latin-ext) + 한글 Noto Sans KR, 제목 두께 500. 라벨(01 About Cove 등)·상단 메뉴·규격·캡션·푸터 크레딧·큰 숫자 스펙·인트로 HI/I'm cove는 Jost(가늘고 정돈). 되돌리려면 font.css 링크 한 줄 삭제. 오프라인 꾸러미는 다시 만들어야 반영됨(Jost는 Google Fonts에서 받아 포함 필요).
