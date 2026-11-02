@@ -28,7 +28,7 @@ function ensure() {
 }
 function resume() {
   const c = ensure(); if (!c) return;
-  if (c.state === 'suspended') c.resume().then(() => { if (on) { lastExpr = -1e9; EXPR['하트 눈'](); } window.dispatchEvent(new Event('cove:sound-on')); startBgm(); }).catch(() => {});   // 처음 한 번 누르면 맑은 소리로 "소리 켜짐"을 알려 줌
+  if (c.state === 'suspended') c.resume().then(() => { window.dispatchEvent(new Event('cove:sound-on')); startBgm(); }).catch(() => {});   // 
 }
 ['pointerdown', 'keydown', 'touchend', 'click'].forEach(ev => window.addEventListener(ev, resume, { capture: true, passive: true }));
 try { ensure(); setTimeout(startBgm, 600); } catch (e) { /* 무시 */ }
@@ -254,7 +254,7 @@ function mount() {
   b.addEventListener('click', () => {
     on = !on; try { localStorage.setItem(KEY, on ? 'on' : 'off'); } catch (e) { /* 무시 */ }
     if (ensure()) { master.gain.setTargetAtTime(on ? VOL : 0, ctx.currentTime, 0.03); }
-    paint(); if (on) { resume(); setTimeout(() => EXPR['하트 눈'] && ctx && ctx.state === 'running' && EXPR['하트 눈'](), 60); }
+    paint(); if (on) resume();
   });
   document.body.appendChild(b);
 }
