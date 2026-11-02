@@ -1,7 +1,0 @@
-/* 글꼴 전부 Google Sans Flex (사용자 요청; Gmarket Sans 에서 교체). 헤드라인은 두께 600.
-   · 한글은 Google Sans Flex 에 글자가 없어 Noto Sans KR 로 이어짐. 되돌리려면 index.html의 gmarket.css 링크 한 줄을 지움. */
-@font-face {font-family: "Google Sans Flex";   font-style: normal;   font-display: swap;   font-weight: 1 1000;   src: url("../assets/fonts/google-sans-flex-latin-ext-wght-normal.woff2") format('woff2-variations');   unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF; }
-@font-face {font-family: "Google Sans Flex";   font-style: normal;   font-display: swap;   font-weight: 1 1000;   src: url("../assets/fonts/google-sans-flex-latin-wght-normal.woff2") format('woff2-variations');   unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-html, body, *, *::before, *::after { font-family: "Google Sans Flex", "Noto Sans KR", system-ui, sans-serif !important; }
-/* 헤드라인 두께 */
-h1, h2, h3, .statement, .principles span, .jobs-tag p, .jobs-press__text p, .jobs-spec__num, .detail h3, .feature h3 { font-weight: 600 !important; }
