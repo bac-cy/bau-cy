@@ -5,7 +5,7 @@
   const el = document.createElement('div'); el.className = 'cv-load'; el.setAttribute('aria-hidden', 'true');
   el.innerHTML = '<div class="cv-load__half cv-load__half--t"></div><div class="cv-load__half cv-load__half--b"></div><div class="cv-load__center"><div class="cv-load__eyes"><i class="cv-eye"></i><i class="cv-eye"></i></div><div class="cv-load__mark"></div><div class="cv-load__bar"><i></i></div></div>';
   document.body.appendChild(el); R.classList.remove('loader-on'); R.classList.add('loader-active'); R.style.overflow = 'hidden';
-  const bar = el.querySelector('.cv-load__bar i'), t0 = performance.now(), MIN = 2400, MAX = 6000;
+  const bar = el.querySelector('.cv-load__bar i'), t0 = performance.now(), MIN = 3400, MAX = 6000;
   let loaded = document.readyState === 'complete', done = false;
   addEventListener('load', () => { loaded = true; });
   function open() {
