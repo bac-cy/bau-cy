@@ -17,3 +17,7 @@ html.loader-on::before { content: ""; position: fixed; inset: 0; background: #17
 @keyframes cvBlink { 0%, 38%, 44%, 100% { transform: scaleY(1); } 41% { transform: scaleY(.08); } 70% { transform: scaleY(1); } 73% { transform: scaleY(.08); } 76% { transform: scaleY(1); } }
 @keyframes cvLook { 0%, 100% { translate: 0 0; } 30% { translate: -10px 0; } 62% { translate: 10px 0; } }
 @keyframes cvHappy { 0% { opacity: 1; } 100% { opacity: 1; transform: scaleY(.16) translateY(-8px); height: clamp(40px, 6.4vw, 64px); } }
+
+/* 소리 안내: 브라우저가 소리를 막고 있을 때만 잠깐 보임 */
+.cv-load__hint { position: absolute; left: 0; right: 0; bottom: clamp(24px, 6svh, 56px); margin: 0; text-align: center; z-index: 3; font-size: clamp(12px, 1.05vw, 15px); letter-spacing: .06em; color: rgba(255, 243, 230, .6); opacity: 0; transition: opacity .8s ease; }
+.cv-load__hint.is-on { opacity: 1; }

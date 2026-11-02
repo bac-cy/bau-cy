@@ -28,7 +28,10 @@ function ensure() {
   setInterval(() => { if (ctx && performance.now() - lastMotor > 220) mGain.gain.setTargetAtTime(0, ctx.currentTime, 0.06); }, 100);   // 움직임이 멈추면 조용해짐
   return ctx;
 }
-function resume() { const c = ensure(); if (c && c.state === 'suspended') c.resume().catch(() => {}); }
+function resume() {
+  const c = ensure(); if (!c) return;
+  if (c.state === 'suspended') c.resume().then(() => { if (on) { lastExpr = -1e9; EXPR['하트 눈'](); } window.dispatchEvent(new Event('cove:sound-on')); }).catch(() => {});   // 처음 한 번 누르면 맑은 소리로 "소리 켜짐"을 알려 줌
+}
 ['pointerdown', 'keydown', 'touchend', 'click'].forEach(ev => window.addEventListener(ev, resume, { capture: true, passive: true }));
 try { ensure(); } catch (e) { /* 무시 */ }
 
@@ -114,5 +117,5 @@ function mount() {
 }
 if (document.body) mount(); else document.addEventListener('DOMContentLoaded', mount);
 
-export const CoveSound = { motor, expr, bite, bounce, type, get on() { return on; } };
+export const CoveSound = { motor, expr, bite, bounce, type, get on() { return on; }, get running() { return !!ctx && ctx.state === 'running'; } };
 window.CoveSound = CoveSound;

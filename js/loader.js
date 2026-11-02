@@ -6,6 +6,10 @@
   el.innerHTML = '<div class="cv-load__half cv-load__half--t"></div><div class="cv-load__half cv-load__half--b"></div><div class="cv-load__center"><div class="cv-load__eyes"><i class="cv-eye"></i><i class="cv-eye"></i></div></div>';
   document.body.appendChild(el); R.classList.remove('loader-on'); R.classList.add('loader-active'); R.style.overflow = 'hidden';
   const t0 = performance.now(), MIN = 2400, MAX = 6000;
+  // 브라우저는 처음 한 번 누르기 전에는 소리를 막아요 → 막혀 있으면 아래에 작은 안내를 보여 주고, 한 번 누르면 소리가 켜져요
+  const hint = document.createElement('p'); hint.className = 'cv-load__hint'; hint.textContent = '소리가 들리려면 화면을 한 번 눌러 주세요'; el.appendChild(hint);
+  (function chk(n) { const cs = window.CoveSound; if (cs && cs.running) { hint.remove(); return; } if (cs && cs.on) hint.classList.add('is-on'); if (n < 200) setTimeout(() => chk(n + 1), 100); })(0);
+  window.addEventListener('cove:sound-on', () => hint.remove(), { once: true });
   let loaded = document.readyState === 'complete', done = false;
   addEventListener('load', () => { loaded = true; });
   function open() {
