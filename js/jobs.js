@@ -33,8 +33,10 @@
     pebble(px, cx - headW / 2, headY, headW, headH, 52, true);                                                              // 머리
     eyes(px, cx, headY + headH / 2 + 2, 44, false);
   }
+  let sp = null;   // 스크롤 진행값을 부드럽게 따라가게 해서 움직임이 끊기지 않음
   function updPress(now) {
-    const r = press.getBoundingClientRect(), total = r.height - innerHeight, p = clamp(-r.top / total);
+    const r = press.getBoundingClientRect(), total = r.height - innerHeight, tp = clamp(-r.top / total);
+    sp = sp === null ? tp : sp + (tp - sp) * 0.1; const p = Math.abs(tp - sp) < 0.0005 ? tp : sp;
     if (r.bottom > -50 && r.top < innerHeight + 50) {
       drawPress(p, now / 1000);
       veil.style.opacity = (0.9 * ez((p - 0.45) / 0.3) * (1 - ez((p - 0.86) / 0.12))).toFixed(3);                       // 화면 전체가 천천히 가라앉음
