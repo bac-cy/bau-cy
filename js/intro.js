@@ -128,11 +128,10 @@
     lineIm.style.transform = `translate3d(0, ${(1 - imA) * 26 - out * 24}px, 0) scale(${(0.94 + 0.06 * imA + out * 0.2).toFixed(3)})`;   // 나타날 때 안착, 사라질 때 앞으로 다가옴
     lineIm.style.filter = (imA < 0.99 || out > 0.01) ? `blur(${((1 - imA) * 8 + out * 14).toFixed(1)}px)` : 'none';   // 번지듯 나타나고, 흩어지듯 사라짐
 
-    // Scene 3: 홍보 영상이 아래에서 부드럽게 올라와 자리잡음
+    // Scene 3: 홍보 영상이 화면 전체를 채우며 부드럽게 나타남(움직이는 칸 없이 제자리에서 서서히)
     const fa = smooth(clamp(b / 0.8));
     film.style.opacity = fa.toFixed(3);
     film.style.pointerEvents = fa > 0.6 ? 'auto' : 'none';
-    film.style.transform = `translate3d(0, ${((1 - fa) * H * 0.18).toFixed(1)}px, 0) scale(${(0.94 + 0.06 * fa).toFixed(3)})`;
   }
   requestAnimationFrame(frame);
 })();
