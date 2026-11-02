@@ -36,7 +36,7 @@ try { ensure(); setTimeout(startBgm, 600); } catch (e) { /* 무시 */ }
 /* 모터: level 0~1 (관절이 움직이는 빠르기) — 움직이는 동안 공기가 스치는 듯한 부드러운 '쉬이' 소리 */
 function motor(level) {
   if (!on || !ensure() || ctx.state !== 'running') return;
-  const l = Math.min(1, Math.max(0, level)); if (l < 0.05) return;
+  const l = Math.min(1, Math.max(0, level)); motionHint(l); if (l < 0.05) return;
   lastMotor = performance.now(); const t = ctx.currentTime;
   mGain.gain.setTargetAtTime(0.02 + 0.09 * l, t, 0.07);
   mFilter.frequency.setTargetAtTime(2600 + 1800 * l, t, 0.08);
@@ -93,8 +93,9 @@ const EXPR_CHIME = {                                                            
 };
 /* 엘릭(Eilik) 느낌: 책상 위 작은 로봇이 "뿌잇·삐리릿·뿌우~" 하고 재잘거리는 짧고 말랑한 전자 말소리. 높은 음역(600Hz 이상)에서 빠르게 올라가거나 내려가는 둥근 '붑' 소리에
    모음처럼 들리는 필터를 걸어 아기 로봇이 옹알이하는 느낌을 냄. (엘릭 실제 음원은 아니고 느낌만 비슷하게 만든 소리) */
+let TR = 1;                                                                     // 소리를 낼 때마다 살짝 다른 높이로 (같은 소리가 반복되지 않게)
 function boop(f0, f1, dur = 0.1, vol = 0.18, delay = 0) {
-  const c = ctx; if (!c) return;
+  const c = ctx; if (!c) return; f0 *= TR; f1 *= TR;
   const t = c.currentTime + delay, g = c.createGain(), bp = c.createBiquadFilter(), v = vol * 4.2;
   bp.type = 'bandpass'; bp.Q.value = 1.6; bp.frequency.setValueAtTime(Math.max(900, f0 * 1.3), t); bp.frequency.exponentialRampToValueAtTime(Math.max(900, f1 * 1.3), t + dur);
   g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + Math.min(0.012, dur * 0.2)); g.gain.setValueAtTime(v, t + dur * 0.55); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
@@ -104,24 +105,52 @@ function boop(f0, f1, dur = 0.1, vol = 0.18, delay = 0) {
   });
   bp.connect(g); g.connect(master);
 }
+const seq = (arr, dur, vol, gap) => arr.forEach((p, i) => boop(p[0], p[1], dur, vol, i * gap));
+// 표정마다 여러 가지 소리를 준비해 두고 매번 다른 것을 골라요 (높이도 조금씩 다르게)
 const EXPR_EILIK = {
-  '놀란 눈': () => { boop(620, 1150, 0.09, 0.2); boop(1150, 900, 0.1, 0.17, 0.1); },                                               // 뿌잇!
-  '신난 눈': () => { [[800, 1000], [1000, 1250], [1250, 1600], [1400, 1800]].forEach((p, i) => boop(p[0], p[1], 0.07, 0.17, i * 0.09)); },   // 삐리리릿 올라감
-  '하트 눈': () => { boop(720, 1050, 0.2, 0.17); boop(1050, 1350, 0.26, 0.15, 0.2); },                                              // 뿌우~ 포근하게 (두 번 올라감)
-  '웃는 눈': () => { boop(760, 1100, 0.16, 0.15); boop(1100, 980, 0.18, 0.12, 0.17); },
-  '반짝 눈': () => { boop(1500, 2000, 0.06, 0.1); },
-  '윙크': () => { boop(800, 1300, 0.07, 0.16); },
-  '속상한 눈': () => { boop(950, 700, 0.3, 0.14); boop(780, 560, 0.4, 0.12, 0.34); },                                               // 뿌우… 내려감
-  '어지러운 눈': () => { [[900, 1200], [1200, 900], [900, 1200]].forEach((p, i) => boop(p[0], p[1], 0.11, 0.12, i * 0.13)); },
-  '졸린 눈': () => { boop(820, 560, 0.55, 0.1); },
-  '편안한 눈': () => { boop(700, 740, 0.4, 0.07); },
+  '놀란 눈': [() => { boop(620, 1150, 0.09, 0.2); boop(1150, 900, 0.1, 0.17, 0.1); },                                              // 뿌잇!
+              () => { boop(700, 900, 0.07, 0.17); boop(900, 1350, 0.1, 0.2, 0.09); },                                               // 어? (올라감)
+              () => { boop(1300, 800, 0.08, 0.18); boop(800, 1300, 0.1, 0.17, 0.09); boop(1300, 1000, 0.09, 0.13, 0.2); }],        // 앗 뿌
+  '신난 눈': [() => seq([[800, 1000], [1000, 1250], [1250, 1600], [1400, 1800]], 0.07, 0.17, 0.09),                                  // 삐리리릿
+              () => seq([[900, 900], [900, 900], [900, 1200], [1200, 1700]], 0.06, 0.16, 0.1),                                      // 뿌 뿌 뿌-삐
+              () => seq([[1000, 1300], [1300, 1000], [1000, 1300], [1300, 1000], [1000, 1500]], 0.06, 0.14, 0.075),                // 뽀로로로롱
+              () => { boop(700, 1000, 0.12, 0.17); boop(1000, 1500, 0.14, 0.16, 0.12); boop(1500, 1300, 0.14, 0.12, 0.26); }],     // 뿌우-삐-이
+  '하트 눈': [() => { boop(720, 1050, 0.2, 0.17); boop(1050, 1350, 0.26, 0.15, 0.2); },                                              // 뿌우~
+              () => { boop(800, 900, 0.14, 0.15); boop(1000, 1250, 0.3, 0.15, 0.17); },                                             // 뽀로~
+              () => { boop(650, 1000, 0.3, 0.16); boop(1000, 840, 0.22, 0.12, 0.3); }],                                             // 뿌우~웅
+  '웃는 눈': [() => { boop(760, 1100, 0.16, 0.15); boop(1100, 980, 0.18, 0.12, 0.17); },
+              () => seq([[900, 1100], [1000, 1300]], 0.09, 0.14, 0.11)],
+  '반짝 눈': [() => boop(1500, 2000, 0.06, 0.1), () => { boop(1800, 2200, 0.05, 0.09); boop(1400, 1700, 0.05, 0.07, 0.07); }],
+  '윙크': [() => boop(800, 1300, 0.07, 0.16), () => { boop(1100, 800, 0.05, 0.14); boop(800, 1300, 0.07, 0.16, 0.06); }, () => boop(900, 1500, 0.09, 0.15)],
+  '속상한 눈': [() => { boop(950, 700, 0.3, 0.14); boop(780, 560, 0.4, 0.12, 0.34); },                                                // 뿌우…
+              () => { boop(900, 650, 0.5, 0.14); boop(700, 620, 0.2, 0.09, 0.55); },                                                // 뿌우우웅
+              () => seq([[900, 800], [800, 650], [700, 540]], 0.16, 0.12, 0.22)],                                                    // 뿌 뿌 뿌…
+  '어지러운 눈': [() => seq([[900, 1200], [1200, 900], [900, 1200]], 0.11, 0.12, 0.13),
+              () => seq([[1000, 800], [800, 1000], [1000, 800], [800, 1000]], 0.1, 0.11, 0.12)],
+  '졸린 눈': [() => boop(820, 560, 0.55, 0.1), () => { boop(600, 900, 0.3, 0.09); boop(900, 520, 0.55, 0.1, 0.32); }],               // 하품
+  '편안한 눈': [() => boop(700, 740, 0.4, 0.07), () => boop(760, 700, 0.45, 0.07)],
+};
+// 동작(버튼)에 맞춘 소리: 인사, 쓰다듬기, 간지럼, 잠들기, 간식, 쉬기
+const EVENT_EILIK = {
+  greet: () => seq([[800, 1000], [1000, 800], [900, 1400]], 0.1, 0.17, 0.13),                                                        // 삐-뽀-삐!
+  pet: () => seq([[760, 840], [840, 760], [760, 840], [840, 760], [760, 900]], 0.09, 0.1, 0.1),                                        // 그르릉 하는 듯한 낮은 떨림
+  tickle: () => seq([[1000, 1400], [1400, 1000], [1100, 1500], [1500, 1100], [1200, 1700], [1700, 1200]], 0.06, 0.13, 0.075),          // 까르르
+  sleep: () => { boop(700, 540, 0.6, 0.09); boop(640, 520, 0.7, 0.07, 0.7); },                                                       // 쿨… 쿨…
+  rest: () => { boop(660, 760, 0.45, 0.08); },
+  snack: () => seq([[900, 1200], [1200, 1500], [1000, 1300]], 0.1, 0.15, 0.13),                                                      // 냠냠 기대
+  startle: () => boop(620, 1150, 0.09, 0.2),
+  wink: () => boop(800, 1300, 0.07, 0.16),
+  happy: () => seq([[800, 1000], [1000, 1250], [1250, 1600]], 0.08, 0.16, 0.1),
+  upset: () => boop(900, 600, 0.45, 0.13),
 };
 const useChime = /[?&]sound=chime/.test(location.search);                          // 주소 끝에 ?sound=chime 을 붙이면 예전 종소리 버전으로 들어 볼 수 있음
 const EXPR = useChime ? EXPR_CHIME : EXPR_EILIK;
+const lastVar = {};
 function expr(name) {
   if (!on || !EXPR[name] || !ensure() || ctx.state !== 'running') return;
   const n = performance.now(); if (n - lastExpr < 180) return; lastExpr = n;
-  duck(); EXPR[name]();
+  duck(); let f = EXPR[name]; if (Array.isArray(f)) { lastVar[name] = ((lastVar[name] ?? -1) + 1 + Math.floor(Math.random() * (f.length - 1 || 1))) % f.length; f = f[lastVar[name]]; }   // 지난번과 다른 변형을 고름
+  TR = useChime ? 1 : 0.9 + Math.random() * 0.24; f(); TR = 1;
 }
 function bite() {                                                               // 냠
   if (!on || !ensure() || ctx.state !== 'running') return;
@@ -133,9 +162,20 @@ function bounce() {                                                             
   if (useChime) pluck(659, 0.2, 0.14); else boop(640, 960, 0.09, 0.15);
 }
 
+function event(name) {                                                         // 동작(인사·쓰다듬기·간지럼·잠들기 등)이 시작될 때 나는 소리
+  if (useChime || !on || !EVENT_EILIK[name] || !ensure() || ctx.state !== 'running') return;
+  duck(); TR = 0.94 + Math.random() * 0.14; EVENT_EILIK[name](); TR = 1;
+}
+let idleSince = 0, wasMoving = false;                                           // 가만히 있다가 움직이기 시작할 때 작은 '으응?' 소리
+function motionHint(level) {
+  if (useChime || !on || !ctx || ctx.state !== 'running') return; const n = performance.now();
+  if (level > 0.28) { if (!wasMoving && n - idleSince > 1800) { duck(); TR = 0.92 + Math.random() * 0.2; Math.random() < 0.5 ? boop(760, 980, 0.09, 0.1) : boop(980, 780, 0.09, 0.1); TR = 1; } wasMoving = true; idleSince = n; }
+  else if (level < 0.05) wasMoving = false;
+}
+
 /* 배경음악: assets/bgm.mp3 파일이 있으면 그 곡을 잔잔하게 반복하고, 없으면 코드로 만든 아주 잔잔한 앰비언트(느린 화음 + 가끔 울리는 맑은 종소리)를 깔아요.
    소리가 켜져 있을 때만, 매우 작게. Cove 효과음이 나올 때와 영상을 전체 화면으로 볼 때는 자동으로 줄어들어요. */
-const BGM_LEVEL = 0.5;
+const BGM_LEVEL = 0.55;
 let bgmBus = null, bgmStarted = false, bgmBase = BGM_LEVEL, echoIn = null;
 function bgmSetup() {
   const c = ctx; bgmBus = c.createGain(); bgmBus.gain.value = 0; bgmBus.connect(master);
@@ -143,29 +183,41 @@ function bgmSetup() {
   echoIn.connect(dl); dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(bgmBus);                    // 은은한 메아리(공간감)
   bgmBus.gain.setTargetAtTime(bgmBase, c.currentTime, 2.5);                                                     // 천천히 커짐
 }
-const CHORDS = [[130.8, 164.8, 196, 246.9], [98, 123.5, 146.8, 196], [110, 130.8, 164.8, 196], [87.3, 130.8, 164.8, 220]];     // C · G · Am · F 를 느리게
-const BELLS = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.7, 1318.5];                                                  // 도 레 미 솔 라 (5음계)
-function bgmPad(chord, dur) {
-  const c = ctx, t = c.currentTime;
-  chord.forEach((f, i) => [[f, 'sine', 0.022], [f * 1.003, 'triangle', 0.008]].forEach(([ff, type, v]) => {
-    const o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.value = ff;
-    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(v, t + 3.2); g.gain.setValueAtTime(v, t + dur - 3.2); g.gain.linearRampToValueAtTime(0.0001, t + dur + 1.5);
-    o.connect(g); g.connect(bgmBus); o.start(t + i * 0.12); o.stop(t + dur + 1.6);
-  }));
+/* 코드로 만든 배경음악: 가볍고 경쾌한 뮤직박스풍 반주. 느린 낮은 화음(무서운 느낌)은 쓰지 않고, 밝은 장조(도·라·파·솔)의 통통 튀는 아르페지오 + 가벼운 베이스 + 아주 작은 셰이커. 템포 104. */
+const BPM = 104, STEP = 60 / BPM / 2;                                                                                              // 8분음표 한 칸의 길이(초)
+const PROG = [[[523.25, 659.25, 783.99, 1046.5], 261.6], [[440, 523.25, 659.25, 880], 220], [[349.2, 440, 523.25, 698.5], 174.6], [[392, 493.9, 587.3, 783.99], 196]];   // 도 · 라m · 파 · 솔 (멜로디 음 4개 + 베이스)
+const PATS = [[0, 1, 2, 3, 2, 1, 2, 1], [0, 2, 1, 3, 2, 1, 0, 1], [0, 1, 2, 1, 3, 2, 1, 2], [0, 2, 3, 2, 1, 2, 3, 1], [3, 2, 1, 2, 3, 1, 2, 0]];
+function bgmNote(f, t, vol, dur, send) {
+  const c = ctx, g = c.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  g.connect(bgmBus); if (send) g.connect(echoIn);
+  [[1, 1], [2, 0.16]].forEach(([m, a]) => { const o = c.createOscillator(), og = c.createGain(); o.type = 'sine'; o.frequency.value = f * m; og.gain.value = a; o.connect(og); og.connect(g); o.start(t); o.stop(t + dur + 0.03); });
 }
-function bgmBell() {
-  const c = ctx, t = c.currentTime, f = BELLS[Math.floor(Math.random() * BELLS.length)], g = c.createGain(), v = 0.07;
-  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 2.6);
-  g.connect(bgmBus); g.connect(echoIn);
-  [[1, 1], [2, 0.12]].forEach(([m, a]) => { const o = c.createOscillator(), og = c.createGain(); o.type = 'sine'; o.frequency.value = f * m; og.gain.value = a; o.connect(og); og.connect(g); o.start(t); o.stop(t + 2.7); });
+let shakerBuf = null;
+function bgmShaker(t, vol) {
+  const c = ctx; if (!shakerBuf) { shakerBuf = c.createBuffer(1, Math.floor(c.sampleRate * 0.05), c.sampleRate); const d = shakerBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length); }
+  const n = c.createBufferSource(); n.buffer = shakerBuf; const hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 6500; const g = c.createGain(); g.gain.value = vol; n.connect(hp); hp.connect(g); g.connect(bgmBus); n.start(t);
+}
+let bgmStep = 0, bgmNext = 0, bgmBar = 0, bgmPat = PATS[0], bgmOrder = [0, 1, 2, 3];
+function bgmSchedule() {
+  if (!ctx || ctx.state !== 'running') return; if (!bgmNext || bgmNext < ctx.currentTime) bgmNext = ctx.currentTime + 0.05;
+  while (bgmNext < ctx.currentTime + 0.4) {
+    const t = bgmNext, i = bgmStep % 8;
+    if (i === 0) { bgmBar++; bgmPat = PATS[Math.floor(Math.random() * PATS.length)]; if (bgmBar % 8 === 1 && Math.random() < 0.35) bgmOrder = [0, 3, 1, 2]; else if (bgmBar % 8 === 1) bgmOrder = [0, 1, 2, 3]; }
+    const [tones, bass] = PROG[bgmOrder[Math.floor(bgmStep / 8) % 4]];
+    if (on) {
+      if (!(i === 7 && Math.random() < 0.3)) bgmNote(tones[bgmPat[i]], t, i % 4 === 0 ? 0.06 : 0.04, 0.34, true);          // 통통 튀는 멜로디 (가끔 쉼)
+      if (i === 0 || i === 4) bgmNote(bass, t, 0.07, 0.4, false);                                                                // 가벼운 베이스
+      if (i % 2 === 1) bgmShaker(t, 0.01);                                                                                          // 아주 작은 셰이커
+    }
+    bgmNext += STEP; bgmStep++;
+  }
 }
 function startBgm() {
   if (bgmStarted || !ensure() || ctx.state !== 'running') return; bgmStarted = true; bgmSetup();
   fetch('assets/bgm.mp3').then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); }).then(b => ctx.decodeAudioData(b)).then(buf => {         // 음악 파일이 있으면 그 곡을 반복
     const s = ctx.createBufferSource(); s.buffer = buf; s.loop = true; s.connect(bgmBus); s.start(); window.COVE_BGM = 'file';
   }).catch(() => {                                                                                                                  // 없으면 코드로 만든 잔잔한 소리
-    window.COVE_BGM = 'generated'; let ci = 0; const next = () => { bgmPad(CHORDS[ci++ % CHORDS.length], 9); }; next(); setInterval(next, 8000);
-    (function sched() { setTimeout(() => { if (on && ctx.state === 'running') bgmBell(); sched(); }, 1800 + Math.random() * 3200); })();
+    window.COVE_BGM = 'generated'; setInterval(bgmSchedule, 100);
   });
   setInterval(() => {                                                                                                               // 영상 전체 화면에서는 배경음악을 끔
     if (!bgmBus) return; const full = !!(document.fullscreenElement || document.webkitFullscreenElement);
@@ -208,5 +260,5 @@ function mount() {
 }
 if (document.body) mount(); else document.addEventListener('DOMContentLoaded', mount);
 
-export const CoveSound = { motor, expr, bite, bounce, type, get on() { return on; }, get running() { return !!ctx && ctx.state === 'running'; } };
+export const CoveSound = { motor, expr, event, bite, bounce, type, get on() { return on; }, get running() { return !!ctx && ctx.state === 'running'; } };
 window.CoveSound = CoveSound;

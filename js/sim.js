@@ -206,6 +206,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     if (clipName === name && clip) { stopClip(); return; }                  // 같은 버튼을 다시 누르면 멈춤
     clip = CLIPS[name]; clipName = name; clipT = -0.9; gest = null; lastActive = tNow;   // 처음 0.9초는 시작 자세로 부드럽게 이동
     buildSteps(clip); setStatus(GUIDE[name] || HINT, 'on');
+    CoveSound.event(name);                                                  // 동작에 맞는 소리 (인사·쓰다듬기·간지럼·잠들기 등)
     motionBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.motion === name || b.dataset.motion === mode)));
   }
   function stopClip(keepPose = true) {
