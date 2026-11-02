@@ -199,11 +199,12 @@ updateNavSpy();
       const p = v.play(); if (p && p.catch) p.catch(() => {});
     };
     const exitUI = () => { clearTimeout(hideT); fig.style.cursor = ''; fig.classList.remove('is-full'); v.muted = true; v.controls = reduce; const p = v.play(); if (p && p.catch && !reduce) p.catch(() => {}); };
-    fig.addEventListener('click', (e) => {
-      if (isFull()) { if (e.target === fig) (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }   // 전체 화면에서는 영상 조작 막대를 쓴다
+    // 영상을 더블클릭하면 전체 화면, 전체 화면에서 한 번 더 더블클릭하면 나옴 (한 번 클릭만으로는 아무 일도 없음)
+    fig.addEventListener('dblclick', (e) => {
+      if (isFull()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
       enter();
     });
-    fig.tabIndex = 0; fig.setAttribute('role', 'button'); fig.setAttribute('aria-label', (v.getAttribute('aria-label') || '영상') + ' 전체 화면으로 보기');
+    fig.tabIndex = 0; fig.setAttribute('role', 'button'); fig.setAttribute('aria-label', (v.getAttribute('aria-label') || '영상') + ' (더블클릭하면 전체 화면)');
     fig.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && !isFull()) { e.preventDefault(); enter(); } });
     const onChange = () => { if (!isFull()) exitUI(); };
     document.addEventListener('fullscreenchange', onChange); document.addEventListener('webkitfullscreenchange', onChange);

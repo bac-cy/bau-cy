@@ -128,3 +128,8 @@
 .intro__film.is-ui .gallery__arrow, .intro__film.is-ui .gallery__expand { opacity: 1; }
 .intro__film.is-ui .gallery__dots { opacity: 1; background: rgba(255, 255, 255, .45); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
 .intro__film .gallery__arrow:focus-visible, .intro__film .gallery__expand:focus-visible { opacity: 1; }
+
+/* 인트로 영상: 좌우 화살표와 확대 버튼은 없애고 가운데 점만 남김 (영상은 더블클릭으로 전체 화면) */
+.intro__film .gallery__arrow, .intro__film .gallery__expand { display: none !important; }
+.intro__film .gallery__film { cursor: default; }
+.intro__film .gallery__film { -webkit-user-select: none; user-select: none; }
