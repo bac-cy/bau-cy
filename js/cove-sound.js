@@ -28,10 +28,10 @@ function ensure() {
 }
 function resume() {
   const c = ensure(); if (!c) return;
-  if (c.state === 'suspended') c.resume().then(() => { if (on) { lastExpr = -1e9; EXPR['하트 눈'](); } window.dispatchEvent(new Event('cove:sound-on')); }).catch(() => {});   // 처음 한 번 누르면 맑은 소리로 "소리 켜짐"을 알려 줌
+  if (c.state === 'suspended') c.resume().then(() => { if (on) { lastExpr = -1e9; EXPR['하트 눈'](); } window.dispatchEvent(new Event('cove:sound-on')); startBgm(); }).catch(() => {});   // 처음 한 번 누르면 맑은 소리로 "소리 켜짐"을 알려 줌
 }
 ['pointerdown', 'keydown', 'touchend', 'click'].forEach(ev => window.addEventListener(ev, resume, { capture: true, passive: true }));
-try { ensure(); } catch (e) { /* 무시 */ }
+try { ensure(); setTimeout(startBgm, 600); } catch (e) { /* 무시 */ }
 
 /* 모터: level 0~1 (관절이 움직이는 빠르기) — 움직이는 동안 공기가 스치는 듯한 부드러운 '쉬이' 소리 */
 function motor(level) {
@@ -94,7 +94,7 @@ const EXPR = {                                                                  
 function expr(name) {
   if (!on || !EXPR[name] || !ensure() || ctx.state !== 'running') return;
   const n = performance.now(); if (n - lastExpr < 180) return; lastExpr = n;
-  EXPR[name]();
+  duck(); EXPR[name]();
 }
 function bite() {                                                               // 냠 (오물오물 두 번 찍찍)
   if (!on || !ensure() || ctx.state !== 'running') return;
@@ -105,6 +105,52 @@ function bounce() {                                                             
   const n = performance.now(); if (n - lastBounce < 90) return; lastBounce = n;
   squeak([[0, 800], [0.5, 1250], [1, 950]], 0.11, 0.15);
 }
+
+/* 배경음악: assets/bgm.mp3 파일이 있으면 그 곡을 잔잔하게 반복하고, 없으면 코드로 만든 아주 잔잔한 앰비언트(느린 화음 + 가끔 울리는 맑은 종소리)를 깔아요.
+   소리가 켜져 있을 때만, 매우 작게. Cove 효과음이 나올 때와 영상을 전체 화면으로 볼 때는 자동으로 줄어들어요. */
+const BGM_LEVEL = 0.5;
+let bgmBus = null, bgmStarted = false, bgmBase = BGM_LEVEL, echoIn = null;
+function bgmSetup() {
+  const c = ctx; bgmBus = c.createGain(); bgmBus.gain.value = 0; bgmBus.connect(master);
+  echoIn = c.createGain(); const dl = c.createDelay(1.5); dl.delayTime.value = 0.46; const fb = c.createGain(); fb.gain.value = 0.42; const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2400;
+  echoIn.connect(dl); dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(bgmBus);                    // 은은한 메아리(공간감)
+  bgmBus.gain.setTargetAtTime(bgmBase, c.currentTime, 2.5);                                                     // 천천히 커짐
+}
+const CHORDS = [[130.8, 164.8, 196, 246.9], [98, 123.5, 146.8, 196], [110, 130.8, 164.8, 196], [87.3, 130.8, 164.8, 220]];     // C · G · Am · F 를 느리게
+const BELLS = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.7, 1318.5];                                                  // 도 레 미 솔 라 (5음계)
+function bgmPad(chord, dur) {
+  const c = ctx, t = c.currentTime;
+  chord.forEach((f, i) => [[f, 'sine', 0.022], [f * 1.003, 'triangle', 0.008]].forEach(([ff, type, v]) => {
+    const o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.value = ff;
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(v, t + 3.2); g.gain.setValueAtTime(v, t + dur - 3.2); g.gain.linearRampToValueAtTime(0.0001, t + dur + 1.5);
+    o.connect(g); g.connect(bgmBus); o.start(t + i * 0.12); o.stop(t + dur + 1.6);
+  }));
+}
+function bgmBell() {
+  const c = ctx, t = c.currentTime, f = BELLS[Math.floor(Math.random() * BELLS.length)], g = c.createGain(), v = 0.07;
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 2.6);
+  g.connect(bgmBus); g.connect(echoIn);
+  [[1, 1], [2, 0.12]].forEach(([m, a]) => { const o = c.createOscillator(), og = c.createGain(); o.type = 'sine'; o.frequency.value = f * m; og.gain.value = a; o.connect(og); og.connect(g); o.start(t); o.stop(t + 2.7); });
+}
+function startBgm() {
+  if (bgmStarted || !ensure() || ctx.state !== 'running') return; bgmStarted = true; bgmSetup();
+  fetch('assets/bgm.mp3').then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); }).then(b => ctx.decodeAudioData(b)).then(buf => {         // 음악 파일이 있으면 그 곡을 반복
+    const s = ctx.createBufferSource(); s.buffer = buf; s.loop = true; s.connect(bgmBus); s.start(); window.COVE_BGM = 'file';
+  }).catch(() => {                                                                                                                  // 없으면 코드로 만든 잔잔한 소리
+    window.COVE_BGM = 'generated'; let ci = 0; const next = () => { bgmPad(CHORDS[ci++ % CHORDS.length], 9); }; next(); setInterval(next, 8000);
+    (function sched() { setTimeout(() => { if (on && ctx.state === 'running') bgmBell(); sched(); }, 1800 + Math.random() * 3200); })();
+  });
+  setInterval(() => {                                                                                                               // 영상 전체 화면에서는 배경음악을 끔
+    if (!bgmBus) return; const full = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    bgmBase = full ? 0 : BGM_LEVEL; if (!duckT) bgmBus.gain.setTargetAtTime(bgmBase, ctx.currentTime, 0.4);
+  }, 500);
+}
+let duckT = 0;
+function duck() {                                                                                                                   // Cove 소리가 나는 동안 배경음악을 잠깐 줄임
+  if (!bgmBus) return; bgmBus.gain.setTargetAtTime(bgmBase * 0.35, ctx.currentTime, 0.06); clearTimeout(duckT);
+  duckT = setTimeout(() => { duckT = 0; bgmBus.gain.setTargetAtTime(bgmBase, ctx.currentTime, 0.5); }, 1100);
+}
+document.addEventListener('visibilitychange', () => { if (!ctx) return; if (document.hidden) ctx.suspend().catch(() => {}); else ctx.resume().catch(() => {}); });
 
 /* 타이핑: 키보드를 톡 치는 소리 (HI, I'm cove 글자가 하나씩 나올 때) */
 let noiseBuf = null;
