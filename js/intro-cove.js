@@ -44,6 +44,7 @@ async function init() {
 
   const loader = new GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder);
   const model = (await loader.loadAsync('assets/cove-rig.glb')).scene; scene.add(model);
+  mark('ready');   // 모델이 준비됨 (Cove 장면이 맨 아래에 있어 처음엔 화면에 안 보이므로, 시작 화면은 이 시점에 열릴 수 있다)
 
   // 인트로 렌더 이미지와 같은 흰색 무광 재질 + 알루미늄 기둥
   const white = new THREE.MeshStandardMaterial({ color: 0xefe9e1, roughness: 0.55, metalness: 0, envMapIntensity: 1.25 });

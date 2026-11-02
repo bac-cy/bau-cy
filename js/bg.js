@@ -17,7 +17,7 @@
     gallery:  [[228, 230, 242, .55], [244, 230, 232, .45], [244, 244, 250, .4]],
     footer:   [[212, 216, 246, .65], [246, 220, 226, .55], [234, 236, 250, .45]],
   });
-  const ids = ['about', 'features', 'design', 'gallery'], els = ids.map(i => document.getElementById(i)), foot = document.querySelector('.footer');
+  const ids = ['about', 'features', 'design'], els = ids.map(i => document.getElementById(i)), foot = document.querySelector('.footer');
   const desat = (c, s) => { const g = (c[0] + c[1] + c[2]) / 3; return [g + (c[0] - g) * s, g + (c[1] - g) * s, g + (c[2] - g) * s, c[3]]; };   // 채도를 낮춰 은은하게(1=원래, 0=회색)
   const SAT = 0.5;
   Object.keys(P).forEach(k => { P[k] = P[k].map(c => desat(c, SAT)); });

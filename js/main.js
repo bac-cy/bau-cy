@@ -102,7 +102,7 @@ const PAGES = [
   { sel: '#about',       num: '01', name: 'About' },
   { sel: '#features',    num: '02', name: 'Features' },
   { sel: '#design',      num: '03', name: 'Design' },
-  { sel: '#gallery',     num: '04', name: 'Gallery' },
+  { sel: '#finale',      num: '',   name: '' },
   { sel: '.closing',     num: '',   name: 'Credits' },
 ].map(p => ({ ...p, el: document.querySelector(p.sel) })).filter(p => p.el);
 
