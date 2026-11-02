@@ -25,7 +25,7 @@
     if (reduced) { out.textContent = text; caret.classList.add('is-done'); onDone && onDone(); return; }
     out.textContent = '';
     (function tick() {
-      out.textContent = text.slice(0, ++i);
+      out.textContent = text.slice(0, ++i); if (window.CoveSound && window.CoveSound.type) window.CoveSound.type();   // 타이핑 소리
       if (i < text.length) setTimeout(tick, speed);
       else { setTimeout(() => caret.classList.add('is-done'), 900); onDone && onDone(); }
     })();
@@ -102,6 +102,7 @@
       typedF = want ? Math.min(IM_TEXT.length, typedF + dt * TYPE_CPS) : Math.max(0, typedF - dt * 40);
       const k = Math.floor(typedF + 0.0001);
       if (k !== imShown) {
+        if (k > imShown && k > 0 && window.CoveSound && window.CoveSound.type) window.CoveSound.type();   // 글자가 늘 때만 타이핑 소리
         imShown = k; imOut.textContent = IM_TEXT.slice(0, k);
         imCaret.classList.toggle('is-done', k === IM_TEXT.length);
       }

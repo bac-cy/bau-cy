@@ -118,7 +118,13 @@
 }
 
 /* 간식: Cove에게 가져다 대면 머리 앞에서 한 입씩 줄어드는 쿠키 */
-.sim__cookie { position: absolute; left: 0; top: 0; z-index: 5; width: 56px; height: 56px; pointer-events: none; transform-origin: 28px 28px; will-change: transform, opacity; filter: drop-shadow(0 6px 8px rgba(90, 60, 40, .25)); }
+.sim__cookie { position: absolute; left: 0; top: 0; z-index: 5; width: 72px; height: 72px; pointer-events: none; transform-origin: 36px 36px; will-change: transform, opacity; filter: drop-shadow(0 6px 8px rgba(90, 60, 40, .25)); }
 .sim__cookie[hidden] { display: none; }
 .sim__cookie svg { width: 100%; height: 100%; display: block; }
 .sim__cookie .bite { fill: #000; }
+
+/* 쿠키 아이콘: 둥근 배경 없이 쿠키 그림만 (실사 느낌) */
+.sim__toy[data-kind="snack"] { width: 80px; height: 80px; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; border-radius: 0; }
+.sim__toy[data-kind="snack"] svg { width: 74px; height: 74px; filter: drop-shadow(0 8px 8px rgba(80, 50, 25, .35)); }
+@media (max-width: 760px) { .sim__toy[data-kind="snack"] { width: 70px; height: 70px; } .sim__toy[data-kind="snack"] svg { width: 64px; height: 64px; } }
+.sim__crumb { position: absolute; z-index: 6; border-radius: 40% 60% 50% 50%; pointer-events: none; }

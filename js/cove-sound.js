@@ -9,13 +9,15 @@
 const KEY = 'cove-sound';
 let on = true; try { on = localStorage.getItem(KEY) !== 'off'; } catch (e) { /* 무시 */ }
 let ctx = null, master = null, mGain = null, mOsc1 = null, mOsc2 = null, mFilter = null, lastMotor = -1e9, lastExpr = -1e9, lastBounce = -1e9;
-const VOL = 0.55;                                                       // 전체 소리 크기 (작게)
+const VOL = 1.0;                                                        // 전체 소리 크기
 
 function ensure() {
   if (ctx) return ctx;
   const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
   try { ctx = new AC(); } catch (e) { return null; }
-  master = ctx.createGain(); master.gain.value = on ? VOL : 0; master.connect(ctx.destination);
+  master = ctx.createGain(); master.gain.value = on ? VOL : 0;
+  const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -10; lim.knee.value = 8; lim.ratio.value = 10; lim.attack.value = 0.002; lim.release.value = 0.12;   // 커져도 찢어지지 않게 눌러 줌
+  master.connect(lim); lim.connect(ctx.destination);
   // 모터: 톱니파 두 개를 낮은 통과 필터에 통과시켜 부드럽게 윙
   mFilter = ctx.createBiquadFilter(); mFilter.type = 'lowpass'; mFilter.frequency.value = 520; mFilter.Q.value = 2.2;
   mGain = ctx.createGain(); mGain.gain.value = 0;
@@ -36,9 +38,9 @@ function motor(level) {
   const l = Math.min(1, Math.max(0, level));
   if (l < 0.03) return;
   lastMotor = performance.now(); const t = ctx.currentTime;
-  mGain.gain.setTargetAtTime(0.012 + 0.05 * l, t, 0.05);
+  mGain.gain.setTargetAtTime(0.05 + 0.2 * l, t, 0.05);
   mOsc1.frequency.setTargetAtTime(78 + 85 * l, t, 0.05); mOsc2.frequency.setTargetAtTime(158 + 170 * l, t, 0.05);
-  mFilter.frequency.setTargetAtTime(380 + 520 * l, t, 0.05);
+  mFilter.frequency.setTargetAtTime(520 + 700 * l, t, 0.05);
 }
 
 /* 짧은 음 하나: [시작 주파수, 끝 주파수, 길이(초), 파형, 크기, 시작 지연(초)] */
@@ -46,13 +48,13 @@ function tone(f0, f1, dur, type = 'sine', vol = 0.2, delay = 0) {
   const c = ctx; if (!c) return;
   const t = c.currentTime + delay, o = c.createOscillator(), g = c.createGain();
   o.type = type; o.frequency.setValueAtTime(f0, t); if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
-  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + Math.min(0.012, dur / 3)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  vol *= 2.6; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + Math.min(0.012, dur / 3)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.03);
 }
 function vibrato(f, dur, rate, depth, vol) {                                     // 어지러운 소리: 떨리는 음
   const c = ctx, t = c.currentTime, o = c.createOscillator(), l = c.createOscillator(), lg = c.createGain(), g = c.createGain();
   o.type = 'sine'; o.frequency.value = f; l.frequency.value = rate; lg.gain.value = depth; l.connect(lg); lg.connect(o.frequency);
-  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.04); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  vol *= 2.6; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.04); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   o.connect(g); g.connect(master); o.start(t); l.start(t); o.stop(t + dur + 0.03); l.stop(t + dur + 0.03);
 }
 
@@ -83,6 +85,18 @@ function bounce() {                                                             
   tone(740, 440, 0.07, 'sine', 0.13);
 }
 
+/* 타이핑: 키보드를 톡 치는 소리 (HI, I'm cove 글자가 하나씩 나올 때) */
+let noiseBuf = null;
+function type() {
+  if (!on || !ensure() || ctx.state !== 'running') return;
+  const c = ctx, t = c.currentTime;
+  if (!noiseBuf) { noiseBuf = c.createBuffer(1, Math.floor(c.sampleRate * 0.05), c.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length); }
+  const n = c.createBufferSource(); n.buffer = noiseBuf; const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2200 + Math.random() * 1400; bp.Q.value = 1.1;
+  const g = c.createGain(); g.gain.setValueAtTime(0.9, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
+  n.connect(bp); bp.connect(g); g.connect(master); n.start(t);                    // 딸깍 하는 바삭한 소리
+  tone(180 + Math.random() * 40, 110, 0.05, 'triangle', 0.22);                    // 키가 눌리는 낮은 톡
+}
+
 /* 켜기/끄기 버튼 (우측 하단) */
 const ICON_ON = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>';
 const ICON_OFF = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>';
@@ -100,5 +114,5 @@ function mount() {
 }
 if (document.body) mount(); else document.addEventListener('DOMContentLoaded', mount);
 
-export const CoveSound = { motor, expr, bite, bounce, get on() { return on; } };
+export const CoveSound = { motor, expr, bite, bounce, type, get on() { return on; } };
 window.CoveSound = CoveSound;

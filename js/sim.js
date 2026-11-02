@@ -359,28 +359,58 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   }
   /* ───────── 간식: 쿠키를 가져다 대면 Cove가 먹고, 먹는 만큼 쿠키가 조금씩 줄어듦 ───────── */
   const ez = (u) => u * u * (3 - 2 * u);
-  const BITES = [6.2, 7.7, 9.1, 10.4, 11.6];                                 // 냠냠 구간(시나리오 14~27초 중 20~25초 부분)에서 한 입씩 베어 무는 시각(재생 시각 초)
-  const SCALES = [1, 0.84, 0.66, 0.48, 0.3, 0.12];                          // 먹은 입 수에 따른 남은 크기
+  const BITES = [5.7, 6.4, 7.1, 7.8, 8.5];                                  // 냠냠 구간에서 한 입씩 베어 무는 시각(재생 시각 초) — 빠르게 연달아
+  const SCALES = [1, 0.8, 0.6, 0.42, 0.25, 0.08];                           // 먹은 입 수에 따른 남은 크기
+  const BITE_AT = [[10, 17], [53, 14], [54, 44], [11, 46], [32, 6]];       // 베어 문 자국 위치(쿠키 그림 기준)
+  // 실사 느낌 쿠키: 구운 빛깔의 그라데이션 + 잔 결(노이즈) + 초콜릿 조각 + 가장자리 어두운 구움색
+  const cookieSvg = (id, mask) => `<svg viewBox="0 0 64 64"><defs>
+    <radialGradient id="${id}b" cx=".4" cy=".34" r=".78"><stop offset="0" stop-color="#f3cd8a"/><stop offset=".5" stop-color="#d9a35e"/><stop offset=".85" stop-color="#b57434"/><stop offset="1" stop-color="#8f5524"/></radialGradient>
+    <radialGradient id="${id}c" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#6a4030"/><stop offset=".6" stop-color="#3b2016"/><stop offset="1" stop-color="#22100a"/></radialGradient>
+    <filter id="${id}n" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="7" result="t"/><feColorMatrix in="t" type="matrix" values="0 0 0 0 .35  0 0 0 0 .2  0 0 0 0 .08  0 0 0 .55 -.12"/><feComposite in2="SourceGraphic" operator="in"/></filter>
+    ${mask ? `<mask id="${id}m"><rect width="64" height="64" fill="#fff"/>${BITE_AT.map(p => `<circle class="bite" cx="${p[0]}" cy="${p[1]}" r="0"/>`).join('')}</mask>` : ''}</defs>
+    <g${mask ? ` mask="url(#${id}m)"` : ''}>
+      <path id="${id}s" d="M32 4C44 2.5 56 9 59.5 20.5 63 32 60.5 45 52.5 54 44 62.5 30 63 20 58 9 52.5 2.5 40 5 28 7 15 18 5.5 32 4Z" fill="url(#${id}b)"/>
+      <path d="M32 4C44 2.5 56 9 59.5 20.5 63 32 60.5 45 52.5 54 44 62.5 30 63 20 58 9 52.5 2.5 40 5 28 7 15 18 5.5 32 4Z" fill="#000" filter="url(#${id}n)" opacity=".9"/>
+      <path d="M32 4C44 2.5 56 9 59.5 20.5 63 32 60.5 45 52.5 54 44 62.5 30 63 20 58 9 52.5 2.5 40 5 28 7 15 18 5.5 32 4Z" fill="none" stroke="#7d4a1f" stroke-opacity=".55" stroke-width="1.6"/>
+      <path d="M17 22c6-3 11-2 15 1M40 44c5 2 10 1 13-2M24 47c3-2 7-2 10 0" fill="none" stroke="#8a5224" stroke-opacity=".35" stroke-width=".9" stroke-linecap="round"/>
+      <g fill="url(#${id}c)"><path d="M20 20l8-2 3 6-6 5-6-3z"/><path d="M40 16l7 2 1 6-7 3-5-4z"/><path d="M42 38l8 1 2 6-6 4-6-3z"/><path d="M18 40l7-2 4 5-4 6-7-3z"/><path d="M31 31l5 1 1 4-4 3-4-2z"/></g>
+      <g fill="#fff" fill-opacity=".28"><ellipse cx="23" cy="20" rx="2.6" ry="1" transform="rotate(-14 23 20)"/><ellipse cx="42" cy="18" rx="2.4" ry=".9" transform="rotate(14 42 18)"/><ellipse cx="45" cy="39" rx="2.4" ry=".9" transform="rotate(8 45 39)"/><ellipse cx="21" cy="40" rx="2.2" ry=".9" transform="rotate(-12 21 40)"/></g>
+    </g></svg>`;
   const cookieEl = document.createElement('div'); cookieEl.className = 'sim__cookie'; cookieEl.hidden = true; cookieEl.setAttribute('aria-hidden', 'true');
-  cookieEl.innerHTML = '<svg viewBox="0 0 48 48"><defs><mask id="cookieMask"><rect width="48" height="48" fill="#fff"/>' + [[8, 14], [41, 12], [41, 36], [9, 37], [25, 4]].map((b, i) => `<circle class="bite" cx="${b[0]}" cy="${b[1]}" r="0"/>`).join('') + '</mask></defs><g mask="url(#cookieMask)"><circle cx="24" cy="24" r="19" fill="#f2c79a"/><circle cx="24" cy="24" r="19" fill="none" stroke="#d9a574" stroke-width="2"/><circle cx="17" cy="19" r="2.4" fill="#8a5a3c"/><circle cx="29" cy="17" r="2.2" fill="#8a5a3c"/><circle cx="31" cy="29" r="2.6" fill="#8a5a3c"/><circle cx="19" cy="31" r="2.2" fill="#8a5a3c"/><circle cx="25" cy="24" r="1.8" fill="#8a5a3c"/></g></svg>';
+  cookieEl.innerHTML = cookieSvg('ckf', true);
   figure.appendChild(cookieEl);
-  const biteEls = [...cookieEl.querySelectorAll('.bite')], biteR = [0, 0, 0, 0, 0]; let cookieDrop = null, cookieScale = 1, cookieA = 0; const _cv = new THREE.Vector3();
+  const toyCookie = figure.querySelector('.sim__toy[data-kind="snack"]'); if (toyCookie) toyCookie.innerHTML = cookieSvg('ckt', false);   // 끌어다 줄 쿠키도 같은 그림
+  const biteEls = [...cookieEl.querySelectorAll('.bite')], biteR = [0, 0, 0, 0, 0]; let cookieDrop = null, cookieScale = 1, cookieA = 0, cookieG0 = 1; const _cv = new THREE.Vector3();
+  const mouthXY = () => {                                                    // Cove 입 높이의 화면 위치(figure 기준)
+    const fr = figure.getBoundingClientRect(), er = el.getBoundingClientRect();
+    head.getWorldPosition(_cv); _cv.addScaledVector(FRONT, 0.03); _cv.project(camera);
+    return { x: er.left - fr.left + (_cv.x + 1) / 2 * er.width, y: er.top - fr.top + (1 - _cv.y) / 2 * er.height + er.height * 0.045, w: er.width };
+  };
+  const nearOf = (px, py) => { const m = mouthXY(); return clamp(1 - Math.hypot(px - m.x, py - m.y) / (m.w * 0.55), 0, 1); };   // 입에 가까울수록 1
+  const CRUMB = ['#c98c4a', '#a8682f', '#e0b070', '#5a3523'];
+  function crumbs(x, y) {                                                    // 한 입 먹을 때 튀는 부스러기
+    for (let i = 0; i < 9; i++) {
+      const c = document.createElement('i'); c.className = 'sim__crumb'; const sz = 3 + Math.random() * 5;
+      c.style.cssText = `left:${x}px;top:${y}px;width:${sz}px;height:${sz * (0.7 + Math.random() * 0.5)}px;background:${CRUMB[i % 4]};`;
+      figure.appendChild(c);
+      const dx = (Math.random() - 0.5) * 80, up = 8 + Math.random() * 22, fall = 40 + Math.random() * 50, rot = (Math.random() - 0.5) * 360;
+      c.animate([{ transform: 'translate(0,0) rotate(0)', opacity: 1 }, { transform: `translate(${dx * 0.6}px,${-up}px) rotate(${rot * 0.5}deg)`, opacity: 1, offset: 0.3 }, { transform: `translate(${dx}px,${fall}px) rotate(${rot}deg)`, opacity: 0 }], { duration: 520 + Math.random() * 260, easing: 'cubic-bezier(.3,.6,.5,1)' }).onfinish = () => c.remove();
+    }
+  }
   function updateCookie(dt) {
     const on = clipName === 'snack' && clip;
     if (!on) { updateCookie._e = 0; cookieEl.hidden = true; cookieDrop = null; cookieScale = 1; cookieA = 0; biteR.fill(0); biteEls.forEach(b => b.setAttribute('r', 0)); return; }
-    const t = clipT, eaten = BITES.filter(b => t >= b).length;
-    if (eaten > (updateCookie._e || 0)) CoveSound.bite(); updateCookie._e = eaten;                    // 한 입 먹을 때마다 냠 소리
-    const fr = figure.getBoundingClientRect(), er = el.getBoundingClientRect();
-    head.getWorldPosition(_cv); _cv.addScaledVector(FRONT, 0.03); _cv.project(camera);
-    const mx = er.left - fr.left + (_cv.x + 1) / 2 * er.width, my = er.top - fr.top + (1 - _cv.y) / 2 * er.height + er.height * 0.045;   // 머리 앞쪽 아래(입 높이)
-    const arrive = ez(clamp((t + 0.9) / 2.6, 0, 1)), d = cookieDrop || { x: mx, y: my };
-    const x = d.x + (mx - d.x) * arrive, y = d.y + (my - d.y) * arrive;
-    cookieScale += (SCALES[eaten] - cookieScale) * Math.min(1, dt * 9);
-    cookieA += ((eaten >= 5 && t > BITES[4] + 0.5 ? 0 : 1) - cookieA) * Math.min(1, dt * 8);
-    biteEls.forEach((b, i) => { biteR[i] += ((i < eaten ? 9 : 0) - biteR[i]) * Math.min(1, dt * 14); b.setAttribute('r', biteR[i].toFixed(2)); });
-    const chew = eaten > 0 && eaten < 5 ? Math.sin(t * 16) * 1.6 : 0;
+    const t = clipT, eaten = BITES.filter(b => t >= b).length, m = mouthXY();
+    const arrive = ez(clamp((t + 0.9) / 2.2, 0, 1)), d = cookieDrop || { x: m.x, y: m.y };
+    const x = d.x + (m.x - d.x) * arrive, y = d.y + (m.y - d.y) * arrive;
+    if (eaten > (updateCookie._e || 0)) { CoveSound.bite(); crumbs(x, y); } updateCookie._e = eaten;      // 한 입마다 냠 소리 + 부스러기
+    cookieScale += (SCALES[eaten] - cookieScale) * Math.min(1, dt * 16);
+    cookieA += ((eaten >= 5 && t > BITES[4] + 0.35 ? 0 : 1) - cookieA) * Math.min(1, dt * 14);
+    biteEls.forEach((b, i) => { biteR[i] += ((i < eaten ? 12 : 0) - biteR[i]) * Math.min(1, dt * 24); b.setAttribute('r', biteR[i].toFixed(2)); });
+    const grow = cookieG0 + (1.7 - cookieG0) * arrive;                      // 얼굴에 가까워질수록 커짐
+    const chew = eaten > 0 && eaten < 5 ? Math.sin(t * 22) * 2 : 0;
     cookieEl.style.opacity = cookieA.toFixed(3);
-    cookieEl.style.transform = `translate(${(x - 28).toFixed(1)}px, ${(y - 28 + chew).toFixed(1)}px) scale(${cookieScale.toFixed(3)})`;
+    cookieEl.style.transform = `translate(${(x - 36).toFixed(1)}px, ${(y - 36 + chew).toFixed(1)}px) scale(${(cookieScale * grow).toFixed(3)}) rotate(${(eaten * 9).toFixed(0)}deg)`;
     cookieEl.hidden = cookieA < 0.02;
   }
   /* ───────── 간식·공: 아이콘을 끌어다 Cove에게 주기 ───────── */
@@ -388,11 +418,12 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   toys.forEach(t => {
     let td = null;
     t.addEventListener('pointerdown', (e) => { td = { x: e.clientX, y: e.clientY }; t.setPointerCapture(e.pointerId); t.classList.add('is-drag'); });
-    t.addEventListener('pointermove', (e) => { if (td) t.style.transform = `translate(${e.clientX - td.x}px, ${e.clientY - td.y}px) scale(1.1)`; });
+    t.addEventListener('pointermove', (e) => { if (!td) return; let sc = 1.1; if (t.dataset.kind === 'snack') { const fr = figure.getBoundingClientRect(); sc = 1 + 0.7 * nearOf(e.clientX - fr.left, e.clientY - fr.top); }   // 쿠키는 Cove 얼굴에 가까워질수록 커짐
+      t.style.transform = `translate(${e.clientX - td.x}px, ${e.clientY - td.y}px) scale(${sc.toFixed(3)})`; });
     t.addEventListener('pointerup', (e) => {
       if (!td) return; td = null; t.classList.remove('is-drag');
       if (!pick(e)) { t.style.transform = ''; return; }
-      if (t.dataset.mode === 'snack') { const fr = figure.getBoundingClientRect(); play('snack'); cookieDrop = { x: e.clientX - fr.left, y: e.clientY - fr.top }; showToys(); const back = setInterval(() => { if (clipName !== 'snack') { clearInterval(back); showToys(); } }, 400); }
+      if (t.dataset.mode === 'snack') { const fr = figure.getBoundingClientRect(); play('snack'); cookieDrop = { x: e.clientX - fr.left, y: e.clientY - fr.top }; cookieG0 = 1 + 0.7 * nearOf(cookieDrop.x, cookieDrop.y); cookieScale = 1; showToys(); const back = setInterval(() => { if (clipName !== 'snack') { clearInterval(back); showToys(); } }, 400); }
       else {}
       showToys();
     });
