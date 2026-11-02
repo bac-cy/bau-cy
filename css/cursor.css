@@ -1,0 +1,5 @@
+/* 마우스 커서를 Cove 심벌 C 로고로 (사용자 요청). 기본은 진한 C, 누를 수 있는 곳 위에서는 보라색 C로 조금 커짐. 터치 화면에는 영향 없음.
+   되돌리려면 index.html의 cursor.css 링크 한 줄을 지움. */
+html, body, *:not(.is-full):not(.is-full *) { cursor: url("../assets/cursor.svg") 18 18, auto !important; }
+a, button, [role="button"], summary, input[type="range"], .sim__toy, .gallery__film, .eng__slider input, .snd, .totop, .sim__ui button, .nav__links a, .gallery__dots button
+{ cursor: url("../assets/cursor-hover.svg") 18 18, pointer !important; }
