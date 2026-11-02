@@ -7,7 +7,7 @@
 
 .sim__views, .sim__motions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
 .sim__ui button {
-  font: inherit; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft);
+  font: inherit; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft);
   padding: 7px 12px; border-radius: 999px; cursor: pointer;
   background: rgba(251, 248, 244, .62); box-shadow: 0 0 0 1px var(--line);
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
@@ -16,10 +16,10 @@
 .sim__ui button:hover { color: var(--ink); box-shadow: 0 0 0 1px rgba(43, 39, 49, .28); }
 .sim__ui button[aria-pressed="true"] { background: var(--ink); color: var(--bg); box-shadow: none; }
 .sim__ui button:focus-visible { outline: 2px solid var(--lavender); outline-offset: 2px; }
-.sim__motions button { letter-spacing: .04em; text-transform: none; font-size: 12.5px; padding: 8px 14px; }
+.sim__motions button { letter-spacing: .04em; text-transform: none; font-size: 11.5px; padding: 8px 14px; }
 .sim__ghost { background: transparent !important; backdrop-filter: none !important; }
 .sim__bottom { display: grid; gap: 12px; justify-items: center; }
-.sim__status { margin: 0; min-height: 1.4em; font-size: 12.5px; letter-spacing: .02em; color: var(--ink-soft); text-align: center; transition: color .3s; }
+.sim__status { margin: 0; min-height: 1.4em; font-size: 11.5px; letter-spacing: .02em; color: var(--ink-soft); text-align: center; transition: color .3s; }
 .sim__status[data-k="play"] { color: #5b43a6; }
 
 /* 캔버스는 시뮬레이터가 있을 때 화면을 더 넓게 사용 */
@@ -27,7 +27,7 @@
 .design__visual.has-3d .cove-3d { inset: 0; }
 .design__visual.has-3d figcaption { left: 20px; bottom: 14px; }
 @media (max-width: 760px) {
-  .sim__motions button { padding: 7px 11px; font-size: 12px; }
+  .sim__motions button { padding: 7px 11px; font-size: 11px; }
   /* 3D 칸은 카드 전체를 덮는다 */
 .design__visual.has-3d .cove-3d { inset: 0; }
 }
@@ -41,40 +41,40 @@
 .slot--detail > .slot__scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .slot--detail.has-scene > .cove-art { visibility: hidden; }
 .slot__msg {
-  position: absolute; right: 16px; bottom: 12px; z-index: 3; font-size: 12px; letter-spacing: .02em; color: #5b43a6;
+  position: absolute; right: 16px; bottom: 12px; z-index: 3; font-size: 11px; letter-spacing: .02em; color: #5b43a6;
   padding: 5px 11px; border-radius: 999px; background: rgba(251, 248, 244, .66); box-shadow: 0 0 0 1px var(--line);
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
 }
 .slot__msg:empty { display: none; }
-@media (max-width: 760px) { .slot__msg { right: 10px; bottom: 10px; font-size: 11.5px; } }
+@media (max-width: 760px) { .slot__msg { right: 10px; bottom: 10px; font-size: 10.6px; } }
 
 /* Material 카드: 재질 클로즈업 사진 (어두운 사진 위에서도 라벨이 읽히도록) */
 .slot--photo > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }   /* 배경이 투명한 사진 → 카드의 크림·라벤더·복숭아 배경이 비침 */
 
 /* 확대·축소 버튼 (오른쪽 가운데) */
 .sim__zoom { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); display: grid; gap: 8px; pointer-events: none; }
-.sim__ui .sim__zoom button { width: 44px; height: 44px; padding: 0; display: grid; place-items: center; font-size: 22px; line-height: 1; letter-spacing: 0; text-transform: none; color: var(--ink); }
+.sim__ui .sim__zoom button { width: 44px; height: 44px; padding: 0; display: grid; place-items: center; font-size: 18.7px; line-height: 1; letter-spacing: 0; text-transform: none; color: var(--ink); }
 @media (max-width: 760px) { .sim__zoom { right: 10px; } .sim__ui .sim__zoom button { width: 40px; height: 40px; } }
 
 /* 시나리오 버튼을 크게 */
-.sim__motions button { font-size: 15px; padding: 12px 22px; }
-.sim__ui .sim__views button { font-size: 12px; padding: 9px 15px; }
-.sim__status { font-size: 15px; min-height: 1.5em; }
+.sim__motions button { font-size: 13.8px; padding: 12px 22px; }
+.sim__ui .sim__views button { font-size: 11px; padding: 9px 15px; }
+.sim__status { font-size: 13.8px; min-height: 1.5em; }
 
 /* 지금 상황의 단계 문구 (왼쪽) */
 .sim__steps { position: absolute; left: 22px; top: 84px; width: 200px; margin: 0; padding: 0; list-style: none; pointer-events: none; }
 .sim__steps[hidden] { display: none; }
-.sim__steps li { display: flex; gap: 10px; align-items: baseline; padding: 8px 0; font-size: 13px; line-height: 1.4; color: var(--ink-faint); border-bottom: 1px solid var(--line); transition: color .4s var(--ease); }
-.sim__steps li i { font-style: normal; font-size: 11px; letter-spacing: .1em; }
+.sim__steps li { display: flex; gap: 10px; align-items: baseline; padding: 8px 0; font-size: 12px; line-height: 1.4; color: var(--ink-faint); border-bottom: 1px solid var(--line); transition: color .4s var(--ease); }
+.sim__steps li i { font-style: normal; font-size: 10.5px; letter-spacing: .1em; }
 .sim__steps li.cur { color: #5b43a6; font-weight: 600; }
-@media (max-width: 760px) { .sim__steps { left: 14px; top: 66px; width: 150px; } .sim__steps li { font-size: 12px; padding: 6px 0; } .sim__motions button { font-size: 13px; padding: 9px 14px; } }
+@media (max-width: 760px) { .sim__steps { left: 14px; top: 66px; width: 150px; } .sim__steps li { font-size: 11px; padding: 6px 0; } .sim__motions button { font-size: 12px; padding: 9px 14px; } }
 
 /* 모바일: 칸을 세로로 더 길게, 단계 목록은 숨김(아래 한 줄 문구가 현재 단계를 알려 줌) */
 @media (max-width: 760px) {
   .design__visual { aspect-ratio: 3 / 4; }
   .sim__steps { display: none !important; }
 }
-@media (max-width: 760px) { .sim__ui .sim__views button { font-size: 10.5px; padding: 7px 10px; letter-spacing: .08em; } .sim__views { gap: 4px; } }
+@media (max-width: 760px) { .sim__ui .sim__views button { font-size: 10px; padding: 7px 10px; letter-spacing: .08em; } .sim__views { gap: 4px; } }
 
 /* 사진 카드의 라벨은 왼쪽 위로: 몸통·바닥판 위에 겹치지 않도록 */
 .slot--photo::after { top: 14px; bottom: auto; left: 20px; }
@@ -82,14 +82,14 @@
 /* ───── Design — Engineering 카드 (Form · Material · Motion 과 같은 칸) ───── */
 .slot--eng { aspect-ratio: 3 / 4; }
 .slot--eng > canvas { position: absolute; left: 50%; top: 48%; height: 90%; aspect-ratio: 1 / 1.6; width: auto; transform: translate(-50%, -50%); display: block; cursor: grab; }
-.eng__hint { position: absolute; left: 0; right: 0; bottom: 14px; z-index: 2; text-align: center; font-size: 12px; letter-spacing: .06em; color: var(--ink-soft); opacity: 0; transition: opacity .6s var(--ease); pointer-events: none; }
+.eng__hint { position: absolute; left: 0; right: 0; bottom: 14px; z-index: 2; text-align: center; font-size: 11px; letter-spacing: .06em; color: var(--ink-soft); opacity: 0; transition: opacity .6s var(--ease); pointer-events: none; }
 .slot--eng .eng__hint { opacity: 1; }
 .eng__tip { position: absolute; z-index: 3; width: min(250px, 78%); padding: 12px 14px; border-radius: 16px; pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity .2s var(--ease), transform .2s var(--ease);
   background: rgba(251, 248, 244, .9); box-shadow: 0 0 0 1px var(--line), 0 14px 40px -18px rgba(80, 60, 100, .35); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
 .eng__tip.is-on { opacity: 1; transform: none; }
-.eng__tip b { display: block; font-weight: 600; font-size: 14px; }
-.eng__tip i { display: block; font-style: normal; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); margin: 1px 0 6px; }
-.eng__tip span { display: block; font-size: 12.5px; line-height: 1.55; color: var(--ink-soft); }
+.eng__tip b { display: block; font-weight: 600; font-size: 12.9px; }
+.eng__tip i { display: block; font-style: normal; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); margin: 1px 0 6px; }
+.eng__tip span { display: block; font-size: 11.5px; line-height: 1.55; color: var(--ink-soft); }
 
 /* 간식: 끌어서 Cove에게 주는 작은 알약형 */
 /* 간식·공: 글자 없이 아이콘만 끌어서 Cove에게 주기 */
@@ -105,16 +105,16 @@
 @media (max-width: 760px) {
   .design__visual { aspect-ratio: 3 / 5; }                                  /* 칸을 더 세로로 길게: 위는 Cove, 아래는 조작 패널 */
   .design__visual .sim__ui { padding: 12px 12px 34px; }
-  .sim__ui .sim__views button { font-size: 11px; padding: 9px 12px; min-height: 36px; }
+  .sim__ui .sim__views button { font-size: 10.5px; padding: 9px 12px; min-height: 36px; }
   .sim__ui .sim__zoom { top: 34%; right: 8px; }
   .sim__ui .sim__zoom button { width: 44px; height: 44px; }
   .sim__bottom { width: 100%; gap: 10px; padding: 12px 10px 12px; border-radius: 22px; background: rgba(251, 248, 244, .6); box-shadow: 0 0 0 1px var(--line); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
-  .sim__status { font-size: 13.5px; min-height: 2.6em; display: grid; place-items: center; line-height: 1.4; }
+  .sim__status { font-size: 12.4px; min-height: 2.6em; display: grid; place-items: center; line-height: 1.4; }
   .sim__motions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; width: 100%; }
-  .sim__motions button, .sim__ui .sim__motions button { min-height: 46px; padding: 8px 4px; font-size: 13px; letter-spacing: 0; line-height: 1.2; white-space: nowrap; }
+  .sim__motions button, .sim__ui .sim__motions button { min-height: 46px; padding: 8px 4px; font-size: 12px; letter-spacing: 0; line-height: 1.2; white-space: nowrap; }
   .sim__toy { width: 58px; height: 58px; left: 4%; }
   .sim__toy[data-kind="snack"] { top: 20% !important; }
-  .design__visual figcaption { left: 16px; bottom: 12px; font-size: 10px; }
+  .design__visual figcaption { left: 16px; bottom: 12px; font-size: 9.5px; }
 }
 
 /* 간식: Cove에게 가져다 대면 머리 앞에서 한 입씩 줄어드는 쿠키 */

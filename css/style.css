@@ -64,12 +64,12 @@ body::before {
 .section__head { margin-bottom: clamp(48px, 7vw, 96px); }
 
 .label, .eyebrow {
-  font-size: clamp(15px, 1.35vw, 20px); letter-spacing: .2em; text-transform: uppercase;
+  font-size: clamp(13.8px, 1.15vw, 17px); letter-spacing: .2em; text-transform: uppercase;
   color: var(--ink-soft); font-weight: 500; margin-bottom: 24px;
 }
 .heading {
   font-family: var(--font-ui); font-weight: 300;
-  font-size: clamp(34px, 5.4vw, 72px); line-height: 1.15; letter-spacing: -.02em;
+  font-size: clamp(28.9px, 4.59vw, 61.2px); line-height: 1.15; letter-spacing: -.02em;
 }
 .heading em { font-size: 1.08em; color: #7d6aa8; }
 
@@ -94,7 +94,7 @@ body::before {
 /* 로고: Cove.ai 의 COVE 글자. 칸(너비 자동·높이 47.6px)과 위치는 기존과 같고, 글자 높이만 이전 로고의 대문자 높이에 맞춤 */
 .nav__logo { display: flex; align-items: center; height: calc(28px * 1.7); }
 .nav__logo svg { display: block; height: 20px; width: auto; }
-.nav__links { display: flex; gap: clamp(16px, 3vw, 40px); font-size: 13px; letter-spacing: .06em; color: var(--ink-soft); }
+.nav__links { display: flex; gap: clamp(16px, 3vw, 40px); font-size: 12px; letter-spacing: .06em; color: var(--ink-soft); }
 .nav__links a { position: relative; transition: color .3s; }
 .nav__links a::after {
   content: ""; position: absolute; left: 0; bottom: -4px; width: 100%; height: 1px;
@@ -129,7 +129,7 @@ body::before {
 
 /* ---------- About ---------- */
 .statement {
-  font-weight: 300; font-size: clamp(28px, 4.4vw, 60px); line-height: 1.35; letter-spacing: -.02em;
+  font-weight: 300; font-size: clamp(23.8px, 3.74vw, 51px); line-height: 1.35; letter-spacing: -.02em;
   max-width: 18em;
 }
 .statement em { color: #7d6aa8; font-size: 1.1em; }
@@ -138,16 +138,16 @@ body::before {
   gap: clamp(28px, 4.5vw, 72px); margin-top: clamp(64px, 9vw, 128px);
   max-width: 1280px; margin-left: auto;
 }
-.about__text h3 { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-faint); font-weight: 500; margin-bottom: 16px; }
-.about__text p { color: var(--ink-soft); font-weight: 300; font-size: 16px; }
+.about__text h3 { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-faint); font-weight: 500; margin-bottom: 16px; }
+.about__text p { color: var(--ink-soft); font-weight: 300; font-size: 14.7px; }
 .principles {
   list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: clamp(72px, 10vw, 140px); border-top: 1px solid var(--line);
 }
-.principles li { padding: 32px 24px 0 0; color: var(--ink-soft); font-size: 14px; font-weight: 300; }
+.principles li { padding: 32px 24px 0 0; color: var(--ink-soft); font-size: 12.9px; font-weight: 300; }
 .principles li:nth-child(2) { transition-delay: .1s; }
 .principles li:nth-child(3) { transition-delay: .2s; }
-.principles span { display: block; font-family: var(--font-display); font-style: italic; font-size: clamp(32px, 4vw, 52px); color: var(--ink); line-height: 1.2; margin-bottom: 8px; }
+.principles span { display: block; font-family: var(--font-display); font-style: italic; font-size: clamp(27.2px, 3.4vw, 44.2px); color: var(--ink); line-height: 1.2; margin-bottom: 8px; }
 
 /* ---------- Features ---------- */
 .features { background: linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 50%, var(--bg) 100%); }   /* 위아래 섹션과 경계 없이 이어지도록 */
@@ -172,9 +172,9 @@ body::before {
 .feature:nth-child(2) { transition-delay: .08s; }
 .feature:nth-child(3) { transition-delay: .16s; }
 .feature:nth-child(4) { transition-delay: .24s; }
-.feature__num { font-family: "Jost", "Futura", system-ui, sans-serif; font-style: normal; font-weight: 300; font-size: 40px; color: #8a7aa8; position: relative; }
-.feature h3 { font-weight: 500; font-size: 19px; margin-top: auto; padding-top: 48px; position: relative; }
-.feature p { color: var(--ink-soft); font-size: 14px; font-weight: 300; margin-top: 12px; position: relative; }
+.feature__num { font-family: "Jost", "Futura", system-ui, sans-serif; font-style: normal; font-weight: 300; font-size: 34px; color: #8a7aa8; position: relative; }
+.feature h3 { font-weight: 500; font-size: 16.1px; margin-top: auto; padding-top: 48px; position: relative; }
+.feature p { color: var(--ink-soft); font-size: 12.9px; font-weight: 300; margin-top: 12px; position: relative; }
 
 /* ---------- Design / Detail ---------- */
 .design__layout { display: grid; grid-template-columns: 1.7fr 1fr; gap: clamp(28px, 4.5vw, 72px); align-items: start; }
@@ -189,10 +189,10 @@ body::before {
 }
 .design__visual figcaption, .slot::after {
   position: absolute; left: 20px; bottom: 16px;
-  font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-soft);
+  font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-soft);
 }
 .design__details { display: grid; gap: clamp(64px, 10vw, 140px); padding-top: 8vh; }
-.detail h3 { font-family: "Jost", "Futura", var(--font-ui); font-weight: 400; letter-spacing: .01em; font-size: clamp(32px, 3.4vw, 44px); margin-top: 28px; }
+.detail h3 { font-family: "Jost", "Futura", var(--font-ui); font-weight: 400; letter-spacing: .01em; font-size: clamp(27.2px, 2.89vw, 37.4px); margin-top: 28px; }
 .detail p { color: var(--ink-soft); font-weight: 300; max-width: 30em; margin-top: 8px; }
 
 .specs {
@@ -200,8 +200,8 @@ body::before {
   margin-top: clamp(80px, 10vw, 140px); border-top: 1px solid var(--line);
 }
 .specs div { padding: 28px 16px 0 0; }
-.specs dt { font-family: "Jost", "Futura", system-ui, sans-serif; font-style: normal; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
-.specs dd { font-family: "Jost", "Futura", system-ui, sans-serif; font-style: normal; font-weight: 300; letter-spacing: -.005em; font-size: clamp(20px, 2.1vw, 30px); margin-top: 4px; }
+.specs dt { font-family: "Jost", "Futura", system-ui, sans-serif; font-style: normal; font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-faint); }
+.specs dd { font-family: "Jost", "Futura", system-ui, sans-serif; font-style: normal; font-weight: 300; letter-spacing: -.005em; font-size: clamp(17px, 1.78vw, 25.5px); margin-top: 4px; }
 
 /* ---------- Slots (image / video placeholders) ---------- */
 .slot {
@@ -245,7 +245,7 @@ body::before {
 
 .moods { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 40px; }
 .moods button {
-  padding: 10px 22px; border-radius: 999px; font-size: 13px; letter-spacing: .08em;
+  padding: 10px 22px; border-radius: 999px; font-size: 12px; letter-spacing: .08em;
   border: 1px solid rgba(255, 255, 255, .18); color: #d8d0e2;
   transition: background .4s, color .4s, border-color .4s, box-shadow .4s;
 }
@@ -256,7 +256,7 @@ body::before {
 }
 .moods button:focus-visible, .nav a:focus-visible { outline: 2px solid var(--lavender); outline-offset: 3px; }
 .mood-text { margin-top: 40px; min-height: 120px; }
-.mood-text h3 { font-family: var(--font-display); font-weight: 400; font-style: italic; font-size: 34px; }
+.mood-text h3 { font-family: var(--font-display); font-weight: 400; font-style: italic; font-size: 28.9px; }
 .mood-text p { color: #c6bdd2; font-weight: 300; margin-top: 6px; max-width: 26em; }
 .mood-text.is-changing { opacity: 0; transform: translateY(8px); }
 .mood-text { transition: opacity .4s var(--ease), transform .4s var(--ease); }
@@ -296,7 +296,7 @@ body::before {
   background: radial-gradient(closest-side, rgba(243, 232, 222, .7), rgba(226, 222, 236, .4) 60%, transparent);
   filter: blur(30px); animation: breathe 8s ease-in-out infinite;
 }
-.closing__title { position: relative; font-weight: 300; font-size: clamp(40px, 7vw, 100px); line-height: 1.1; letter-spacing: -.03em; }
+.closing__title { position: relative; font-weight: 300; font-size: clamp(34px, 5.95vw, 85px); line-height: 1.1; letter-spacing: -.03em; }
 .closing__title em { color: #7d6aa8; }
 
 /* ---------- Footer ---------- */
@@ -307,10 +307,10 @@ body::before {
 /* 푸터 로고: Cove.ai 의 COVE 글자 (글자 색을 따라가도록 마스크로 그림) */
 .footer__logo { display: block; width: clamp(150px, 22vw, 330px); margin-left: calc(clamp(150px, 22vw, 330px) * -0.035); aspect-ratio: 400.4 / 94.4; background: currentColor;
   -webkit-mask: url("../assets/cove-logo.svg") left center / contain no-repeat; mask: url("../assets/cove-logo.svg") left center / contain no-repeat; }
-.footer__brand p { color: var(--ink-soft); font-size: 13px; letter-spacing: .1em; margin-top: 8px; }
-.footer__links { display: flex; gap: 24px; font-size: 13px; color: var(--ink-soft); }
+.footer__brand p { color: var(--ink-soft); font-size: 12px; letter-spacing: .1em; margin-top: 8px; }
+.footer__links { display: flex; gap: 24px; font-size: 12px; color: var(--ink-soft); }
 .footer__links a:hover { color: var(--ink); }
-.footer__copy { grid-column: 1 / -1; font-size: 12px; color: var(--ink-faint); }
+.footer__copy { grid-column: 1 / -1; font-size: 11px; color: var(--ink-faint); }
 
 /* ---------- Keyframes ---------- */
 @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
@@ -353,13 +353,13 @@ em.ko { font-family: var(--font-ui); font-style: normal; font-weight: 400; font-
   background: rgba(246, 241, 234, .72);
   backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
   box-shadow: 0 0 0 1px var(--line);
-  font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft);
+  font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft);
   opacity: 0; transform: translateY(6px); pointer-events: none;
   transition: opacity .5s var(--ease), transform .5s var(--ease), color .6s var(--ease), background .6s var(--ease);
 }
 .pager.is-visible { opacity: 1; transform: none; }
 .pager.is-dark { color: #d8d0e2; background: rgba(42, 37, 51, .6); box-shadow: 0 0 0 1px rgba(255, 255, 255, .12); }
-.pager__num { font-family: "Jost", "Futura", system-ui, sans-serif; font-style: normal; font-size: 15px; letter-spacing: .04em; color: inherit; }
+.pager__num { font-family: "Jost", "Futura", system-ui, sans-serif; font-style: normal; font-size: 13.8px; letter-spacing: .04em; color: inherit; }
 .pager__name { transition: opacity .3s var(--ease); }
 .pager.is-swapping .pager__name, .pager.is-swapping .pager__num { opacity: 0; }
 
@@ -386,7 +386,7 @@ em.ko { font-family: var(--font-ui); font-style: normal; font-weight: 400; font-
 
 /* 갤러리 영상: 누르면 전체 화면 */
 .gallery__film { cursor: zoom-in; }
-.gallery__expand { position: absolute; right: 18px; bottom: 16px; z-index: 2; display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink); background: rgba(251, 248, 244, .7); box-shadow: 0 0 0 1px var(--line); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); pointer-events: none; transition: opacity .3s var(--ease); }
+.gallery__expand { position: absolute; right: 18px; bottom: 16px; z-index: 2; display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink); background: rgba(251, 248, 244, .7); box-shadow: 0 0 0 1px var(--line); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); pointer-events: none; transition: opacity .3s var(--ease); }
 .gallery__expand i { width: 11px; height: 11px; border: 1.5px solid currentColor; border-radius: 2px; }
 .gallery__film:focus-visible { outline: 2px solid var(--lavender); outline-offset: 4px; }
 .gallery__film.is-full .gallery__expand, .gallery__film:fullscreen .gallery__expand { display: none; }
@@ -404,7 +404,7 @@ em.ko { font-family: var(--font-ui); font-style: normal; font-weight: 400; font-
 /* 푸터: 프로젝트 크레딧을 하나로 합침 (모노스페이스 명세) */
 .footer { grid-template-columns: 1fr auto; row-gap: 40px; padding-top: clamp(72px, 10vw, 130px);
   background: radial-gradient(60% 70% at 18% 20%, rgba(226, 222, 236, .45), transparent 70%), radial-gradient(50% 60% at 80% 90%, rgba(243, 232, 222, .4), transparent 70%), var(--bg); }
-.footer__credits { grid-column: 1 / -1; font-family: "JetBrains Mono", "Noto Sans KR", ui-monospace, monospace; font-size: clamp(11px, .85vw, 13px);
+.footer__credits { grid-column: 1 / -1; font-family: "JetBrains Mono", "Noto Sans KR", ui-monospace, monospace; font-size: clamp(10.5px, 0.72vw, 12px);
   letter-spacing: .06em; line-height: 1.6; text-transform: uppercase; text-align: left; }
 .footer__event { margin: 0 0 16px; color: var(--ink); }
 .footer__credits dl { margin: 0; display: grid; gap: 2px; }

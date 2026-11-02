@@ -1,10 +1,10 @@
 /* 미리보기(?jobs=1 에서만 적용): 한 줄 약속 · 압력 시연 · 큰 숫자 스펙 · One more thing */
 .jobs-tag { min-height: 86vh; display: grid; place-items: center; padding: 18vh var(--gutter); text-align: center; position: relative; }
-.jobs-tag p { margin: 0; font-family: "Jost", "Noto Sans KR", sans-serif; font-weight: 300; font-size: clamp(38px, 7.2vw, 112px); line-height: 1.12; letter-spacing: -.03em; color: #1d1d1f; }
+.jobs-tag p { margin: 0; font-family: "Jost", "Noto Sans KR", sans-serif; font-weight: 300; font-size: clamp(32.3px, 6.12vw, 95.2px); line-height: 1.12; letter-spacing: -.03em; color: #1d1d1f; }
 .jobs-tag .w { display: inline-block; opacity: 0; transform: translateY(.5em); filter: blur(10px); transition: opacity 1.1s cubic-bezier(.2,.9,.2,1), transform 1.1s cubic-bezier(.2,.9,.2,1), filter 1.1s; }
 .jobs-tag.in .w { opacity: 1; transform: none; filter: none; }
 .jobs-tag em { font-style: normal; background: linear-gradient(100deg, #7d6ad8, #e0907a); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.jobs-tag small { display: block; margin-top: 3vh; font-size: clamp(13px, 1.2vw, 17px); letter-spacing: .18em; text-transform: uppercase; color: #6e6e73; opacity: 0; transition: opacity 1.4s 1.2s; }
+.jobs-tag small { display: block; margin-top: 3vh; font-size: clamp(12px, 1.02vw, 15.6px); letter-spacing: .18em; text-transform: uppercase; color: #6e6e73; opacity: 0; transition: opacity 1.4s 1.2s; }
 .jobs-tag.in small { opacity: 1; }
 
 .jobs-press { position: relative; height: 200vh; }
@@ -12,19 +12,19 @@
 .jobs-press__veil { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(70% 60% at 50% 55%, rgba(40, 30, 70, 0) 0%, rgba(40, 30, 70, .34) 100%); opacity: 0; }
 .jobs-press canvas { width: min(92vw, 1100px); height: min(64vh, 720px); display: block; }
 .jobs-press__text { position: absolute; left: 0; right: 0; bottom: 9vh; text-align: center; padding: 0 var(--gutter); }
-.jobs-press__text p { margin: 0; position: absolute; left: 0; right: 0; font-family: "Jost", "Noto Sans KR", sans-serif; font-weight: 300; font-size: clamp(24px, 3.4vw, 52px); letter-spacing: -.02em; color: #1d1d1f; opacity: 0; transform: translateY(14px); transition: opacity .8s, transform .8s; }
+.jobs-press__text p { margin: 0; position: absolute; left: 0; right: 0; font-family: "Jost", "Noto Sans KR", sans-serif; font-weight: 300; font-size: clamp(20.4px, 2.89vw, 44.2px); letter-spacing: -.02em; color: #1d1d1f; opacity: 0; transform: translateY(14px); transition: opacity .8s, transform .8s; }
 .jobs-press__text p.on { opacity: 1; transform: none; }
 .jobs-press__text { height: 1.4em; }
-.jobs-press__label { position: absolute; left: var(--gutter); top: 14vh; font-size: clamp(13px, 1.2vw, 17px); letter-spacing: .16em; text-transform: uppercase; color: #6e6e73; }
+.jobs-press__label { position: absolute; left: var(--gutter); top: 14vh; font-size: clamp(12px, 1.02vw, 15.6px); letter-spacing: .16em; text-transform: uppercase; color: #6e6e73; }
 
 .jobs-spec { padding: clamp(96px, 14vw, 180px) var(--gutter); }
-.jobs-spec__label { font-size: clamp(15px, 1.35vw, 20px); letter-spacing: .14em; text-transform: uppercase; color: #6e6e73; margin: 0 0 clamp(36px, 5vw, 72px); }
+.jobs-spec__label { font-size: clamp(13.8px, 1.15vw, 17px); letter-spacing: .14em; text-transform: uppercase; color: #6e6e73; margin: 0 0 clamp(36px, 5vw, 72px); }
 .jobs-spec__grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(20px, 3vw, 40px) clamp(24px, 4vw, 64px); }
 .jobs-spec__item { padding: clamp(24px, 3vw, 44px) 0 clamp(20px, 2.4vw, 36px); border-top: 1px solid rgba(0, 0, 0, .12); }
 .jobs-spec__num i { font-style: normal; }
-.jobs-spec__num { white-space: nowrap; font-family: "Jost", sans-serif; font-weight: 300; font-size: clamp(44px, 8.2vw, 124px); line-height: 1; letter-spacing: -.045em; color: #1d1d1f; font-variant-numeric: tabular-nums; }
+.jobs-spec__num { white-space: nowrap; font-family: "Jost", sans-serif; font-weight: 300; font-size: clamp(37.4px, 6.97vw, 105.4px); line-height: 1; letter-spacing: -.045em; color: #1d1d1f; font-variant-numeric: tabular-nums; }
 .jobs-spec__num sup, .jobs-spec__num span { font-size: .28em; letter-spacing: 0; font-weight: 400; color: #6e6e73; margin-left: .15em; vertical-align: baseline; }
-.jobs-spec__cap { margin-top: 14px; font-size: clamp(14px, 1.2vw, 17px); color: #6e6e73; }
+.jobs-spec__cap { margin-top: 14px; font-size: clamp(12.9px, 1.02vw, 15.6px); color: #6e6e73; }
 .jobs-spec__cap b { display: block; font-weight: 500; color: #1d1d1f; letter-spacing: .02em; margin-bottom: 4px; }
 .jobs-spec__item { opacity: 0; transform: translateY(24px); transition: opacity 1s, transform 1s cubic-bezier(.2,.9,.2,1); }
 .jobs-spec__item.in { opacity: 1; transform: none; }
@@ -37,26 +37,26 @@
 /* ───── 모바일: 스크롤 길이·글자 크기·겹침 정리 ───── */
 @media (max-width: 760px) {
   .jobs-tag { min-height: 70svh; padding: 14svh var(--gutter); }
-  .jobs-tag p { font-size: clamp(34px, 10.4vw, 52px); line-height: 1.18; }
+  .jobs-tag p { font-size: clamp(28.9px, 8.84vw, 44.2px); line-height: 1.18; }
   .jobs-press { height: 150vh; }
   .jobs-press canvas { width: 96vw; height: 52svh; }
   .jobs-press__label { top: 12svh; }
   .jobs-press__text { bottom: 16svh; }
-  .jobs-press__text p { font-size: clamp(21px, 6vw, 30px); }
+  .jobs-press__text p { font-size: clamp(17.8px, 5.1vw, 25.5px); }
   .jobs-spec { padding-top: 72px; padding-bottom: 72px; }
-  .jobs-spec__num { font-size: clamp(44px, 15vw, 72px); }
+  .jobs-spec__num { font-size: clamp(37.4px, 12.75vw, 61.2px); }
   .jobs-spec__item { padding: 20px 0 16px; }
           .footer { padding-bottom: 96px; }                                  /* 왼쪽 아래 페이지 표시가 저작권 문구를 가리지 않게 */
 }
 
 /* Engineering + Tech Specs 한 그룹: 왼쪽 분해도 카드, 오른쪽 큰 숫자 스펙 */
 .engspec { margin-top: clamp(96px, 12vw, 160px); }
-.engspec__label { font-size: clamp(15px, 1.35vw, 20px); letter-spacing: .14em; text-transform: uppercase; color: #6e6e73; margin: 0 0 clamp(28px, 4vw, 56px); }
+.engspec__label { font-size: clamp(13.8px, 1.15vw, 17px); letter-spacing: .14em; text-transform: uppercase; color: #6e6e73; margin: 0 0 clamp(28px, 4vw, 56px); }
 .engspec__grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(32px, 5vw, 88px); align-items: center; }
 .engspec .jobs-spec { padding: 0; }
 .engspec .jobs-spec__label { display: none; }
 .engspec .jobs-spec__grid { grid-template-columns: 1fr 1fr; }
-.engspec .jobs-spec__num { font-size: clamp(30px, 3.8vw, 64px); }
+.engspec .jobs-spec__num { font-size: clamp(25.5px, 3.23vw, 54.4px); }
 @media (max-width: 900px) { .engspec__grid { grid-template-columns: 1fr; } }
 @media (max-width: 520px) { .engspec .jobs-spec__grid { grid-template-columns: 1fr; } }
 
@@ -64,6 +64,6 @@
 .engspec__grid { align-items: start; }
 .engspec__eng { margin: 0; }
 .engspec__side { display: grid; gap: clamp(36px, 5vw, 72px); align-content: start; }
-.engspec__copy h3 { margin: 0; font-weight: 400; letter-spacing: .01em; font-size: clamp(32px, 3.4vw, 44px); }
+.engspec__copy h3 { margin: 0; font-weight: 400; letter-spacing: .01em; font-size: clamp(27.2px, 2.89vw, 37.4px); }
 .engspec__copy p { color: var(--ink-soft); font-weight: 300; max-width: 34em; margin: 14px 0 0; line-height: 1.75; }
 @media (min-width: 901px) { .engspec__side { position: sticky; top: 14vh; } }
