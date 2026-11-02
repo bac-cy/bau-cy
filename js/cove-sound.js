@@ -180,13 +180,13 @@ const BGM_LEVEL = 0.55;
 let bgmBus = null, bgmStarted = false, bgmBase = BGM_LEVEL, echoIn = null;
 function bgmSetup() {
   const c = ctx; bgmBus = c.createGain(); bgmBus.gain.value = 0; bgmBus.connect(master);
-  echoIn = c.createGain(); const dl = c.createDelay(1.5); dl.delayTime.value = 0.46; const fb = c.createGain(); fb.gain.value = 0.42; const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2400;
+  echoIn = c.createGain(); const dl = c.createDelay(1.5); dl.delayTime.value = 0.34; const fb = c.createGain(); fb.gain.value = 0.22; const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2400;
   echoIn.connect(dl); dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(bgmBus);                    // 은은한 메아리(공간감)
   bgmBus.gain.setTargetAtTime(bgmBase, c.currentTime, 2.5);                                                     // 천천히 커짐
 }
-/* 코드로 만든 배경음악: 가볍고 경쾌한 뮤직박스풍 반주. 느린 낮은 화음(무서운 느낌)은 쓰지 않고, 밝은 장조(도·라·파·솔)의 통통 튀는 아르페지오 + 가벼운 베이스 + 아주 작은 셰이커. 템포 104. */
-const BPM = 104, STEP = 60 / BPM / 2;                                                                                              // 8분음표 한 칸의 길이(초)
-const PROG = [[[392, 523.25, 659.25, 783.99], 196], [[329.6, 440, 523.25, 659.25], 164.8], [[349.2, 440, 523.25, 698.5], 174.6], [[392, 493.9, 587.3, 783.99], 196]];   // 도 · 라m · 파 · 솔 (멜로디 음 4개 + 베이스)
+/* 코드로 만든 배경음악: 가볍고 경쾌한 뮤직박스풍 반주. 느린 낮은 화음(무서운 느낌)은 쓰지 않고, 밝은 장조(도·라·파·솔)의 통통 튀는 아르페지오 + 아주 작은 셰이커. 낮은 베이스 없이 가볍게. 템포 116. */
+const BPM = 116, STEP = 60 / BPM / 2;                                                                                              // 8분음표 한 칸의 길이(초)
+const PROG = [[[523.25, 659.25, 783.99, 1046.5], 0], [[440, 523.25, 698.5, 880], 0], [[523.25, 659.25, 783.99, 1046.5], 0], [[392, 493.9, 587.3, 783.99], 0]];   // 도 · 파 · 도 · 솔 (모두 밝은 장조, 낮은 베이스 없음)
 const PATS = [[0, 1, 2, 3, 2, 1, 2, 1], [0, 2, 1, 3, 2, 1, 0, 1], [0, 1, 2, 1, 3, 2, 1, 2], [0, 2, 3, 2, 1, 2, 3, 1], [3, 2, 1, 2, 3, 1, 2, 0]];
 function bgmNote(f, t, vol, dur, send) {
   const c = ctx, g = c.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
@@ -207,7 +207,6 @@ function bgmSchedule() {
     const [tones, bass] = PROG[bgmOrder[Math.floor(bgmStep / 8) % 4]];
     if (on) {
       if (!(i === 7 && Math.random() < 0.3)) bgmNote(tones[bgmPat[i]], t, i % 4 === 0 ? 0.06 : 0.04, 0.34, true);          // 통통 튀는 멜로디 (가끔 쉼)
-      if (i === 0 || i === 4) bgmNote(bass, t, 0.07, 0.4, false);                                                                // 가벼운 베이스
       if (i % 2 === 1) bgmShaker(t, 0.01);                                                                                          // 아주 작은 셰이커
     }
     bgmNext += STEP; bgmStep++;
