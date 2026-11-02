@@ -48,3 +48,14 @@
   .jobs-spec__item { padding: 20px 0 16px; }
           .footer { padding-bottom: 96px; }                                  /* 왼쪽 아래 페이지 표시가 저작권 문구를 가리지 않게 */
 }
+
+/* Engineering + Tech Specs 한 그룹: 왼쪽 분해도 카드, 오른쪽 큰 숫자 스펙 */
+.engspec { margin-top: clamp(96px, 12vw, 160px); }
+.engspec__label { font-size: clamp(15px, 1.35vw, 20px); letter-spacing: .14em; text-transform: uppercase; color: #6e6e73; margin: 0 0 clamp(28px, 4vw, 56px); }
+.engspec__grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(32px, 5vw, 88px); align-items: center; }
+.engspec .jobs-spec { padding: 0; }
+.engspec .jobs-spec__label { display: none; }
+.engspec .jobs-spec__grid { grid-template-columns: 1fr 1fr; }
+.engspec .jobs-spec__num { font-size: clamp(30px, 3.8vw, 64px); }
+@media (max-width: 900px) { .engspec__grid { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .engspec .jobs-spec__grid { grid-template-columns: 1fr; } }
