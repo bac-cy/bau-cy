@@ -1,5 +1,6 @@
 import { printedMaterial, layerUV } from './print-material.js';
 import { fabricFor, FABRIC_NAMES } from './fabric-material.js';
+import { CoveSound } from './cove-sound.js';
 /* ==========================================================
    인트로의 Cove — 마우스를 따라 일어나서 바라봐요
    · 처음에는 조약돌처럼 겹쳐 있고, 마우스를 움직이면 일어나요.
@@ -119,7 +120,7 @@ async function init() {
   let hoverAt = 0;
   window.addEventListener('pointermove', (e) => { if (e.pointerType === 'touch' || performance.now() - hoverAt < 80 || !visible()) return; hoverAt = performance.now(); document.documentElement.style.cursor = hitKind(e) ? 'pointer' : ''; }, { passive: true });
   const pose = { neck: 0, head: 0, tilt: 0, body: 0 }, vel = { neck: { v: 0 }, head: { v: 0 }, tilt: { v: 0 }, body: { v: 0 } };
-  let gaze = { x: 0, y: 0 }, tNow = 0, last = performance.now(), shown = false;
+  let sndEye = '뜬 눈'; let gaze = { x: 0, y: 0 }, tNow = 0, last = performance.now(), shown = false;
   let autoFrom = 0, autoUntil = -1, autoDone = false;                       // 도착하면 마우스가 없어도 스스로 한 번 일어나 두리번거린다
   const visible = () => { const r = figure.getBoundingClientRect(); return +getComputedStyle(figure).opacity > 0.4 && r.bottom > 0 && r.top < innerHeight; };
 
@@ -154,7 +155,9 @@ async function init() {
       reactEye = R.eyes.filter(e => e[0] <= u).pop()[1];
     }
     const T = reacting ? { neck: 0.12, head: 0.12, tilt: 0.12, body: 0.14 } : { neck: awake ? 0.45 : 0.9, head: awake ? 0.4 : 0.9, tilt: 0.3, body: awake ? 0.35 : 0.8 };
+    const _pp = { neck: pose.neck, head: pose.head, tilt: pose.tilt, body: pose.body };
     for (const j of ['neck', 'head', 'tilt', 'body']) pose[j] = smoothDamp(pose[j], goal[j], vel[j], T[j], dt);
+    CoveSound.motor((Math.abs(pose.neck - _pp.neck) + Math.abs(pose.head - _pp.head) + Math.abs(pose.tilt - _pp.tilt) + Math.abs(pose.body - _pp.body)) / Math.max(dt, 0.001) / 110);   // 움직임 → 모터 소리
     const up = clamp((pose.neck - 2) / 10, 0, 1), sway = up * up * (3 - 2 * up);
     spin(col, AXZ, pose.neck + sway * 0.4 * Math.sin(2 * Math.PI * tNow / 3.7));
     spin(head, AXZ, pose.head + sway * 0.6 * Math.sin(2 * Math.PI * tNow / 4.3 + 0.6));
@@ -162,7 +165,9 @@ async function init() {
     eyes.group.visible = true;
     const near = ptr.seen && now - ptr.at < IDLE_MS + 3000;
     const gx = Math.round(clamp((ptr.x - cx) / (innerWidth * 0.5), -1, 1) * (near ? 2 : 0)), gy = Math.round(gaze.y * 1.4);
-    eyes.show(reactEye || (awake && Math.abs(gaze.x) + Math.abs(gaze.y) > 0.9 ? '반짝 눈' : '뜬 눈'), awake ? Math.round(clamp(gaze.x * 2.6, -2, 2)) : gx, gy, tNow);
+    const eyeNow = reactEye || (awake && Math.abs(gaze.x) + Math.abs(gaze.y) > 0.9 ? '반짝 눈' : '뜬 눈');
+    if (eyeNow !== sndEye) { sndEye = eyeNow; CoveSound.expr(eyeNow); }                         // 표정이 바뀌면 효과음
+    eyes.show(eyeNow, awake ? Math.round(clamp(gaze.x * 2.6, -2, 2)) : gx, gy, tNow);
     renderer.render(scene, camera);
     if (!shown) { shown = true; figure.classList.add('is-live'); mark('live'); }
   }

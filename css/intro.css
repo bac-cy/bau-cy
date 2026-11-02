@@ -133,3 +133,7 @@
 .intro__film .gallery__arrow, .intro__film .gallery__expand { display: none !important; }
 .intro__film .gallery__film { cursor: default; }
 .intro__film .gallery__film { -webkit-user-select: none; user-select: none; }
+
+/* 마무리 장면 위쪽: 앞 섹션(Engineering)의 배경이 그대로 비치다가 하얀 무대로 경계 없이 서서히 이어지게 */
+.intro--finale .intro__stage { background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, .55) 22%, #fff 52%); }
+.intro--finale { background: transparent; }

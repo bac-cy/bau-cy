@@ -1,5 +1,6 @@
 import { printedMaterial, layerUV } from './print-material.js';
 import { fabricFor } from './fabric-material.js';
+import { CoveSound } from './cove-sound.js';
 /* ==========================================================
    Cove 시뮬레이터 — Design 섹션
    · 머리·몸통을 끌거나 눌러서 자세를 바꿀 수 있어요.
@@ -366,8 +367,9 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   const biteEls = [...cookieEl.querySelectorAll('.bite')], biteR = [0, 0, 0, 0, 0]; let cookieDrop = null, cookieScale = 1, cookieA = 0; const _cv = new THREE.Vector3();
   function updateCookie(dt) {
     const on = clipName === 'snack' && clip;
-    if (!on) { cookieEl.hidden = true; cookieDrop = null; cookieScale = 1; cookieA = 0; biteR.fill(0); biteEls.forEach(b => b.setAttribute('r', 0)); return; }
+    if (!on) { updateCookie._e = 0; cookieEl.hidden = true; cookieDrop = null; cookieScale = 1; cookieA = 0; biteR.fill(0); biteEls.forEach(b => b.setAttribute('r', 0)); return; }
     const t = clipT, eaten = BITES.filter(b => t >= b).length;
+    if (eaten > (updateCookie._e || 0)) CoveSound.bite(); updateCookie._e = eaten;                    // 한 입 먹을 때마다 냠 소리
     const fr = figure.getBoundingClientRect(), er = el.getBoundingClientRect();
     head.getWorldPosition(_cv); _cv.addScaledVector(FRONT, 0.03); _cv.project(camera);
     const mx = er.left - fr.left + (_cv.x + 1) / 2 * er.width, my = er.top - fr.top + (1 - _cv.y) / 2 * er.height + er.height * 0.045;   // 머리 앞쪽 아래(입 높이)
@@ -439,6 +441,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     if (b.state === 'chomp') {                                                 // 머리와 몸통 사이에 공을 넣고 머리를 빠르게 위아래로 앙앙앙
       const tc = b.hold += dt, ON = 4.8, cyc = 0.36, active = tc < ON;
       const down = active ? 0.5 - 0.5 * Math.cos(2 * Math.PI * tc / cyc) : 0;
+      if (down > 0.92 && !(b.bitten)) { b.bitten = true; CoveSound.bite(); } else if (down < 0.5) b.bitten = false;   // 앙! 한 번마다 소리
       goal.neck = lerp(19, 7, down); goal.head = lerp(-25, -7, down); goal.body = active ? Math.sin(tc * 2.6) * 7 : 0; goal.tilt = active ? Math.sin(tc * 5.1) * 3 : 0;
       ballEye = active ? (Math.floor(tc / 0.72) % 2 ? '하트 눈' : '신난 눈') : '반짝 눈'; ballGx = 0;
       p.set(center.x + FRONT.x * 0.05, BODY_TOP + BR * (1 - 0.22 * down), center.z + FRONT.z * 0.05);
@@ -462,13 +465,13 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     const py = p.y; v.y -= G * h; p.addScaledVector(v, h);
     hd = horiz(p, _hc);
     if (v.y < 0 && py - BR >= headTop - 0.002 && p.y - BR <= headTop && hd < headR) {                       // 머리 위에 닿음 → 드리블
-      p.y = headTop + BR; b.state = 'dribble'; v.y = Math.max(0.62, -v.y * 0.82); bob = 1;
+      p.y = headTop + BR; b.state = 'dribble'; v.y = Math.max(0.62, -v.y * 0.82); bob = 1; CoveSound.bounce();
       v.x = v.x * 0.5 + (_hc.x - p.x) * 2.2 + (Math.random() - 0.5) * 0.08; v.z = v.z * 0.5 + (_hc.z - p.z) * 2.2 + (Math.random() - 0.5) * 0.08;      // 중심으로 모으고 살짝 흔들어 줌
     } else if (v.y < 0 && py - BR >= BODY_TOP - 0.002 && p.y - BR <= BODY_TOP && horiz(p, center) < BODY_R && p.y < headTop - 0.04) {      // 몸통 위에 떨어짐 → 덥석
       if (b.state === 'fall' || b.state === 'dribble') { p.y = BODY_TOP + BR; v.set(0, 0, 0); b.state = 'bite'; b.hold = 0; b.rest = p.clone(); }
-      else { p.y = BODY_TOP + BR; v.y = -v.y * 0.45; }
+      else { p.y = BODY_TOP + BR; v.y = -v.y * 0.45; CoveSound.bounce(); }
     }
-    if (p.y - BR <= FLOOR && v.y < 0) { p.y = FLOOR + BR; v.y = -v.y * 0.5; if (v.y < 0.2) v.y = 0; v.x *= 0.97; v.z *= 0.97; if (b.state !== 'roll') b.state = 'roll'; }
+    if (p.y - BR <= FLOOR && v.y < 0) { if (-v.y > 0.35) CoveSound.bounce(); p.y = FLOOR + BR; v.y = -v.y * 0.5; if (v.y < 0.2) v.y = 0; v.x *= 0.97; v.z *= 0.97; if (b.state !== 'roll') b.state = 'roll'; }
     if (b.state === 'roll') { v.x *= (1 - 0.8 * h); v.z *= (1 - 0.8 * h); b.spin += Math.hypot(v.x, v.z) * h / BR; if (Math.hypot(v.x, v.z) < 0.03 && p.y <= FLOOR + BR + 0.001) b.still += h; }
     const cd = horiz(p, center);                                              // 몸통 옆면에 부딪히면 튕겨 나감
     if (p.y - BR < BODY_TOP - 0.01 && cd < BODY_R + BR && cd > 1e-4 && b.state !== 'bite') {
@@ -567,7 +570,9 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     if (off) target = limit({ neck: goal.neck + (off.neck || 0), head: goal.head + (off.head || 0), tilt: goal.tilt + (off.tilt || 0), body: goal.body + (off.body || 0) });
     // 목표 자세를 부드럽게 따라간다
     const tm = clip ? (clipT < 0 ? 0.3 : 0.07) : gest ? 0.16 : 0.1;           // 동작이 시작되기 전 준비 구간은 천천히 부드럽게
+    const _pp = { neck: pose.neck, head: pose.head, tilt: pose.tilt, body: pose.body };
     for (const j of ['neck', 'head', 'tilt', 'body']) pose[j] = smoothDamp(pose[j], target[j], vv[j], tm, dt);
+    CoveSound.motor((Math.abs(pose.neck - _pp.neck) + Math.abs(pose.head - _pp.head) + Math.abs(pose.tilt - _pp.tilt) + Math.abs(pose.body - _pp.body)) / Math.max(dt, 0.001) / 110);   // 관절이 움직이는 빠르기 → 모터 소리
     // 서 있을 때는 숨 쉬듯 아주 조금 흔들린다
     const g = clamp((pose.neck - 2) / 10, 0, 1), a = g * g * (3 - 2 * g);
     const sway = { neck: a * (0.45 * Math.sin(2 * Math.PI * tNow / 3.7) + 0.25 * Math.sin(2 * Math.PI * tNow / 5.9 + 1.3)), head: a * (0.7 * Math.sin(2 * Math.PI * tNow / 4.3 + 0.6) + 0.3 * Math.sin(2 * Math.PI * tNow / 2.9 + 2.1)) };
@@ -575,6 +580,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     const shown = { ...pose }; shown.neck += sway.neck - bob * 3.5; shown.head += sway.head + bob * 2.5;
     const saved = { ...pose }; Object.assign(pose, shown); writePose(); Object.assign(pose, saved);
     if (!clip) eyeName = eyeForce || reactEye || (mode === 'ball' && ballEye) || (gest ? gest.eye : pose.neck < 4 ? '감은 눈' : '뜬 눈');
+    if (eyeName !== sndEye) { sndEye = eyeName; CoveSound.expr(eyeName); }                    // 표정이 바뀌면 효과음
     eyes.show(eyeName, mode === 'ball' ? ballGx : gx, 0, tNow);
     // 카메라
     cam.az = smoothDamp(cam.az, camGoal.az, cv.az, 0.28, dt); cam.el = smoothDamp(cam.el, camGoal.el, cv.el, 0.28, dt); cam.zoom = smoothDamp(cam.zoom, camGoal.zoom, cv.zoom, 0.22, dt);
@@ -582,7 +588,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     updateCookie(dt);
     renderer.render(scene, camera);
   }
-  let eyeName = '뜬 눈';
+  let eyeName = '뜬 눈', sndEye = '뜬 눈';
   resize(); setView('persp'); cam.az = camGoal.az; cam.el = camGoal.el; writePose(); setStatus(HINT);
   figure.classList.add('has-3d'); ui?.removeAttribute('hidden');
   requestAnimationFrame(frame);

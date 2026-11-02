@@ -473,10 +473,18 @@ html.lenis, html.lenis body { height: auto; }
 .nav.is-hidden { transform: translateY(-110%); }
 
 /* 맨 위로 올라가기 버튼 (우측 하단, 조금 내려가면 나타남) */
-.totop { position: fixed; right: clamp(16px, 2.4vw, 32px); bottom: clamp(16px, 2.4vw, 32px); z-index: 60; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; padding: 0;
+.totop { position: fixed; right: clamp(16px, 2.4vw, 32px); bottom: calc(clamp(16px, 2.4vw, 32px) + 60px); z-index: 60; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; padding: 0;
   color: #1d1d1f; background: rgba(255, 255, 255, .62); border: 1px solid rgba(0, 0, 0, .08); -webkit-backdrop-filter: blur(16px) saturate(1.6); backdrop-filter: blur(16px) saturate(1.6); box-shadow: 0 10px 30px -14px rgba(60, 40, 90, .4);
   opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity .35s ease, transform .35s cubic-bezier(.2, .9, .2, 1), background .2s; }
 .totop.is-on { opacity: 1; transform: none; pointer-events: auto; }
 .totop:hover { background: #fff; transform: translateY(-2px); }
 .totop:active { transform: scale(.94); }
-@media (max-width: 760px) { .totop { width: 44px; height: 44px; bottom: 18px; } }
+@media (max-width: 760px) { .totop { width: 44px; height: 44px; bottom: 74px; } }
+
+/* 소리 켜기/끄기 버튼 (우측 하단, 맨 위 버튼 아래) */
+.snd { position: fixed; right: clamp(16px, 2.4vw, 32px); bottom: clamp(16px, 2.4vw, 32px); z-index: 60; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; padding: 0;
+  color: #1d1d1f; background: rgba(255, 255, 255, .62); border: 1px solid rgba(0, 0, 0, .08); -webkit-backdrop-filter: blur(16px) saturate(1.6); backdrop-filter: blur(16px) saturate(1.6); box-shadow: 0 10px 30px -14px rgba(60, 40, 90, .4); transition: background .2s, transform .2s; }
+.snd:hover { background: #fff; transform: translateY(-2px); }
+.snd:active { transform: scale(.94); }
+.snd[aria-pressed="false"] { color: #8a8590; }
+@media (max-width: 760px) { .snd { width: 44px; height: 44px; bottom: 18px; } }
