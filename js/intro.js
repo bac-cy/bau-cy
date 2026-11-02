@@ -144,7 +144,7 @@
     blobA.style.transform = `translate3d(${ax}px, ${ay}px, 0) scale(${sa.toFixed(3)})`;
     blobB.style.transform = `translate3d(${W - ax * .8}px, ${H - ay * .7}px, 0) scale(${sb.toFixed(3)})`;
     const glow = imA * (1 - .08 * b);          // 마지막 장면까지 반응형 빛이 또렷하게 남음
-    blobA.style.opacity = glow; blobB.style.opacity = glow;
+    blobA.style.opacity = glow * 0.55; blobB.style.opacity = glow * 0.5;   // 배경 빛을 은은하게
     dots.style.opacity = imA * .55;
     peach.style.opacity = b;
 

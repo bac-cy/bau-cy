@@ -121,3 +121,4 @@
 - **시작 화면 적용됨**(css/loader.css, js/loader.js): 접속하면 어두운 화면에 눈 LED 두 개가 켜져 깜빡이고 두리번거리다, 준비되면(최소 2.4초·최대 6초) 웃는 눈으로 바뀌며 위아래로 열림. 로딩 중엔 스크롤 잠금. 되돌리려면 index.html의 loader 링크·스크립트·'loader-on' 줄을 지움.
 - **작은 디테일 적용됨**(css/detail.css): 선택 글자색 라일락, 얇은 라벤더 스크롤바, 통일된 포커스 링·링크 밑줄 애니메이션·버튼 호버/눌림/비활성 규칙.
 - **파비콘·링크 공유 카드 적용됨**: index.html head에 favicon.svg(Cove 심벌 C), favicon-32.png, apple-touch-icon.png, og:title/description/image(assets/og-image.png 1200×630)·twitter:card 추가. 공유 카드 문구 "로봇에게 기대어 쉬어 보세요."는 예시라 팀 확정 필요. theme-color #f5f5f7.
+- **배경 은은하게**(사용자 요청): 전체 배경 빛 세기를 낮춤(js/bg.js 의 K 1.35→0.62), 인트로의 마우스 따라가는 빛은 약 절반 세기(js/intro.js 의 blob opacity ×0.5~0.55). 더 진하게/연하게는 이 숫자들로 조정.
