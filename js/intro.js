@@ -27,12 +27,12 @@
     (function tick() {
       out.textContent = text.slice(0, ++i); if (window.CoveSound && window.CoveSound.type) window.CoveSound.type();   // 타이핑 소리
       if (i < text.length) setTimeout(tick, speed);
-      else { setTimeout(() => caret.classList.add('is-done'), 900); onDone && onDone(); }
+      else { setTimeout(() => caret.classList.add('is-done'), 2200); onDone && onDone(); }
     })();
   }
   const IM_TEXT = lineIm.dataset.type, imOut = lineIm.querySelector('.intro__typed'), imCaret = lineIm.querySelector('.intro__caret');
   let hiStarted = false, imShown = -1;
-  const startHi = () => { if (hiStarted) return; hiStarted = true; setTimeout(() => typeInto(lineHi, 480), 1500); };   // 시작 화면이 거의 사라진 뒤(열린 지 1.5초)에 시작해서, 글자가 하나씩 찍히는 모습이 분명히 보이게
+  const startHi = () => { if (hiStarted) return; hiStarted = true; setTimeout(() => typeInto(lineHi, 650), 1900); };   // 시작 화면이 거의 사라진 뒤(열린 지 1.9초)에 시작해서, 글자가 하나씩 찍히는 모습이 분명히 보이게
   // 시작 화면(눈 LED)이 열리기 시작할 때 HI 타이핑을 시작해서, 타이핑이 시작 화면 뒤에서 끝나 버리지 않고 눈앞에서 보이게 함
   const R = document.documentElement, loading = () => R.classList.contains('loader-on') || R.classList.contains('loader-active');
   const go = () => (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(startHi);
