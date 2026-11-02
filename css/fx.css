@@ -14,6 +14,6 @@
 .statement.reveal.fx-t, .detail h3.fx-t, .principles span.fx-t { opacity: 1; transform: none; }
 /* 카드: 따라오는 빛 + 살짝 기울기 */
 .feature.fx-card::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; opacity: 0; transition: opacity .4s;
-  background: radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%), rgba(184, 166, 224, .30), transparent 70%); }
+  background: radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%), rgba(190, 180, 214, .18), transparent 70%); }
 .feature.fx-card:hover::after { opacity: 1; }
 .fx-mag { will-change: transform; }

@@ -4,7 +4,7 @@
    ========================================================== */
 
 .intro {
-  --intro-peach: #fbe3cf;
+  --intro-peach: #f3e9df;
   --intro-word: #f2ead8;          /* 배경 속 큰 COVE 글자색 */
   position: relative;
   height: 215svh;                 /* 한 화면 + 스크롤 거리 60svh (장면 전환 구간 + 마지막 장면 머무름) */
@@ -24,11 +24,11 @@
 .intro__blob { border-radius: 50%; opacity: 0; will-change: transform, opacity; left: 0; top: 0; }
 .intro__blob--a {            /* 라일락 빛 — 마우스를 따라 움직임 (샌드색 COVE 글자와 또렷하게 대비) */
   width: 85vmax; height: 85vmax; margin: -42.5vmax 0 0 -42.5vmax;
-  background: radial-gradient(closest-side, rgba(196, 176, 240, .95), rgba(214, 198, 246, .55) 45%, rgba(235, 226, 250, 0) 100%);
+  background: radial-gradient(closest-side, rgba(208, 200, 230, .9), rgba(222, 216, 240, .5) 45%, rgba(236, 232, 246, 0) 100%);
 }
 .intro__blob--b {            /* 반대편의 연한 핑크 */
   width: 70vmax; height: 70vmax; margin: -35vmax 0 0 -35vmax;
-  background: radial-gradient(closest-side, rgba(255, 196, 176, .9), rgba(255, 214, 196, .45) 50%, rgba(255, 240, 230, 0) 100%);
+  background: radial-gradient(closest-side, rgba(240, 214, 204, .85), rgba(244, 228, 220, .4) 50%, rgba(248, 240, 234, 0) 100%);
 }
 .intro__dots {
   inset: 0; opacity: 0; will-change: opacity;
@@ -94,7 +94,7 @@
 .intro__ch::before { content: ""; position: absolute; inset: 6% 3% -2% 3%; background: radial-gradient(closest-side, rgba(120, 96, 170, .22), transparent 75%); filter: blur(1.2vw); z-index: -1; }
 .intro__burst {
   position: absolute; left: 50%; top: 64%; width: 92vmin; height: 92vmin; margin: -46vmin 0 0 -46vmin; border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(255, 238, 210, .95), rgba(255, 214, 190, .55) 42%, rgba(217, 205, 242, 0) 76%);
+  background: radial-gradient(closest-side, rgba(246, 238, 226, .85), rgba(240, 222, 210, .45) 42%, rgba(226, 222, 236, 0) 76%);
   opacity: 0; pointer-events: none; will-change: transform, opacity;
 }
 .intro__render { transform-origin: 50% 100%; }

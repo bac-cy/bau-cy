@@ -1,6 +1,6 @@
 /* 배경 통일(기본 C안 · 애플풍; 주소 끝에 ?bg=a / ?bg=b 를 붙이면 다른 안): 라일락·복숭아 빛이 섹션마다 아주 천천히 색을 바꾸며 이어짐 (?bg=a 은은하게 / ?bg=b 또렷하게) */
 (() => {
-  const mode = /[?&]bg=a/.test(location.search) ? 'a' : /[?&]bg=b/.test(location.search) ? 'b' : 'c', K = mode === 'a' ? 0.55 : mode === 'c' ? 0.62 : 1;       // 색 진하기
+  const mode = /[?&]bg=a/.test(location.search) ? 'a' : /[?&]bg=b/.test(location.search) ? 'b' : 'c', K = mode === 'a' ? 0.55 : mode === 'c' ? 0.75 : 1;       // 색 진하기
   document.documentElement.classList.add('bgfx-on'); document.body.classList.add('bg-' + mode); document.documentElement.classList.add('bg-' + mode);
   const bg = document.createElement('div'); bg.className = 'bgfx'; bg.innerHTML = '<i></i><i></i><i></i>'; document.body.prepend(bg);
   const P = {   // [빛1(왼쪽 위), 빛2(오른쪽 아래), 빛3(가운데)] 각각 [r,g,b,a]
@@ -18,6 +18,9 @@
     footer:   [[212, 216, 246, .65], [246, 220, 226, .55], [234, 236, 250, .45]],
   });
   const ids = ['about', 'features', 'design', 'gallery'], els = ids.map(i => document.getElementById(i)), foot = document.querySelector('.footer');
+  const desat = (c, s) => { const g = (c[0] + c[1] + c[2]) / 3; return [g + (c[0] - g) * s, g + (c[1] - g) * s, g + (c[2] - g) * s, c[3]]; };   // 채도를 낮춰 은은하게(1=원래, 0=회색)
+  const SAT = 0.5;
+  Object.keys(P).forEach(k => { P[k] = P[k].map(c => desat(c, SAT)); });
   const mix = (a, b, t) => a.map((v, k) => v + (b[k] - v) * t);
   const rgba = (c) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${(c[3] * K).toFixed(3)})`;
   const smooth = (t) => t * t * (3 - 2 * t);

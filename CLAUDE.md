@@ -122,3 +122,4 @@
 - **작은 디테일 적용됨**(css/detail.css): 선택 글자색 라일락, 얇은 라벤더 스크롤바, 통일된 포커스 링·링크 밑줄 애니메이션·버튼 호버/눌림/비활성 규칙.
 - **파비콘·링크 공유 카드 적용됨**: index.html head에 favicon.svg(Cove 심벌 C), favicon-32.png, apple-touch-icon.png, og:title/description/image(assets/og-image.png 1200×630)·twitter:card 추가. 공유 카드 문구 "로봇에게 기대어 쉬어 보세요."는 예시라 팀 확정 필요. theme-color #f5f5f7.
 - **배경 은은하게**(사용자 요청): 전체 배경 빛 세기를 낮춤(js/bg.js 의 K 1.35→0.62), 인트로의 마우스 따라가는 빛은 약 절반 세기(js/intro.js 의 blob opacity ×0.5~0.55). 더 진하게/연하게는 이 숫자들로 조정.
+- **배경 채도 낮춤**(사용자 요청, 더 깔끔하게): 섹션 배경 빛은 색 채도를 절반으로(js/bg.js 의 SAT 0.5, 세기 K 0.75), 인트로 빛·Design 카드·시뮬레이터·Features 카드의 라일락/복숭아 그라데이션을 회색빛 라일락과 회색빛 베이지로 바꿈. 라벤더(#b8a6e0) 강조 요소(패드·포커스·글자 강조)는 그대로.
