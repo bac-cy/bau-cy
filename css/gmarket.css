@@ -1,0 +1,4 @@
+/* 글꼴 전부 Gmarket Sans (사용자 요청, 마음에 안 들면 되돌림: index.html의 gmarket 링크 한 줄만 지우면 원래 글꼴로).
+   · 받을 수 있는 굵기가 Medium 하나뿐이라 모든 굵기에 같은 파일을 연결(가짜 굵게 방지). */
+@font-face { font-family: "Gmarket Sans"; src: url("../assets/fonts/gmarketsansmedium-normal.woff") format("woff"); font-weight: 100 900; font-style: normal; font-display: swap; }
+html, body, *, *::before, *::after { font-family: "Gmarket Sans", "Noto Sans KR", system-ui, sans-serif !important; }

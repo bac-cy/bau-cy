@@ -131,3 +131,4 @@
 - **시작 화면 순서**(사용자 요청): 세 가지가 한꺼번에 움직이지 않고 차례로 — COVE 로고가 먼저 나타나고(0.25초), 이어서 눈 LED가 켜지며(1.3초), 마지막에 진행 막대(2.1초). 최소 표시 시간 2.4→3.4초(css/loader.css, js/loader.js).
 - **시작 화면 = 눈 LED만**(사용자 요청, 위의 '시작 화면 순서'는 대체됨): 로고·진행 막대를 빼고 화면 중앙에 눈 LED 두 개만 켜져 깜빡이다 열림. 최소 표시 2.4초로 복귀.
 - **라벨의 긴 줄표(—) 제거**(사용자 요청, AI 티가 난다고): 01 About Cove·02 Key Features·03 Design & Detail·04 Gallery, Detail 01 Form 등, Render 3/4 View, 푸터 'COVE PHYSICAL AI COMPANION', 약속 아래 'Cove Desktop Home Robot'에서 '—'를 뺐다. 규격의 숫자 범위(160–237)는 그대로. 위 문서의 '01 — About Cove' 표기는 이제 '01 About Cove'.
+- **글꼴 전부 Gmarket Sans**(사용자 요청, 위 '폰트' 고정 세팅은 이 안으로 대체됨): css/gmarket.css 가 모든 글자(Jost·Manrope·Instrument Serif·Noto Sans KR·JetBrains Mono 대체)를 Gmarket Sans(assets/fonts/gmarketsansmedium-normal.woff, npm @noonnu/gmarket-sans-medium, MIT)로 바꿈. 받을 수 있는 굵기가 Medium 하나뿐이라 모든 굵기에 같은 파일을 연결. 되돌리려면 index.html의 gmarket 링크 한 줄을 지움. 로고(COVE)·인트로 큰 COVE·눈 도트는 그림이라 그대로. 오프라인 꾸러미는 다시 만들어야 반영됨.
