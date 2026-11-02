@@ -79,7 +79,7 @@ function squeak(pts, dur = 0.14, vol = 0.18, delay = 0) {
   g2.gain.value = 0.2; o.connect(g); o2.connect(g2); g2.connect(g); g.connect(master); o.start(t); o2.start(t); o.stop(t + dur + 0.04); o2.stop(t + dur + 0.04);
 }
 // 음 높이: 도5=523 미5=659 솔5=784 라5=880 시5=988 도6=1047 미6=1319 솔6=1568
-const EXPR = {                                                                  // LG 가전·로봇처럼 깔끔한 전자 종소리 (동물 울음 없이, 음높이가 미끄러지지 않는 또렷한 음만)
+const EXPR_CHIME = {                                                            // LG 가전·로봇처럼 깔끔한 전자 종소리 (동물 울음 없이, 음높이가 미끄러지지 않는 또렷한 음만)
   '놀란 눈': () => { pluck(988, 0.22, 0.17); pluck(1319, 0.34, 0.15, 0.09); },                                                   // 띠딩 (짧게 올라감)
   '신난 눈': () => { [523, 659, 784, 1047, 1319].forEach((f, i) => pluck(f, 0.45, 0.14, i * 0.1)); },                              // 도미솔도미 경쾌하게
   '하트 눈': () => { pluck(784, 0.7, 0.17); pluck(1047, 0.9, 0.16, 0.16); },                                                      // 솔→도 맑은 두 음
@@ -91,19 +91,46 @@ const EXPR = {                                                                  
   '졸린 눈': () => { pluck(523, 0.9, 0.1); pluck(392, 1.1, 0.08, 0.35); },
   '편안한 눈': () => { pluck(523, 0.8, 0.07); },
 };
+/* 엘릭(Eilik) 느낌: 책상 위 작은 로봇이 "뿌잇·삐리릿·뿌우~" 하고 재잘거리는 짧고 말랑한 전자 말소리. 높은 음역(600Hz 이상)에서 빠르게 올라가거나 내려가는 둥근 '붑' 소리에
+   모음처럼 들리는 필터를 걸어 아기 로봇이 옹알이하는 느낌을 냄. (엘릭 실제 음원은 아니고 느낌만 비슷하게 만든 소리) */
+function boop(f0, f1, dur = 0.1, vol = 0.18, delay = 0) {
+  const c = ctx; if (!c) return;
+  const t = c.currentTime + delay, g = c.createGain(), bp = c.createBiquadFilter(), v = vol * 4.2;
+  bp.type = 'bandpass'; bp.Q.value = 1.6; bp.frequency.setValueAtTime(Math.max(900, f0 * 1.3), t); bp.frequency.exponentialRampToValueAtTime(Math.max(900, f1 * 1.3), t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + Math.min(0.012, dur * 0.2)); g.gain.setValueAtTime(v, t + dur * 0.55); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  [['sine', 1, 1], ['triangle', 2, 0.18]].forEach(([type, m, a]) => {
+    const o = c.createOscillator(), og = c.createGain(); o.type = type; o.frequency.setValueAtTime(f0 * m, t); o.frequency.exponentialRampToValueAtTime(f1 * m, t + dur);
+    og.gain.value = a; o.connect(og); og.connect(bp); o.start(t); o.stop(t + dur + 0.04);
+  });
+  bp.connect(g); g.connect(master);
+}
+const EXPR_EILIK = {
+  '놀란 눈': () => { boop(620, 1150, 0.09, 0.2); boop(1150, 900, 0.1, 0.17, 0.1); },                                               // 뿌잇!
+  '신난 눈': () => { [[800, 1000], [1000, 1250], [1250, 1600], [1400, 1800]].forEach((p, i) => boop(p[0], p[1], 0.07, 0.17, i * 0.09)); },   // 삐리리릿 올라감
+  '하트 눈': () => { boop(720, 1050, 0.2, 0.17); boop(1050, 1350, 0.26, 0.15, 0.2); },                                              // 뿌우~ 포근하게 (두 번 올라감)
+  '웃는 눈': () => { boop(760, 1100, 0.16, 0.15); boop(1100, 980, 0.18, 0.12, 0.17); },
+  '반짝 눈': () => { boop(1500, 2000, 0.06, 0.1); },
+  '윙크': () => { boop(800, 1300, 0.07, 0.16); },
+  '속상한 눈': () => { boop(950, 700, 0.3, 0.14); boop(780, 560, 0.4, 0.12, 0.34); },                                               // 뿌우… 내려감
+  '어지러운 눈': () => { [[900, 1200], [1200, 900], [900, 1200]].forEach((p, i) => boop(p[0], p[1], 0.11, 0.12, i * 0.13)); },
+  '졸린 눈': () => { boop(820, 560, 0.55, 0.1); },
+  '편안한 눈': () => { boop(700, 740, 0.4, 0.07); },
+};
+const useChime = /[?&]sound=chime/.test(location.search);                          // 주소 끝에 ?sound=chime 을 붙이면 예전 종소리 버전으로 들어 볼 수 있음
+const EXPR = useChime ? EXPR_CHIME : EXPR_EILIK;
 function expr(name) {
   if (!on || !EXPR[name] || !ensure() || ctx.state !== 'running') return;
   const n = performance.now(); if (n - lastExpr < 180) return; lastExpr = n;
   duck(); EXPR[name]();
 }
-function bite() {                                                               // 냠 (또록 또록)
+function bite() {                                                               // 냠
   if (!on || !ensure() || ctx.state !== 'running') return;
-  pluck(1175, 0.12, 0.16); pluck(988, 0.14, 0.12, 0.07);
+  if (useChime) { pluck(1175, 0.12, 0.16); pluck(988, 0.14, 0.12, 0.07); } else { boop(900, 650, 0.06, 0.16); boop(980, 700, 0.06, 0.12, 0.07); }
 }
 function bounce() {                                                             // 공 통통
   if (!on || !ensure() || ctx.state !== 'running') return;
   const n = performance.now(); if (n - lastBounce < 90) return; lastBounce = n;
-  pluck(659, 0.2, 0.14);
+  if (useChime) pluck(659, 0.2, 0.14); else boop(640, 960, 0.09, 0.15);
 }
 
 /* 배경음악: assets/bgm.mp3 파일이 있으면 그 곡을 잔잔하게 반복하고, 없으면 코드로 만든 아주 잔잔한 앰비언트(느린 화음 + 가끔 울리는 맑은 종소리)를 깔아요.
