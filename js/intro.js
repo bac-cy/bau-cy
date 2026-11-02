@@ -29,10 +29,11 @@
   }
   const IM_TEXT = lineIm.dataset.type, imOut = lineIm.querySelector('.intro__typed'), imCaret = lineIm.querySelector('.intro__caret');
   let hiStarted = false, imShown = -1;
-  const startHi = () => { if (hiStarted) return; hiStarted = true; setTimeout(() => typeInto(lineHi, 220), 500); };
-  // 글꼴이 준비된 뒤에 시작해야 깜빡임 없이 타이핑됩니다.
-  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(startHi);
-  setTimeout(startHi, 1500);
+  const startHi = () => { if (hiStarted) return; hiStarted = true; setTimeout(() => typeInto(lineHi, 260), 350); };
+  // 시작 화면(눈 LED)이 열리기 시작할 때 HI 타이핑을 시작해서, 타이핑이 시작 화면 뒤에서 끝나 버리지 않고 눈앞에서 보이게 함
+  const R = document.documentElement, loading = () => R.classList.contains('loader-on') || R.classList.contains('loader-active');
+  const go = () => (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(startHi);
+  if (loading()) { window.addEventListener('cove:loader-open', go, { once: true }); setTimeout(go, 9000); } else { go(); setTimeout(startHi, 1500); }
 
   /* ---------- 반응형 그라디언트 (마우스를 따라가고, 가만히 있으면 천천히 흐름) ---------- */
   const pointer = { x: .55, y: .45, active: false, t: 0 };
