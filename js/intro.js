@@ -12,6 +12,9 @@
   const peach = $('.intro__peach'), blobA = $('.intro__blob--a'), blobB = $('.intro__blob--b');
   const dots = $('.intro__dots');
   const film = $('.intro__film');
+  // 영상 위 아이콘(화살표·점·전체 화면 버튼): 마우스를 움직이거나 만지면 잠깐 나타났다가 2.5초 뒤 다시 숨음
+  if (film) { let uiT = 0; const showUi = () => { film.classList.add('is-ui'); clearTimeout(uiT); uiT = setTimeout(() => film.classList.remove('is-ui'), 2500); };
+    ['pointermove', 'pointerdown', 'focusin'].forEach(ev => film.addEventListener(ev, showUi, { passive: true })); }
   const reduced = false;   // 사용자 요청: PC의 '움직임 줄이기' 설정과 상관없이 모든 효과를 보여준다
   /* ---------- 타이핑 ---------- */
   // 타이핑 전에 글자가 잠깐 보였다 사라지는 깜빡임을 막기 위해 먼저 비워 둡니다.

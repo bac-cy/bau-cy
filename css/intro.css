@@ -119,3 +119,12 @@
 /* 맨 아래 마무리 장면(큰 COVE 글자 + Cove): 예전 인트로 마지막 장면 */
 .intro--finale { height: 190svh; }
 .intro--finale .intro__stage { background: #fff; }
+
+/* 영상이 나오는 동안 아이콘이 거슬리지 않게: 평소엔 거의 숨기고, 마우스를 움직이거나 화면을 만지면 잠깐 나타남 */
+.intro__film .gallery__arrow, .intro__film .gallery__expand { opacity: 0; transition: opacity .6s ease; }
+.intro__film .gallery__dots { opacity: .45; background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; transition: opacity .6s ease, background .6s ease; }
+.intro__film .gallery__dots button { background: rgba(255, 255, 255, .85); box-shadow: 0 0 0 .5px rgba(0, 0, 0, .12); }
+.intro__film .gallery__dots button[aria-selected="true"] { background: #fff; }
+.intro__film.is-ui .gallery__arrow, .intro__film.is-ui .gallery__expand { opacity: 1; }
+.intro__film.is-ui .gallery__dots { opacity: 1; background: rgba(255, 255, 255, .45); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.intro__film .gallery__arrow:focus-visible, .intro__film .gallery__expand:focus-visible { opacity: 1; }
