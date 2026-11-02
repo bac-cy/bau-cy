@@ -10,7 +10,7 @@
   addEventListener('load', () => { loaded = true; });
   function open() {
     if (done) return; done = true; el.classList.add('is-done');
-    setTimeout(() => { el.classList.add('is-open'); setTimeout(() => { el.remove(); R.style.overflow = ''; R.classList.remove('loader-active'); try { window.__lenis && window.__lenis.start && window.__lenis.start(); } catch (e) {} }, 1250); }, 650);
+    setTimeout(() => { el.classList.add('is-open'); setTimeout(() => { el.remove(); R.style.overflow = ''; R.classList.remove('loader-active'); try { window.__lenis && window.__lenis.start && window.__lenis.start(); } catch (e) {} }, 1400); }, 750);
   }
   (function tick() {
     const t = performance.now() - t0, introState = R.dataset.introCove;
