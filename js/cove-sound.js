@@ -17,11 +17,12 @@ function ensure() {
   try { ctx = new AC(); } catch (e) { return null; }
   master = ctx.createGain(); master.gain.value = on ? VOL : 0;
   const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -10; lim.knee.value = 8; lim.ratio.value = 10; lim.attack.value = 0.002; lim.release.value = 0.12;   // 커져도 찢어지지 않게 눌러 줌
-  master.connect(lim); lim.connect(ctx.destination);
+  const soft = ctx.createBiquadFilter(); soft.type = 'lowpass'; soft.frequency.value = 1700; soft.Q.value = 0.5;     // 날카로운 높은 소리를 깎아 부드럽게
+  master.connect(soft); soft.connect(lim); lim.connect(ctx.destination);
   // 모터: 낮게 '부르르' 하는 소리가 아니라, 가전 로봇처럼 공기가 스치는 듯한 아주 부드러운 '쉬이' 소리
   const nb = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate), nd = nb.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
   mNoise = ctx.createBufferSource(); mNoise.buffer = nb; mNoise.loop = true;
-  mFilter = ctx.createBiquadFilter(); mFilter.type = 'bandpass'; mFilter.frequency.value = 3200; mFilter.Q.value = 1.4;
+  mFilter = ctx.createBiquadFilter(); mFilter.type = 'bandpass'; mFilter.frequency.value = 1600; mFilter.Q.value = 0.8;
   mGain = ctx.createGain(); mGain.gain.value = 0; mNoise.connect(mFilter); mFilter.connect(mGain); mGain.connect(master); mNoise.start();
   setInterval(() => { if (ctx && performance.now() - lastMotor > 220) mGain.gain.setTargetAtTime(0, ctx.currentTime, 0.08); }, 100);   // 움직임이 멈추면 조용해짐
   return ctx;
@@ -39,7 +40,7 @@ function motor(level) {
   const l = Math.min(1, Math.max(0, level)); motionHint(l); if (l < 0.05) return;
   lastMotor = performance.now(); const t = ctx.currentTime;
   mGain.gain.setTargetAtTime(0.02 + 0.09 * l, t, 0.07);
-  mFilter.frequency.setTargetAtTime(2600 + 1800 * l, t, 0.08);
+  mFilter.frequency.setTargetAtTime(1300 + 900 * l, t, 0.08);
 }
 
 /* 짧은 음 하나: [시작 주파수, 끝 주파수, 길이(초), 파형, 크기, 시작 지연(초)] */
@@ -61,9 +62,9 @@ function vibrato(f, dur, rate, depth, vol) {                                    
 function pluck(f, dur = 0.5, vol = 0.2, delay = 0, glideTo = 0) {
   const c = ctx; if (!c) return;
   const t = c.currentTime + delay, g = c.createGain(), v = vol * 4.2;
-  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.025); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   g.connect(master);
-  [[1, 1], [2, 0.14], [4, 0.04]].forEach(([m, a]) => {
+  [[1, 1], [2, 0.05]].forEach(([m, a]) => {
     const o = c.createOscillator(), og = c.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(f * m, t);
     if (glideTo) o.frequency.exponentialRampToValueAtTime(glideTo * m, t + Math.min(dur, 0.05));
     og.gain.value = a; o.connect(og); og.connect(g); o.start(t); o.stop(t + dur + 0.03);
@@ -97,9 +98,9 @@ let TR = 1;                                                                     
 function boop(f0, f1, dur = 0.1, vol = 0.18, delay = 0) {
   const c = ctx; if (!c) return; f0 *= TR; f1 *= TR;
   const t = c.currentTime + delay, g = c.createGain(), bp = c.createBiquadFilter(), v = vol * 4.2;
-  bp.type = 'bandpass'; bp.Q.value = 1.6; bp.frequency.setValueAtTime(Math.max(900, f0 * 1.3), t); bp.frequency.exponentialRampToValueAtTime(Math.max(900, f1 * 1.3), t + dur);
-  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + Math.min(0.012, dur * 0.2)); g.gain.setValueAtTime(v, t + dur * 0.55); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  [['sine', 1, 1], ['triangle', 2, 0.18]].forEach(([type, m, a]) => {
+  bp.type = 'bandpass'; bp.Q.value = 0.9; bp.frequency.setValueAtTime(Math.max(700, f0 * 1.1), t); bp.frequency.exponentialRampToValueAtTime(Math.max(700, f1 * 1.1), t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + Math.min(0.03, dur * 0.35)); g.gain.setValueAtTime(v, t + dur * 0.55); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  [['sine', 1, 1], ['sine', 2, 0.06]].forEach(([type, m, a]) => {
     const o = c.createOscillator(), og = c.createGain(); o.type = type; o.frequency.setValueAtTime(f0 * m, t); o.frequency.exponentialRampToValueAtTime(f1 * m, t + dur);
     og.gain.value = a; o.connect(og); og.connect(bp); o.start(t); o.stop(t + dur + 0.04);
   });
@@ -150,7 +151,7 @@ function expr(name) {
   if (!on || !EXPR[name] || !ensure() || ctx.state !== 'running') return;
   const n = performance.now(); if (n - lastExpr < 180) return; lastExpr = n;
   duck(); let f = EXPR[name]; if (Array.isArray(f)) { lastVar[name] = ((lastVar[name] ?? -1) + 1 + Math.floor(Math.random() * (f.length - 1 || 1))) % f.length; f = f[lastVar[name]]; }   // 지난번과 다른 변형을 고름
-  TR = useChime ? 1 : 0.9 + Math.random() * 0.24; f(); TR = 1;
+  TR = useChime ? 1 : 0.74 + Math.random() * 0.2; f(); TR = 1;                    // 엘릭풍 소리는 전체적으로 낮고 둥글게(0.74~0.94배)
 }
 function bite() {                                                               // 냠
   if (!on || !ensure() || ctx.state !== 'running') return;
@@ -164,12 +165,12 @@ function bounce() {                                                             
 
 function event(name) {                                                         // 동작(인사·쓰다듬기·간지럼·잠들기 등)이 시작될 때 나는 소리
   if (useChime || !on || !EVENT_EILIK[name] || !ensure() || ctx.state !== 'running') return;
-  duck(); TR = 0.94 + Math.random() * 0.14; EVENT_EILIK[name](); TR = 1;
+  duck(); TR = 0.76 + Math.random() * 0.14; EVENT_EILIK[name](); TR = 1;
 }
 let idleSince = 0, wasMoving = false;                                           // 가만히 있다가 움직이기 시작할 때 작은 '으응?' 소리
 function motionHint(level) {
   if (useChime || !on || !ctx || ctx.state !== 'running') return; const n = performance.now();
-  if (level > 0.28) { if (!wasMoving && n - idleSince > 1800) { duck(); TR = 0.92 + Math.random() * 0.2; Math.random() < 0.5 ? boop(760, 980, 0.09, 0.1) : boop(980, 780, 0.09, 0.1); TR = 1; } wasMoving = true; idleSince = n; }
+  if (level > 0.28) { if (!wasMoving && n - idleSince > 1800) { duck(); TR = 0.76 + Math.random() * 0.16; Math.random() < 0.5 ? boop(760, 980, 0.09, 0.1) : boop(980, 780, 0.09, 0.1); TR = 1; } wasMoving = true; idleSince = n; }
   else if (level < 0.05) wasMoving = false;
 }
 
@@ -185,7 +186,7 @@ function bgmSetup() {
 }
 /* 코드로 만든 배경음악: 가볍고 경쾌한 뮤직박스풍 반주. 느린 낮은 화음(무서운 느낌)은 쓰지 않고, 밝은 장조(도·라·파·솔)의 통통 튀는 아르페지오 + 가벼운 베이스 + 아주 작은 셰이커. 템포 104. */
 const BPM = 104, STEP = 60 / BPM / 2;                                                                                              // 8분음표 한 칸의 길이(초)
-const PROG = [[[523.25, 659.25, 783.99, 1046.5], 261.6], [[440, 523.25, 659.25, 880], 220], [[349.2, 440, 523.25, 698.5], 174.6], [[392, 493.9, 587.3, 783.99], 196]];   // 도 · 라m · 파 · 솔 (멜로디 음 4개 + 베이스)
+const PROG = [[[392, 523.25, 659.25, 783.99], 196], [[329.6, 440, 523.25, 659.25], 164.8], [[349.2, 440, 523.25, 698.5], 174.6], [[392, 493.9, 587.3, 783.99], 196]];   // 도 · 라m · 파 · 솔 (멜로디 음 4개 + 베이스)
 const PATS = [[0, 1, 2, 3, 2, 1, 2, 1], [0, 2, 1, 3, 2, 1, 0, 1], [0, 1, 2, 1, 3, 2, 1, 2], [0, 2, 3, 2, 1, 2, 3, 1], [3, 2, 1, 2, 3, 1, 2, 0]];
 function bgmNote(f, t, vol, dur, send) {
   const c = ctx, g = c.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
@@ -195,7 +196,7 @@ function bgmNote(f, t, vol, dur, send) {
 let shakerBuf = null;
 function bgmShaker(t, vol) {
   const c = ctx; if (!shakerBuf) { shakerBuf = c.createBuffer(1, Math.floor(c.sampleRate * 0.05), c.sampleRate); const d = shakerBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length); }
-  const n = c.createBufferSource(); n.buffer = shakerBuf; const hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 6500; const g = c.createGain(); g.gain.value = vol; n.connect(hp); hp.connect(g); g.connect(bgmBus); n.start(t);
+  const n = c.createBufferSource(); n.buffer = shakerBuf; const hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 3500; const g = c.createGain(); g.gain.value = vol * 0.6; n.connect(hp); hp.connect(g); g.connect(bgmBus); n.start(t);
 }
 let bgmStep = 0, bgmNext = 0, bgmBar = 0, bgmPat = PATS[0], bgmOrder = [0, 1, 2, 3];
 function bgmSchedule() {
@@ -237,10 +238,10 @@ function type() {
   if (!on || !ensure() || ctx.state !== 'running') return;
   const c = ctx, t = c.currentTime;
   if (!noiseBuf) { noiseBuf = c.createBuffer(1, Math.floor(c.sampleRate * 0.05), c.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length); }
-  const n = c.createBufferSource(); n.buffer = noiseBuf; const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2200 + Math.random() * 1400; bp.Q.value = 1.1;
-  const g = c.createGain(); g.gain.setValueAtTime(0.9, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
+  const n = c.createBufferSource(); n.buffer = noiseBuf; const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1300 + Math.random() * 700; bp.Q.value = 0.8;
+  const g = c.createGain(); g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
   n.connect(bp); bp.connect(g); g.connect(master); n.start(t);                    // 딸깍 하는 바삭한 소리
-  pluck(1568 + Math.random() * 200, 0.06, 0.08);                                   // 맑은 톡
+  pluck(880 + Math.random() * 150, 0.07, 0.08);                                   // 맑은 톡
 }
 
 /* 켜기/끄기 버튼 (우측 하단) */
