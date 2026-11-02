@@ -235,7 +235,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     // 가장 가까운 회전 방향으로 돌도록 기준을 맞춘다
     camGoal.az = cam.az + (((camGoal.az - cam.az) % 360) + 540) % 360 - 180;
     viewBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === v)));
-    if (caption) caption.textContent = `Render — ${VIEWS[v].label}`;
+    if (caption) caption.textContent = `Render ${VIEWS[v].label}`;
   }
   function placeCamera() {
     const az = cam.az * D2R, el = cam.el * D2R, d = cam.dist / cam.zoom;
@@ -296,7 +296,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     if (!drag.moved) { drag.moved = true; el.style.cursor = 'grabbing'; }
     if (drag.kind === 'head') headDrag(dx, dy);
     else if (drag.kind === 'body') goal.body = clamp(drag.p0.body + dx * 0.35, ...BODY);
-    else { camGoal.az = drag.az0 - dx * 0.4; camGoal.el = clamp(drag.el0 + dy * 0.3, -5, 84); view = 'persp'; viewBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === 'persp'))); if (caption) caption.textContent = `Render — ${VIEWS.persp.label}`; }
+    else { camGoal.az = drag.az0 - dx * 0.4; camGoal.el = clamp(drag.el0 + dy * 0.3, -5, 84); view = 'persp'; viewBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === 'persp'))); if (caption) caption.textContent = `Render ${VIEWS.persp.label}`; }
   });
   const end = (ev) => {
     if (!drag) return;

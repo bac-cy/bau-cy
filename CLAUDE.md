@@ -130,3 +130,4 @@
 - **Engineering 층 색 차분하게**(사용자 요청, 너무 컬러풀해서): 층마다 쓰던 복숭아·라일락·실버블루 파스텔을 채도 낮춘 회색빛 베이지·라일락·블루그레이로 바꿈(js/engineering.js 의 TINT). 선택 강조선 보라색은 그대로.
 - **시작 화면 순서**(사용자 요청): 세 가지가 한꺼번에 움직이지 않고 차례로 — COVE 로고가 먼저 나타나고(0.25초), 이어서 눈 LED가 켜지며(1.3초), 마지막에 진행 막대(2.1초). 최소 표시 시간 2.4→3.4초(css/loader.css, js/loader.js).
 - **시작 화면 = 눈 LED만**(사용자 요청, 위의 '시작 화면 순서'는 대체됨): 로고·진행 막대를 빼고 화면 중앙에 눈 LED 두 개만 켜져 깜빡이다 열림. 최소 표시 2.4초로 복귀.
+- **라벨의 긴 줄표(—) 제거**(사용자 요청, AI 티가 난다고): 01 About Cove·02 Key Features·03 Design & Detail·04 Gallery, Detail 01 Form 등, Render 3/4 View, 푸터 'COVE PHYSICAL AI COMPANION', 약속 아래 'Cove Desktop Home Robot'에서 '—'를 뺐다. 규격의 숫자 범위(160–237)는 그대로. 위 문서의 '01 — About Cove' 표기는 이제 '01 About Cove'.

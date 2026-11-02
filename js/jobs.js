@@ -5,7 +5,7 @@
   const intro = document.getElementById('intro'), feats = document.getElementById('features'), gal = document.getElementById('gallery'), foot = document.querySelector('.footer');
 
   /* 1) 한 줄 약속 */
-  const tag = $(`<section class="jobs-tag" aria-label="한 줄 약속"><p>${['로봇에게', '기대어', '쉬어', '보세요.'].map((w, i) => `<span class="w" style="transition-delay:${i * 0.18}s">${i === 1 ? '<em>기대어</em>' : w}</span>`).join(' ')}<small>Cove — Desktop Home Robot</small></p></section>`);
+  const tag = $(`<section class="jobs-tag" aria-label="한 줄 약속"><p>${['로봇에게', '기대어', '쉬어', '보세요.'].map((w, i) => `<span class="w" style="transition-delay:${i * 0.18}s">${i === 1 ? '<em>기대어</em>' : w}</span>`).join(' ')}<small>Cove Desktop Home Robot</small></p></section>`);
   intro && intro.after(tag);
 
   /* 2) 압력 시연: 스크롤을 따라 팔(점선 캡슐)이 내려와 머리를 누르고, 머리와 몸통 사이의 라벤더 패드가 지그시 눌림 */
