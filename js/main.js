@@ -81,8 +81,17 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
 /* ---------- 3. Nav background on scroll ---------- */
 const nav = document.getElementById('nav');
-const onScroll = () => nav.classList.toggle('is-scrolled', window.scrollY > 40);
+let lastY = window.scrollY;
+const onScroll = () => {
+  const y = window.scrollY;
+  nav.classList.toggle('is-scrolled', y > 40);
+  // 아래로 스크롤하면 메뉴 바가 위로 사라지고, 위로 스크롤하면 다시 내려옴 (맨 위에서는 항상 보임)
+  if (y < 80 || y < lastY - 2) nav.classList.remove('is-hidden');
+  else if (y > lastY + 2) nav.classList.add('is-hidden');
+  lastY = y;
+};
 window.addEventListener('scroll', onScroll, { passive: true });
+nav.addEventListener('focusin', () => nav.classList.remove('is-hidden'));
 onScroll();
 
 /* ---------- 6. Page indicator ----------

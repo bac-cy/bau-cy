@@ -467,3 +467,7 @@ html.lenis, html.lenis body { height: auto; }
 /* About Close: 3D 장면이 뜨면 정지 이미지는 감춤 */
 .principles__img > .slot__scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .principles__img.has-scene > img { visibility: hidden; }
+
+/* 아래로 스크롤하면 메뉴 바가 사라지고, 위로 스크롤하면 다시 내려옴 */
+.nav { transition: background .5s var(--ease), padding .5s var(--ease), backdrop-filter .5s, transform .45s cubic-bezier(.2, .9, .2, 1); }
+.nav.is-hidden { transform: translateY(-110%); }
