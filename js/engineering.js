@@ -115,6 +115,14 @@ if (root) {
       camera.position.set(d * Math.sin(az) * Math.cos(el), cy + d * Math.sin(el), d * Math.cos(az) * Math.cos(el)); camera.lookAt(0, cy, 0);
     }
 
+    // 아래 슬라이더: 좌우로 밀어서 부품을 합치거나 펼침 (왼쪽 = 합치기, 오른쪽 = 펼치기). 스크롤·휠로 움직일 때는 슬라이더도 따라감
+    const slider = document.querySelector('.eng__slider input'); let sliding = false;
+    if (slider) {
+      const set = () => { usingWheel = true; wheelE = clamp(+slider.value / 100, 0, 1); dirty = true; };
+      slider.addEventListener('input', set);
+      slider.addEventListener('pointerdown', () => { sliding = true; set(); }); addEventListener('pointerup', () => { sliding = false; });
+      slider.addEventListener('keydown', () => { sliding = true; setTimeout(() => { sliding = false; }, 400); });
+    }
     let last = performance.now();
     (function loop(now) {
       requestAnimationFrame(loop);
@@ -123,6 +131,7 @@ if (root) {
       eGoal = reduced ? 0 : usingWheel ? wheelE : smooth(scrollGoal());
       const ne = e + (eGoal - e) * Math.min(1, dt * 5);                       // 천천히 흐르듯 따라감
       if (Math.abs(ne - e) > 0.0004) { e = ne; dirty = true; }
+      if (slider && !sliding) { const sv = Math.round((usingWheel ? wheelE : e) * 100); if (+slider.value !== sv) slider.value = sv; slider.style.setProperty('--p', sv + '%'); }
       const yawGoal = baseYaw, elGoal = baseEl;
       const ny = yaw + (yawGoal - yaw) * Math.min(1, dt * 4), nel = tiltEl + (elGoal - tiltEl) * Math.min(1, dt * 4);
       if (Math.abs(ny - yaw) > 0.0004 || Math.abs(nel - tiltEl) > 0.0004) { yaw = ny; tiltEl = nel; dirty = true; }

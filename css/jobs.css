@@ -67,3 +67,14 @@
 .engspec__copy h3 { margin: 0; font-weight: 400; letter-spacing: .01em; font-size: clamp(27.2px, 2.89vw, 37.4px); }
 .engspec__copy p { color: var(--ink-soft); font-weight: 300; max-width: 34em; margin: 14px 0 0; line-height: 1.75; }
 @media (min-width: 901px) { .engspec__side { position: sticky; top: 14vh; } }
+
+/* Engineering 분해도 아래 슬라이더: 좌우로 밀어 부품을 합치거나 펼침 */
+.eng__slider { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; margin-top: 18px; padding: 0 6px; font-size: 12px; letter-spacing: .08em; color: #6e6e73; }
+.eng__slider input { -webkit-appearance: none; appearance: none; width: 100%; height: 28px; background: transparent; cursor: pointer; margin: 0; --p: 100%; }
+.eng__slider input::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: linear-gradient(90deg, #1d1d1f var(--p), rgba(0, 0, 0, .14) var(--p)); }
+.eng__slider input::-moz-range-track { height: 4px; border-radius: 4px; background: rgba(0, 0, 0, .14); }
+.eng__slider input::-moz-range-progress { height: 4px; border-radius: 4px; background: #1d1d1f; }
+.eng__slider input::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; margin-top: -10px; border-radius: 50%; background: #fff; border: 1px solid rgba(0, 0, 0, .12); box-shadow: 0 6px 16px -6px rgba(60, 40, 90, .5); transition: transform .15s; }
+.eng__slider input::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 1px solid rgba(0, 0, 0, .12); box-shadow: 0 6px 16px -6px rgba(60, 40, 90, .5); }
+.eng__slider input:active::-webkit-slider-thumb { transform: scale(1.12); }
+.eng__slider input:focus-visible { outline: 2px solid var(--lavender); outline-offset: 4px; border-radius: 8px; }
