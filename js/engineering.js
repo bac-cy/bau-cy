@@ -38,8 +38,8 @@ if (root) {
     const model = (await loader.loadAsync('assets/eng/cove-eng.glb')).scene; scene.add(model);
 
     // X-ray 재질: 층마다 은은한 파스텔 빛(진주·복숭아·라일락·실버블루)을 입히고, 윤곽선은 따뜻한 먹색 가는 선.
-    const TINT = { head_top: ['#f4d7c4', '#e9c7d8'], head_inner: ['#d9d0f0', '#c3b8e6'], head_low: ['#f1dccb', '#e8c9d4'], body_top: ['#f4d7c4', '#e9c7d8'],
-      board: ['#d6e0ee', '#bccbe0'], ring: ['#e9e2d6', '#d8cfbf'], body_frame: ['#d9d0f0', '#c3b8e6'], base: ['#e4dccf', '#cfc4b4'] };
+    const TINT = { head_top: ['#e9e4df', '#d9d3cd'], head_inner: ['#e4e2e8', '#d0cdd8'], head_low: ['#ebe6e0', '#dcd5ce'], body_top: ['#e9e4df', '#d9d3cd'],
+      board: ['#e2e5ea', '#cfd4dc'], ring: ['#e9e6e1', '#d9d4cc'], body_frame: ['#e4e2e8', '#d0cdd8'], base: ['#e6e2db', '#d4cec4'] };
     const mk = (k) => {
       const [c2, c1] = TINT[k] || TINT.base, shell = SHELL.has(k);
       return new THREE.ShaderMaterial({
