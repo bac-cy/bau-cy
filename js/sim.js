@@ -176,7 +176,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   };
   const GUIDE = {
     greet: '인사하는 Cove를 지켜보세요', pet: '마우스로 머리를 쓰다듬어 보세요', tickle: '마우스로 몸통을 살살 문질러 보세요',
-    snack: '간식 아이콘을 끌어다 Cove에게 주세요', ball: '원하는 곳을 눌러 공을 떨어뜨려 보세요 — 머리 위는 통통, 몸통 위는 덥석!', rest: '기대어 쉬는 Cove를 지켜보세요', sleep: 'Cove가 스르르 잠들어요',
+    snack: '간식 아이콘을 끌어다 Cove에게 주세요', ball: '원하는 곳을 눌러 공을 떨어뜨려 보세요. 머리 위는 통통, 몸통 위는 덥석!', rest: '기대어 쉬는 Cove를 지켜보세요', sleep: 'Cove가 스르르 잠들어요',
   };
   let clip = null, clipT = 0, clipName = '';
   function sampleClip(c, t) {

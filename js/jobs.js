@@ -48,13 +48,13 @@
 
   /* 3) 큰 숫자 스펙 */
   const spec = $(`<section class="jobs-spec" aria-label="스펙"><p class="jobs-spec__label">Tech Specs</p><div class="jobs-spec__grid">
-    <div class="jobs-spec__item"><div class="jobs-spec__num"><i data-a="160" data-b="237">160–237</i><span>mm</span></div><div class="jobs-spec__cap"><b>Height</b>접은 모습부터 가장 길게 펴졌을 때까지</div></div>
-    <div class="jobs-spec__item"><div class="jobs-spec__num"><i data-a="222" data-b="251">222–251</i><span>mm</span></div><div class="jobs-spec__cap"><b>Width</b>몸통을 돌리고 갸웃할 때의 폭</div></div>
+    <div class="jobs-spec__item"><div class="jobs-spec__num"><i data-a="160" data-b="237">160~237</i><span>mm</span></div><div class="jobs-spec__cap"><b>Height</b>접은 모습부터 가장 길게 펴졌을 때까지</div></div>
+    <div class="jobs-spec__item"><div class="jobs-spec__num"><i data-a="222" data-b="251">222~251</i><span>mm</span></div><div class="jobs-spec__cap"><b>Width</b>몸통을 돌리고 갸웃할 때의 폭</div></div>
     <div class="jobs-spec__item"><div class="jobs-spec__num"><i data-a="4" data-b="4">4</i><span>모터</span></div><div class="jobs-spec__cap"><b>Motors</b>고개와 몸통을 부드럽게 움직이는 다이나믹셀 4개</div></div>
     <div class="jobs-spec__item"><div class="jobs-spec__num"><i data-a="2" data-b="2">2</i><span>+</span><i data-a="3" data-b="3">3</i><span>센서</span></div><div class="jobs-spec__cap"><b>Sensors</b>거리센서 2개 · 접촉센서 3개</div></div></div></section>`);
   gal && gal.before(spec);
   const io = new IntersectionObserver((es) => es.forEach(e => { if (!e.isIntersecting) return; const it = e.target; it.classList.add('in'); io.unobserve(it);
-    it.querySelectorAll('i[data-a]').forEach(n => { const a = +n.dataset.a, b = +n.dataset.b, t0 = performance.now(); (function step(now) { const u = ez((now - t0) / 1400), va = Math.round(a * u), vb = Math.round(b * u); n.textContent = a === b ? va : `${va}–${vb}`; if (u < 1) requestAnimationFrame(step); else n.textContent = a === b ? a : `${a}–${b}`; })(t0); }); }), { threshold: 0.4 });
+    it.querySelectorAll('i[data-a]').forEach(n => { const a = +n.dataset.a, b = +n.dataset.b, t0 = performance.now(); (function step(now) { const u = ez((now - t0) / 1400), va = Math.round(a * u), vb = Math.round(b * u); n.textContent = a === b ? va : `${va}~${vb}`; if (u < 1) requestAnimationFrame(step); else n.textContent = a === b ? a : `${a}~${b}`; })(t0); }); }), { threshold: 0.4 });
   spec.querySelectorAll('.jobs-spec__item').forEach(i => io.observe(i));
   const io2 = new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }), { threshold: 0.45 }); io2.observe(tag);
 
