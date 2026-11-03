@@ -1,0 +1,33 @@
+/* Cove 360° 뷰어 (js/cove360.js) — 되돌리려면 cove.html 에서 이 파일 링크, js/cove360.js 줄, .v360 이 들어간 두 군데(Design 칸·마무리 장면)를 지움 */
+.v360 { position: absolute; inset: 0; cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; opacity: 0; transition: opacity .5s; }
+.v360.is-ready { opacity: 1; }
+.v360.is-drag { cursor: grabbing; }
+.v360__cv { display: block; width: 100%; height: 100%; pointer-events: none; }
+
+/* Design 칸: 평소엔 고화질 360° 렌더가 보이고(끌어서 회전·보는 각도·확대), 동작을 할 때(.is-live)만 3D 시뮬레이터가 보임 */
+.design__visual .v360 { z-index: 2; pointer-events: none; }                 /* display:none 이면 화면 감지가 안 돼 이미지를 못 불러오므로 숨김은 opacity 로 */
+.design__visual.has-360:not(.is-live) .v360.is-ready { pointer-events: auto; }
+.design__visual.is-live .v360 { opacity: 0; pointer-events: none; }
+.design__visual.has-360 .cove-art { visibility: hidden; }
+.design__visual.has-360 .cove-3d { transition: opacity .45s; }
+.design__visual.has-360:not(.is-live) .cove-3d { opacity: 0; pointer-events: none; }
+.design__visual.has-360 figcaption { display: none; }
+.v360__hint { display: none; }
+.design__visual.has-360:not(.is-live) .sim__status:not(.v360__hint) { display: none; }
+.design__visual.has-360:not(.is-live) .v360__hint { display: block; pointer-events: none; }
+.design__visual .sim__ui { z-index: 3; }
+/* 마무리 장면: 같은 자리의 렌더 이미지를 대신함 */
+.intro__render.has-360 img { visibility: hidden; }
+/* 3D Cove 는 평소엔 투명하게 숨어 있다가(클릭·마우스 접근을 받아 줌), 움직일 때(.is-act)만 360° 렌더 위로 나타남 */
+.intro__render.has-360 .intro__live { display: block !important; opacity: 0; transition: opacity .25s; }
+.intro__render.has-360.is-act .intro__live { opacity: 1; }
+.intro__render.has-360.is-act .v360 { opacity: 0; transition: opacity .25s; }
+.intro__render .v360 { cursor: default; touch-action: auto; pointer-events: none;
+  /* 360° 사진은 가장자리 여백이 커서, 칸을 크게 잡아 예전 3D 때와 비슷한 크기로 보이게 함 */
+  inset: auto; left: 50%; top: 50%; width: min(190%, 110vw); height: auto; aspect-ratio: 2039 / 1440; translate: -50% -50%; }
+/* 360° 렌더와 3D Cove가 바뀔 때 크기·바닥 위치가 어긋나지 않게 3D 쪽을 맞춤(실측: 폭 0.85배, 바닥 3%) */
+.intro__render.has-360 .intro__live { transform-origin: 50% 94.4%; transform: translateY(3.07%) scale(.85); }
+/* 마무리 장면 Cove 끌어서 돌리기: 세로 스크롤은 그대로 두고 가로로 끌면 360° 렌더가 돌아감 */
+.intro__render.has-360 { touch-action: pan-y; }
+/* Design 칸: 360° 렌더와 3D(동작 버튼)가 바뀔 때 Cove 위치가 어긋나지 않게 360° 쪽을 맞춤(실측: 3D가 약 100px 위, 오른쪽 9px 어긋남 → 높이의 13.4% 위, 폭의 1.4% 오른쪽) */
+.design__visual .v360__cv { transform-origin: 50% 85%; transform: translate(-0.7%, -13.4%) scale(.96); }

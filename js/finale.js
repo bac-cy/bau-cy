@@ -45,7 +45,7 @@
     if (r.bottom < -50 || r.top > innerHeight + 50) return;
     const W = innerWidth, H = innerHeight;
     // 장면이 화면 아래에서 절반쯤 올라왔을 때부터 글자가 나오기 시작해서, 화면에 꽉 차면 Cove가 올라옴
-    const raw = -r.top / H + 0.45, tgt = clamp(raw, 0, (r.height - H) / H + 0.45);
+    const raw = -r.top / H + 0.8, tgt = clamp(raw, 0, (r.height - H) / H + 0.8);
     ss = smoothDamp(ss, tgt, vss, 0.2, dt); if (Math.abs(tgt - ss) < 0.0003 && Math.abs(vss.v) < 0.005) { ss = tgt; vss.v = 0; }
     const b = smooth(clamp(ss / 1.0));
     const bl = clamp(b / 0.55), br = clamp((b - 0.62) / 0.38);                          // 글자가 먼저 다 나오고, 그다음 Cove가 올라옴
@@ -69,8 +69,10 @@
       el.style.transform = `translate3d(0, ${((1 - e) * H * 0.42).toFixed(1)}px, 0)`;
       el.style.filter = q < 0.98 ? `blur(${((1 - q) * 12).toFixed(1)}px)` : 'none';
     });
+    // 글자 위치를 먼저 한꺼번에 읽고(레이아웃 계산 1번) 나서 스타일을 씀 → 글자마다 읽고 쓰기를 번갈아 하면 매 프레임 끊김
+    const rects = b > 0.02 ? chars.map(el => el.getBoundingClientRect()) : null;
     if (b > 0.02) chars.forEach((el, i) => {
-      const inner = el.firstChild, rr = el.getBoundingClientRect(); if (!rr.width) return;
+      const inner = el.firstChild, rr = rects[i]; if (!rr.width) return;
       const ccx = rr.left + rr.width / 2, ccy = rr.top + rr.height / 2, dx = ax - ccx, dy = ay - ccy, dist = Math.hypot(dx, dy);
       const st = inner._s || (inner._s = { tx: 0, ty: 0, rx: 0, ry: 0, sc: 1, hx: 50, hy: 30 });
       const prox = Math.exp(-Math.pow(dist / (W * 0.22), 2)), k = 1 - Math.exp(-dt * 9);
@@ -97,8 +99,8 @@
     }
     burst.style.opacity = (0.95 * bump).toFixed(3);
     burst.style.transform = `scale(${(0.45 + 1.15 * br).toFixed(3)})`;
-    render.style.opacity = clamp(br * 3);
-    render.style.transform = `translate3d(0, ${(1 - backOut(br)) * H * 0.95}px, 0) scale(${(0.7 + 0.3 * backOut(br)).toFixed(3)})`;
+    if (render) render.style.opacity = clamp(br * 3);
+    if (render) render.style.transform = `translate3d(0, ${(1 - backOut(br)) * H * 0.95}px, 0) scale(${(0.7 + 0.3 * backOut(br)).toFixed(3)})`;
   }
   requestAnimationFrame(frame);
 })();

@@ -11,6 +11,16 @@
     const id = a.getAttribute('href'); if (id.length < 2) return;
     const el = document.querySelector(id); if (!el) return;
     e.preventDefault();
-    lenis.scrollTo(el, { offset: -(parseFloat(getComputedStyle(el).scrollMarginTop) || 0), duration: 1.4 });
+    const offset = -(parseFloat(getComputedStyle(el).scrollMarginTop) || 0), dist = Math.abs(el.getBoundingClientRect().top + offset);
+    if (dist < 4) return;
+    /* 메뉴 이동: 천천히 출발해서 속도를 내고 부드럽게 멈추는 한 번의 스크롤(거리에 맞춰 0.8~1.6초).
+       이동하는 동안 주변이 어색하게 반응하지 않도록: 메뉴 바는 그대로 있고, 강조 항목은 누른 항목에 고정,
+       페이지 표시는 도착한 뒤에 바뀌고, 유리 흐림 효과는 잠시 꺼서(가벼워짐) 끊김을 줄여요. */
+    const dur = Math.min(1.6, Math.max(0.8, 0.7 + dist / innerHeight * 0.1));
+    const R = document.documentElement; window.__coveJump = id; R.classList.add('is-jumping');
+    let ended = false;
+    const end = () => { if (ended) return; ended = true; window.__coveJump = null; R.classList.remove('is-jumping'); window.dispatchEvent(new Event('scroll')); };
+    lenis.scrollTo(el, { offset, duration: dur, easing: (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, onComplete: end });
+    setTimeout(end, dur * 1000 + 600);
   });
 })();

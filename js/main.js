@@ -85,6 +85,7 @@ let lastY = window.scrollY;
 const onScroll = () => {
   const y = window.scrollY;
   nav.classList.toggle('is-scrolled', y > 40);
+  if (window.__coveJump) { nav.classList.remove('is-hidden'); lastY = y; return; }      // 메뉴로 이동하는 동안에는 메뉴 바가 사라지지 않음
   // 아래로 스크롤하면 메뉴 바가 위로 사라지고, 위로 스크롤하면 다시 내려옴 (맨 위에서는 항상 보임)
   if (y < 80 || y < lastY - 2) nav.classList.remove('is-hidden');
   else if (y > lastY + 2) nav.classList.add('is-hidden');
@@ -113,6 +114,7 @@ let pagerIndex = -1, pagerTick = false;
 
 function updatePager() {
   pagerTick = false;
+  if (window.__coveJump) return;                                                   // 메뉴로 이동하는 동안에는 바꾸지 않고, 도착하면 한 번에 바뀜
   const mid = window.innerHeight * 0.5;
   let idx = 0;
   PAGES.forEach((p, i) => { if (p.el.getBoundingClientRect().top <= mid) idx = i; });
@@ -146,6 +148,7 @@ function updateNavSpy() {
   const mid = window.innerHeight * 0.45;
   let cur = null;
   spyItems.forEach(x => { if (x.el.getBoundingClientRect().top <= mid) cur = x; });
+  if (window.__coveJump) cur = spyItems.find(x => x.a.getAttribute('href') === window.__coveJump) || cur;      // 이동 중에는 누른 항목에 고정
   if (cur && spyEnd && spyEnd.getBoundingClientRect().top <= mid) cur = null;
   spyItems.forEach(x => {
     if (x === cur) x.a.setAttribute('aria-current', 'location'); else x.a.removeAttribute('aria-current');
@@ -167,7 +170,7 @@ updateNavSpy();
   /* 캐러셀 이동 */
   const idx = () => Math.round(track.scrollLeft / (track.clientWidth + 16));
   const go = (i) => { i = Math.max(0, Math.min(figs.length - 1, i)); track.scrollTo({ left: i * (track.clientWidth + 16), behavior: 'smooth' }); };
-  const sync = () => { const i = idx(); dots.forEach((d, k) => d.setAttribute('aria-selected', String(k === i))); arrows[0] && (arrows[0].style.opacity = i === 0 ? .35 : 1); arrows[1] && (arrows[1].style.opacity = i === figs.length - 1 ? .35 : 1); };
+  const sync = () => { const i = idx(); window.COVE_FILM2 = (i === 1);   /* 두 번째 영상이 보이는 중: 영상에 소리가 없어서 배경음악을 켬(js/cove-sound.js) */ dots.forEach((d, k) => d.setAttribute('aria-selected', String(k === i))); arrows[0] && (arrows[0].style.opacity = i === 0 ? .35 : 1); arrows[1] && (arrows[1].style.opacity = i === figs.length - 1 ? .35 : 1); };
   track.addEventListener('scroll', () => requestAnimationFrame(sync), { passive: true }); sync();
   arrows.forEach(a => a.addEventListener('click', () => go(idx() + Number(a.dataset.dir))));
   dots.forEach((d, k) => d.addEventListener('click', () => go(k)));
@@ -186,7 +189,7 @@ updateNavSpy();
     const isFull = () => document.fullscreenElement === fig || document.webkitFullscreenElement === fig || v.webkitDisplayingFullscreen;
     // 인트로 영상 소리: 전체 화면으로 바꾸지 않아도, 화면에 보이는 동안 소리와 함께 재생 (브라우저가 막으면 소리 없이 시작했다가 처음 클릭·키 입력 때 바로 켜짐)
     const filmBox = fig.closest('.intro__film'); let vis = false;
-    const soundOn = () => { try { return localStorage.getItem('cove-sound') !== 'off'; } catch (e) { return true; } };
+    const soundOn = () => { if (/[?&]sub=1/.test(location.search)) return false; try { return localStorage.getItem('cove-sound') !== 'off'; } catch (e) { return true; } };
     const opac = () => { const o = filmBox ? parseFloat(filmBox.style.opacity) : 1; return isNaN(o) ? 1 : o; };   // 영상이 서서히 사라지는 동안 소리도 함께 작아짐
     const applyAudio = () => { if (isFull()) return; const want = soundOn() && opac() > 0.05; v.volume = Math.max(0, Math.min(1, opac() * 0.9)); if (want && v.muted && gestureDone) v.muted = false; if (!want && !v.muted) v.muted = true; };
     const startPlay = () => {
@@ -205,14 +208,25 @@ updateNavSpy();
     const showBar = () => { if (!isFull()) return; v.controls = true; fig.style.cursor = ''; clearTimeout(hideT); hideT = setTimeout(hideBar, 1500); };
     const hideBar = () => { if (!isFull() || v.paused) return; v.controls = false; fig.style.cursor = 'none'; };
     ['pointermove', 'pointerdown', 'touchstart'].forEach(t => fig.addEventListener(t, showBar, { passive: true }));
+    // 전체 화면에서는 영상 1 → 영상 2 순서로 이어서 재생하고, 마지막이 끝나면 전체 화면을 닫고 스크롤이 이어짐
+    const orig = { src: v.getAttribute('src'), poster: v.getAttribute('poster') }; let seq = -1;
+    const playAt = (k) => { const nv = figs[k].querySelector('video'); seq = k; v.loop = false; v.poster = nv.getAttribute('poster') || ''; v.src = nv.getAttribute('src'); v.currentTime = 0; v.muted = false; const p = v.play(); if (p && p.catch) p.catch(() => {}); };
+    v.addEventListener('ended', () => {
+      if (seq < 0 || !isFull()) return;
+      /* 영상을 이어 붙이지 않음(사용자 요청): 전체 화면에서는 보던 영상이 처음부터 반복돼요 */
+      v.currentTime = 0; const p = v.play(); if (p && p.catch) p.catch(() => {});
+    });
     const enter = () => {
+      seq = figs.indexOf(fig);
       v.currentTime = 0; v.muted = false; v.controls = false; fig.classList.add('is-full'); setTimeout(hideBar, 300);
       const req = fig.requestFullscreen || fig.webkitRequestFullscreen;
       if (req) { const r = req.call(fig); if (r && r.catch) r.catch(() => exitUI()); }
       else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen();                  // iPhone Safari
       const p = v.play(); if (p && p.catch) p.catch(() => {});
     };
-    const exitUI = () => { clearTimeout(hideT); fig.style.cursor = ''; fig.classList.remove('is-full'); v.muted = !(soundOn() && gestureDone); v.controls = reduce; const p = v.play(); if (p && p.catch && !reduce) p.catch(() => {}); };
+    const exitUI = () => {
+      if (seq >= 0) { seq = -1; v.loop = true; if (v.getAttribute('src') !== orig.src) { v.setAttribute('src', orig.src); if (orig.poster) v.poster = orig.poster; } }
+      clearTimeout(hideT); fig.style.cursor = ''; fig.classList.remove('is-full'); v.muted = !(soundOn() && gestureDone); v.controls = reduce; const p = v.play(); if (p && p.catch && !reduce) p.catch(() => {}); };
     // 영상을 더블클릭하면 전체 화면, 전체 화면에서 한 번 더 더블클릭하면 나옴 (한 번 클릭만으로는 아무 일도 없음)
     fig.addEventListener('dblclick', (e) => {
       if (isFull()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }

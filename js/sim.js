@@ -31,6 +31,9 @@ async function init(host) {
   ]);
 
   const figure = host.closest('figure');
+  // Design 시뮬레이터가 화면에 보일 때만 소리를 냄(혼자 하는 움직임·표정 소리가 다른 페이지에서 나던 문제)
+  let simVis = false; new IntersectionObserver(([en]) => { simVis = en.isIntersecting; }, { threshold: 0.12 }).observe(figure);
+  const snd = (fn, ...a) => { if (simVis) CoveSound[fn](...a); };
   const ui = figure.querySelector('.sim__ui');
   const caption = figure.querySelector('figcaption');
   const statusEl = figure.querySelector('.sim__status');
@@ -39,16 +42,16 @@ async function init(host) {
 
   /* ───────── 장면 ───────── */
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.08;
+  renderer.setPixelRatio(Math.min(Math.max(window.devicePixelRatio || 1, 2) * 1.25, 3));          // 2.5배 크게 그려 줄여 보여 줌(슈퍼샘플링): 윤곽이 매끈하고 패브릭 결이 또렷해짐
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.12;
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.VSMShadowMap;      // 머리가 몸통에 드리우는 부드러운 그림자 — 렌더 이미지 같은 입체감
   host.appendChild(renderer.domElement);
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  scene.add(new THREE.HemisphereLight(0xfff4e8, 0xd8c8c0, 1.5));
-  const key = new THREE.DirectionalLight(0xfff0e0, 1.35); key.position.set(-0.45, 2.5, 0.95);
-  key.castShadow = true; key.shadow.mapSize.set(innerWidth <= 760 ? 1024 : 2048, innerWidth <= 760 ? 1024 : 2048); key.shadow.bias = -0.0006; key.shadow.normalBias = 0.003; key.shadow.radius = 9; key.shadow.blurSamples = 20;
+  scene.add(new THREE.HemisphereLight(0xfff4e8, 0xd8c8c0, 1.1));
+  const key = new THREE.DirectionalLight(0xfff0e0, 1.8); key.position.set(-0.45, 2.5, 0.95);
+  key.castShadow = true; key.shadow.mapSize.set(innerWidth <= 760 ? 2048 : 4096, innerWidth <= 760 ? 2048 : 4096); key.shadow.bias = -0.0005; key.shadow.normalBias = 0.0025; key.shadow.radius = 11; key.shadow.blurSamples = 25;
   Object.assign(key.shadow.camera, { left: -0.45, right: 0.45, top: 0.45, bottom: -0.45, near: 0.3, far: 5 }); key.target.position.set(0, 0.12, 0); scene.add(key, key.target);
   const fill = new THREE.DirectionalLight(0xe4dbf5, 0.5); fill.position.set(2, .6, -1); scene.add(fill);
   const rim = new THREE.DirectionalLight(0xffe9d6, 0.7); rim.position.set(1.2, 1.2, -1.6); scene.add(rim);            // 가장자리에 은은한 빛줄기(윤곽이 또렷해짐)
@@ -71,7 +74,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
 { float g1 = vn(vObjPos * 420.0), g2 = vn(vObjPos * 130.0), g3 = vn(vObjPos * 38.0);
   diffuseColor.rgb *= 0.93 + 0.10 * g1 + 0.05 * g2 + 0.04 * g3; }`);
   };
-  const piping = new THREE.MeshStandardMaterial({ color: '#f4f2ee', roughness: 0.55, metalness: 0, envMapIntensity: 0.9 });
+  const piping = new THREE.MeshStandardMaterial({ color: '#dad7e2', roughness: 0.34, metalness: 0.72, envMapIntensity: 1.4 });   // 머리·몸통 가운데 띠 = 스틸 느낌(사용자 요청)
   const aluminum = printedMaterial(THREE);
   const rubber = new THREE.MeshStandardMaterial({ color: '#8d8c8a', roughness: 0.9, metalness: 0 });
   const FABRIC = ['새_헤드_상판', '새_쿠션', '새_하부_폼', '새_하부_쉘'], PIPING = ['새_헤드_하부판', '새_하부_덮개판'];
@@ -154,7 +157,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     greet: slice(greet, 3, 14),            // 반가워서 고개를 들고 인사하기
     pet: slice(rest1, petStart, petStart + 6),
     tickle: slice(tickle, 8, 22),          // 간지러워요! → 더 놀고 싶어요
-    snack: slice(snack, 14, 27),           // 먹고 싶어요 → 냠냠 → 배가 불러요
+    snack: slice(snack, 17.5, 27),         // 먹고 싶어요(끝부분) → 냠냠 → 배가 불러요 (앞부분 3.5초를 건너뛰어 먹는 장면이 더 빨리 나옴)
     rest: slice(rest1, 9, 16),             // 팔을 올려 주길 기다리다 기대니까 편안해요
     sleep: slice(rest1, 14, 24),           // 스르르 잠이 와요 → 감은 눈
     // 콕 찌르기 반응 (기본 상태에서 머리·몸통을 클릭할 때)
@@ -206,7 +209,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     if (clipName === name && clip) { stopClip(); return; }                  // 같은 버튼을 다시 누르면 멈춤
     clip = CLIPS[name]; clipName = name; clipT = -0.9; gest = null; lastActive = tNow;   // 처음 0.9초는 시작 자세로 부드럽게 이동
     buildSteps(clip); setStatus(GUIDE[name] || HINT, 'on');
-    CoveSound.event(name);                                                  // 동작에 맞는 소리 (인사·쓰다듬기·간지럼·잠들기 등)
+    snd('event', name);                                                  // 동작에 맞는 소리 (인사·쓰다듬기·간지럼·잠들기 등)
     motionBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.motion === name || b.dataset.motion === mode)));
   }
   function stopClip(keepPose = true) {
@@ -360,7 +363,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   }
   /* ───────── 간식: 쿠키를 가져다 대면 Cove가 먹고, 먹는 만큼 쿠키가 조금씩 줄어듦 ───────── */
   const ez = (u) => u * u * (3 - 2 * u);
-  const BITES = [5.7, 6.4, 7.1, 7.8, 8.5];                                  // 냠냠 구간에서 한 입씩 베어 무는 시각(재생 시각 초) — 빠르게 연달아
+  const BITES = [3.2, 3.9, 4.6, 5.3, 6.0];                                  // 냠냠 구간에서 한 입씩 베어 무는 시각(재생 시각 초) — 빠르게 연달아
   const SCALES = [1, 0.8, 0.6, 0.42, 0.25, 0.08];                           // 먹은 입 수에 따른 남은 크기
   const BITE_AT = [[10, 17], [53, 14], [54, 44], [11, 46], [32, 6]];       // 베어 문 자국 위치(쿠키 그림 기준)
   // 실사 느낌 쿠키: 구운 빛깔의 그라데이션 + 잔 결(노이즈) + 초콜릿 조각 + 가장자리 어두운 구움색
@@ -382,10 +385,14 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   figure.appendChild(cookieEl);
   const toyCookie = figure.querySelector('.sim__toy[data-kind="snack"]'); if (toyCookie) toyCookie.innerHTML = cookieSvg('ckt', false);   // 끌어다 줄 쿠키도 같은 그림
   const biteEls = [...cookieEl.querySelectorAll('.bite')], biteR = [0, 0, 0, 0, 0]; let cookieDrop = null, cookieScale = 1, cookieA = 0, cookieG0 = 1; const _cv = new THREE.Vector3();
+  const _mb = new THREE.Box3(), _ms = new THREE.Vector3();
   const mouthXY = () => {                                                    // Cove 입 높이의 화면 위치(figure 기준)
     const fr = figure.getBoundingClientRect(), er = el.getBoundingClientRect();
-    head.getWorldPosition(_cv); _cv.addScaledVector(FRONT, 0.03); _cv.project(camera);
-    return { x: er.left - fr.left + (_cv.x + 1) / 2 * er.width, y: er.top - fr.top + (1 - _cv.y) / 2 * er.height + er.height * 0.045, w: er.width };
+    // 입 = 머리 앞쪽 아래 가장자리의 3D 점을 지금 카메라(정면·측면·위·퍼스펙티브)로 투영 → 보는 각도에 따라 쿠키 위치가 알맞게 바뀜
+    _mb.setFromObject(head); _mb.getCenter(_cv); _mb.getSize(_ms);
+    _cv.y = _mb.min.y + _ms.y * 0.2; _cv.addScaledVector(FRONT, Math.max(_ms.x, _ms.z) * 0.32);
+    _cv.project(camera);
+    return { x: er.left - fr.left + (_cv.x + 1) / 2 * er.width, y: er.top - fr.top + (1 - _cv.y) / 2 * er.height, w: er.width };
   };
   const nearOf = (px, py) => { const m = mouthXY(); return clamp(1 - Math.hypot(px - m.x, py - m.y) / (m.w * 0.55), 0, 1); };   // 입에 가까울수록 1
   const CRUMB = ['#c98c4a', '#a8682f', '#e0b070', '#5a3523'];
@@ -402,9 +409,9 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     const on = clipName === 'snack' && clip;
     if (!on) { updateCookie._e = 0; cookieEl.hidden = true; cookieDrop = null; cookieScale = 1; cookieA = 0; biteR.fill(0); biteEls.forEach(b => b.setAttribute('r', 0)); return; }
     const t = clipT, eaten = BITES.filter(b => t >= b).length, m = mouthXY();
-    const arrive = ez(clamp((t + 0.9) / 2.2, 0, 1)), d = cookieDrop || { x: m.x, y: m.y };
+    const arrive = ez(clamp((t + 0.9) / 1.6, 0, 1)), d = cookieDrop || { x: m.x, y: m.y };
     const x = d.x + (m.x - d.x) * arrive, y = d.y + (m.y - d.y) * arrive;
-    if (eaten > (updateCookie._e || 0)) { CoveSound.bite(); crumbs(x, y); } updateCookie._e = eaten;      // 한 입마다 냠 소리 + 부스러기
+    if (eaten > (updateCookie._e || 0)) { snd('bite', ); crumbs(x, y); } updateCookie._e = eaten;      // 한 입마다 냠 소리 + 부스러기
     cookieScale += (SCALES[eaten] - cookieScale) * Math.min(1, dt * 16);
     cookieA += ((eaten >= 5 && t > BITES[4] + 0.35 ? 0 : 1) - cookieA) * Math.min(1, dt * 14);
     biteEls.forEach((b, i) => { biteR[i] += ((i < eaten ? 12 : 0) - biteR[i]) * Math.min(1, dt * 24); b.setAttribute('r', biteR[i].toFixed(2)); });
@@ -473,7 +480,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     if (b.state === 'chomp') {                                                 // 머리와 몸통 사이에 공을 넣고 머리를 빠르게 위아래로 앙앙앙
       const tc = b.hold += dt, ON = 4.8, cyc = 0.36, active = tc < ON;
       const down = active ? 0.5 - 0.5 * Math.cos(2 * Math.PI * tc / cyc) : 0;
-      if (down > 0.92 && !(b.bitten)) { b.bitten = true; CoveSound.bite(); } else if (down < 0.5) b.bitten = false;   // 앙! 한 번마다 소리
+      if (down > 0.92 && !(b.bitten)) { b.bitten = true; snd('bite', ); } else if (down < 0.5) b.bitten = false;   // 앙! 한 번마다 소리
       goal.neck = lerp(19, 7, down); goal.head = lerp(-25, -7, down); goal.body = active ? Math.sin(tc * 2.6) * 7 : 0; goal.tilt = active ? Math.sin(tc * 5.1) * 3 : 0;
       ballEye = active ? (Math.floor(tc / 0.72) % 2 ? '하트 눈' : '신난 눈') : '반짝 눈'; ballGx = 0;
       p.set(center.x + FRONT.x * 0.05, BODY_TOP + BR * (1 - 0.22 * down), center.z + FRONT.z * 0.05);
@@ -497,13 +504,13 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     const py = p.y; v.y -= G * h; p.addScaledVector(v, h);
     hd = horiz(p, _hc);
     if (v.y < 0 && py - BR >= headTop - 0.002 && p.y - BR <= headTop && hd < headR) {                       // 머리 위에 닿음 → 드리블
-      p.y = headTop + BR; b.state = 'dribble'; v.y = Math.max(0.62, -v.y * 0.82); bob = 1; CoveSound.bounce();
+      p.y = headTop + BR; b.state = 'dribble'; v.y = Math.max(0.62, -v.y * 0.82); bob = 1; snd('bounce', );
       v.x = v.x * 0.5 + (_hc.x - p.x) * 2.2 + (Math.random() - 0.5) * 0.08; v.z = v.z * 0.5 + (_hc.z - p.z) * 2.2 + (Math.random() - 0.5) * 0.08;      // 중심으로 모으고 살짝 흔들어 줌
     } else if (v.y < 0 && py - BR >= BODY_TOP - 0.002 && p.y - BR <= BODY_TOP && horiz(p, center) < BODY_R && p.y < headTop - 0.04) {      // 몸통 위에 떨어짐 → 덥석
       if (b.state === 'fall' || b.state === 'dribble') { p.y = BODY_TOP + BR; v.set(0, 0, 0); b.state = 'bite'; b.hold = 0; b.rest = p.clone(); }
-      else { p.y = BODY_TOP + BR; v.y = -v.y * 0.45; CoveSound.bounce(); }
+      else { p.y = BODY_TOP + BR; v.y = -v.y * 0.45; snd('bounce', ); }
     }
-    if (p.y - BR <= FLOOR && v.y < 0) { if (-v.y > 0.35) CoveSound.bounce(); p.y = FLOOR + BR; v.y = -v.y * 0.5; if (v.y < 0.2) v.y = 0; v.x *= 0.97; v.z *= 0.97; if (b.state !== 'roll') b.state = 'roll'; }
+    if (p.y - BR <= FLOOR && v.y < 0) { if (-v.y > 0.35) snd('bounce', ); p.y = FLOOR + BR; v.y = -v.y * 0.5; if (v.y < 0.2) v.y = 0; v.x *= 0.97; v.z *= 0.97; if (b.state !== 'roll') b.state = 'roll'; }
     if (b.state === 'roll') { v.x *= (1 - 0.8 * h); v.z *= (1 - 0.8 * h); b.spin += Math.hypot(v.x, v.z) * h / BR; if (Math.hypot(v.x, v.z) < 0.03 && p.y <= FLOOR + BR + 0.001) b.still += h; }
     const cd = horiz(p, center);                                              // 몸통 옆면에 부딪히면 튕겨 나감
     if (p.y - BR < BODY_TOP - 0.01 && cd < BODY_R + BR && cd > 1e-4 && b.state !== 'bite') {
@@ -604,7 +611,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     const tm = clip ? (clipT < 0 ? 0.3 : 0.07) : gest ? 0.16 : 0.1;           // 동작이 시작되기 전 준비 구간은 천천히 부드럽게
     const _pp = { neck: pose.neck, head: pose.head, tilt: pose.tilt, body: pose.body };
     for (const j of ['neck', 'head', 'tilt', 'body']) pose[j] = smoothDamp(pose[j], target[j], vv[j], tm, dt);
-    CoveSound.motor((Math.abs(pose.neck - _pp.neck) + Math.abs(pose.head - _pp.head) + Math.abs(pose.tilt - _pp.tilt) + Math.abs(pose.body - _pp.body)) / Math.max(dt, 0.001) / 110);   // 관절이 움직이는 빠르기 → 모터 소리
+    snd('motor', (Math.abs(pose.neck - _pp.neck) + Math.abs(pose.head - _pp.head) + Math.abs(pose.tilt - _pp.tilt) + Math.abs(pose.body - _pp.body)) / Math.max(dt, 0.001) / 110);   // 관절이 움직이는 빠르기 → 모터 소리
     // 서 있을 때는 숨 쉬듯 아주 조금 흔들린다
     const g = clamp((pose.neck - 2) / 10, 0, 1), a = g * g * (3 - 2 * g);
     const sway = { neck: a * (0.45 * Math.sin(2 * Math.PI * tNow / 3.7) + 0.25 * Math.sin(2 * Math.PI * tNow / 5.9 + 1.3)), head: a * (0.7 * Math.sin(2 * Math.PI * tNow / 4.3 + 0.6) + 0.3 * Math.sin(2 * Math.PI * tNow / 2.9 + 2.1)) };
@@ -612,7 +619,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     const shown = { ...pose }; shown.neck += sway.neck - bob * 3.5; shown.head += sway.head + bob * 2.5;
     const saved = { ...pose }; Object.assign(pose, shown); writePose(); Object.assign(pose, saved);
     if (!clip) eyeName = eyeForce || reactEye || (mode === 'ball' && ballEye) || (gest ? gest.eye : pose.neck < 4 ? '감은 눈' : '뜬 눈');
-    if (eyeName !== sndEye) { sndEye = eyeName; CoveSound.expr(eyeName); }                    // 표정이 바뀌면 효과음
+    if (eyeName !== sndEye) { sndEye = eyeName; snd('expr', eyeName); }                    // 표정이 바뀌면 효과음
     eyes.show(eyeName, mode === 'ball' ? ballGx : gx, 0, tNow);
     // 카메라
     cam.az = smoothDamp(cam.az, camGoal.az, cv.az, 0.28, dt); cam.el = smoothDamp(cam.el, camGoal.el, cv.el, 0.28, dt); cam.zoom = smoothDamp(cam.zoom, camGoal.zoom, cv.zoom, 0.22, dt);
@@ -626,5 +633,6 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   requestAnimationFrame(frame);
 
   // 확인·연동용 (콘솔에서 COVE_SIM.play('greet') 처럼 쓸 수 있어요)
-  window.COVE_SIM = { play, stop: stopClip, setView, goal, pose, eyes, pick, camGoal, cam, get view() { return view; }, setTiltSign(s) { TILT_SIGN = s; } };
+  window.COVE_SIM = { play, stop: stopClip, setView, goal, pose, eyes, pick, camGoal, cam, get view() { return view; }, setTiltSign(s) { TILT_SIGN = s; },
+    get busy() { return !!clip || !!mode || !!drag || tNow - lastActive < 3; } };            // 동작 재생·체험·끌기 중이거나 방금 만졌으면 true (js/cove360.js 가 고화질 360°로 돌아갈 때를 정함)
 }

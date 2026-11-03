@@ -7,26 +7,26 @@
   <meta name="description" content="책상 위, 가장 가까운 거리에서 함께하는 작은 존재. 데스크탑 홈 로봇 Cove.">
   <meta name="theme-color" content="#f5f5f7">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600&family=Noto+Sans+KR:wght@300;400;500;600;700&family=Jost:wght@200;300;400;500&family=JetBrains+Mono:wght@300;400&family=Fredoka:wdth,wght@125,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20261104z">
-  <link rel="stylesheet" href="css/intro.css?v=20261104z">
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <script src="js/offline-fetch.js"></script>
+  <link rel="stylesheet" href="css/style.css?v=20261106c">
+  <link rel="stylesheet" href="css/intro.css?v=20261106b">
   <link rel="stylesheet" href="css/sim.css?v=20261104z">
+  <link rel="stylesheet" href="css/cove360.css?v=8">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="alternate icon" href="favicon-32.png" type="image/png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <meta property="og:type" content="website">
   <meta property="og:title" content="COVE | Desktop Home Robot">
   <meta property="og:description" content="로봇에게 기대어 쉬어 보세요. 책상 위에서 손이나 팔을 지그시 눌러 휴식을 돕는 데스크탑 홈 로봇 Cove.">
-  <meta property="og:image" content="https://bac-cy.github.io/bau-cy/assets/og-image.png">
+  <meta property="og:image" content="assets/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:url" content="https://bac-cy.github.io/bau-cy/">
+  <meta property="og:url" content="">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://bac-cy.github.io/bau-cy/assets/og-image.png">
+  <meta name="twitter:image" content="assets/og-image.png">
   <link rel="stylesheet" href="css/font.css?v=2">   <!-- 글꼴 조합: Google Sans Flex + Jost -->
-  <link rel="stylesheet" href="css/cursor.css?v=2">   <!-- 마우스 커서 = Cove C 로고 -->
+  <link rel="stylesheet" href="css/cursor.css?v=3">   <!-- 마우스 커서 = Cove C 로고 -->
   <link rel="stylesheet" href="css/detail.css?v=2">
   <link rel="stylesheet" href="css/loader.css?v=7">
   <script>document.documentElement.classList.add('loader-on'); try { history.scrollRestoration = 'manual'; } catch (e) {} addEventListener('pageshow', function () { scrollTo(0, 0); });</script>   <!-- 시작 화면: 불러오는 동안 어두운 화면으로 가림 -->
@@ -65,7 +65,7 @@
             <span class="gallery__expand" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></span>
           </figure>
           <figure class="gallery__film">
-            <video src="assets/cove-ball.mp4" poster="assets/cove-ball-poster.jpg" muted loop playsinline preload="none" aria-label="Cove 공놀이 영상"></video>
+            <video src="assets/cove-ball.mp4?v=2" poster="assets/cove-ball-poster.jpg?v=2" muted loop playsinline preload="none" aria-label="Cove 공놀이 영상"></video>
             <span class="gallery__expand" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></span>
           </figure>
         </div>
@@ -151,6 +151,8 @@
         <!-- 큰 제품 이미지 (스크롤 시 고정) -->
         <figure class="design__visual">
           <div class="cove-art" data-cove></div>
+          <!-- 고화질 360° 렌더(js/cove360.js): 평소엔 이 렌더가 보이고(끌어서 회전·각도·확대 버튼), 동작 버튼을 누르면 3D 시뮬레이터가 이어받아 움직인 뒤 다시 돌아옴 -->
+          <div class="v360" data-v360="drag" data-auto="off" data-start="11.94,11.1" role="img" aria-label="Cove 360도 보기, 끌어서 돌릴 수 있어요"></div>
           <!-- 움직여 볼 수 있는 Cove 시뮬레이터 (불러오지 못하면 위의 임시 이미지가 그대로 보임) -->
           <div class="cove-3d" data-model="assets/cove-rig.glb"></div>
           <div class="sim__ui" hidden>
@@ -168,6 +170,7 @@
             <div class="sim__toy" data-mode="snack" data-kind="snack" hidden role="button" aria-label="간식, Cove에게 끌어다 주세요" style="top:40%"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="#f2c79a"/><circle cx="24" cy="24" r="19" fill="none" stroke="#d9a574" stroke-width="2"/><circle cx="17" cy="19" r="2.4" fill="#8a5a3c"/><circle cx="29" cy="17" r="2.2" fill="#8a5a3c"/><circle cx="31" cy="29" r="2.6" fill="#8a5a3c"/><circle cx="19" cy="31" r="2.2" fill="#8a5a3c"/><circle cx="25" cy="24" r="1.8" fill="#8a5a3c"/></svg></div>
             <div class="sim__bottom">
               <p class="sim__status" aria-live="polite"></p>
+              <p class="sim__status v360__hint" aria-hidden="true">끌어서 돌려 보고, 아래 동작을 눌러 보세요</p>
               <div class="sim__motions" role="group" aria-label="동작">
                 <button type="button" data-motion="greet" aria-pressed="false">인사하기</button>
                 <button type="button" data-motion="pet" aria-pressed="false">쓰다듬기</button>
@@ -186,21 +189,21 @@
         <div class="design__details">
           <article class="detail reveal">
             <figure class="slot slot--detail slot--photo" data-label="Detail 01 Form">
-              <img src="assets/form.webp?v=2" alt="머리와 몸통, 두 개의 둥근 볼륨이 포개진 Cove의 정면" loading="lazy">
+              <img src="assets/form.webp?v=3" alt="머리와 몸통, 두 개의 둥근 볼륨이 포개진 Cove의 정면" loading="lazy">
             </figure>
             <h3>Form</h3>
             <p>Cove는 머리와 몸통, 두 개의 둥근 볼륨으로 이루어져 있어요. 부드러운 곡면과 균형 잡힌 비례로 작은 자세 변화에도 로봇의 성격이 드러나요.</p>
           </article>
           <article class="detail reveal">
             <figure class="slot slot--detail slot--photo" data-label="Detail 02 Material">
-              <img src="assets/material.webp" alt="같은 패브릭이 머리와 몸통에서 두 가지 색으로 이어지는 모습" loading="lazy">
+              <img src="assets/material.webp?v=5" alt="같은 패브릭이 머리와 몸통에서 두 가지 색으로 이어지는 모습" loading="lazy">
             </figure>
             <h3>Material</h3>
             <p>머리 아래쪽과 몸통 위쪽은 기대는 손과 팔에 안전하고 부드러운 압력이 전해지도록 우레탄 폼으로, 머리 위쪽과 몸통 아래쪽은 형태와 내부 부품을 단단히 지지하도록 3D 프린팅으로 만들었어요. 두 소재를 같은 패브릭, 두 가지 색으로 이어 하나의 형태로 마감했어요.</p>
           </article>
           <article class="detail reveal">
             <figure class="slot slot--detail slot--photo" data-label="Detail 03 Motion">
-              <img src="assets/motion.webp" alt="머리와 몸통이 둥글게 이어진 Cove의 옆모습" loading="lazy">
+              <img src="assets/motion.webp?v=2" alt="머리와 몸통이 둥글게 이어진 Cove의 옆모습" loading="lazy">
             </figure>
             <h3>Motion</h3>
             <p>몸통을 부드럽게 돌리고 고개를 살짝 갸웃하며, 눈 LED 표정으로 관심을 다정하게 전해요. 한자리에서 이어지는 작은 몸짓만으로도 책상 위에서 마음이 자연스럽게 닿아요.</p>
@@ -248,7 +251,7 @@
         <div class="intro__dots" aria-hidden="true"></div>
         <div class="intro__finale">
           <div class="intro__bigword" aria-hidden="true">COVE</div>
-          <figure class="intro__render"><img src="assets/intro-cove.png" alt="Cove 렌더 이미지" width="1470" height="921"></figure>
+          <figure class="intro__render"><img src="assets/intro-cove.png" alt="Cove 렌더 이미지" width="1470" height="921"></figure>   <!-- 키샷 360° 겹침은 뺐고 움직이는 3D Cove만 남김(사용자 요청) -->
         </div>
       </div>
     </section>
@@ -282,7 +285,7 @@
   </footer>
 
   <!-- 현재 보고 있는 섹션 표시 (좌측 하단 고정) -->
-  <button type="button" class="totop" id="totop" aria-label="맨 위로 올라가기"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></button>
+  <button type="button" class="totop" id="totop" aria-label="맨 위로 올라가기"><svg viewBox="0 0 18 18" width="14" height="14" fill="currentColor" aria-hidden="true"><circle cx="9" cy="2" r="1.5"/><circle cx="5.5" cy="5.5" r="1.5"/><circle cx="12.5" cy="5.5" r="1.5"/><circle cx="2" cy="9" r="1.5"/><circle cx="9" cy="9" r="1.5"/><circle cx="16" cy="9" r="1.5"/><circle cx="9" cy="13" r="1.5"/><circle cx="9" cy="16.5" r="1.5"/></svg><span>top</span></button>
 
   <div class="pager" id="pager" aria-hidden="true">
     <span class="pager__num">01</span><span class="pager__name">About</span>
@@ -290,8 +293,8 @@
 
   <script src="assets/vendor/lenis/lenis.min.js"></script>
   <script src="js/smooth.js?v=20261104z"></script>
-  <script src="js/main.js?v=20261104z"></script>
-  <script src="js/autoscroll.js"></script>
+  <script src="js/main.js?v=20261106a"></script>
+  <script src="js/autoscroll.js?v=3"></script>
   <script src="js/intro.js?v=20261104z"></script>
   <script type="importmap">
     { "imports": {
@@ -299,9 +302,10 @@
         "three/addons/": "./assets/vendor/three/examples/jsm/"
     } }
   </script>
-  <script type="module" src="js/sim.js?v=20261104z"></script>
-  <script type="module" src="js/cards.js?v=20261105a"></script>
-  <script type="module" src="js/intro-cove.js?v=20261104z"></script>
+  <script src="js/cove360.js?v=6" defer></script>
+  <script type="module" src="js/sim.js?v=20261106g"></script>
+  <script type="module" src="js/cards.js?v=20261106d"></script>
+  <script type="module" src="js/intro-cove.js?v=20261106d"></script>
   <script type="module" src="js/features.js?v=20261104z"></script>
   <script type="module" src="js/engineering.js?v=20261104z"></script>
   <!-- 디테일 효과: 필름 입자 · 자석 버튼 · 카드 빛/기울기 (되돌리려면 아래 두 줄과 css/fx.css, js/fx.js 를 지우면 됨) -->
@@ -311,14 +315,16 @@
   <link rel="stylesheet" href="css/bg.css?v=20261104z">
   <script src="js/bg.js?v=20261104z" defer></script>
   <!-- 잡스 제안 4가지(한 줄 약속·압력 시연·큰 숫자 스펙·One more thing). 되돌리려면 아래 두 줄을 지우면 됨 -->
-  <link rel="stylesheet" href="css/jobs.css?v=20261104z">
-  <script src="js/jobs.js?v=20261104z" defer></script>
+  <link rel="stylesheet" href="css/jobs.css?v=20261106a">
+  <script src="js/jobs.js?v=20261105s" defer></script>
   <script type="module" src="js/cove-sound.js"></script>   <!-- 소리: 일찍 불러와 인트로 타이핑 소리에도 씀 -->
-  <script src="js/finale.js?v=1"></script>
+  <script src="js/finale.js?v=2"></script>
+  <script src="js/scramble.js?v=1" defer></script>
   <script src="js/loader.js?v=8"></script>   <!-- 시작 화면 (눈 LED가 깜빡이다 열림) -->
   <script>
     /* 오프라인 보관: 인터넷이 되는 곳에서 한 번 열어 두면 파일이 PC에 저장돼 와이파이 없이도 열려요 (sw.js) */
-    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+    if ('serviceWorker' in navigator && location.protocol === 'https:') addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  else if ('serviceWorker' in navigator && location.hostname === 'localhost') navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); if (window.caches) caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); }); });   // 로컬 서버에서는 옛 화면이 남지 않게 저장본을 쓰지 않음
   </script>
 </body>
 </html>

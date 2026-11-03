@@ -8,6 +8,8 @@
    ========================================================== */
 const KEY = 'cove-sound';
 let on = true; try { on = localStorage.getItem(KEY) !== 'off'; } catch (e) { /* 무시 */ }
+/* 보조 화면(?sub=1): 모니터 2대로 같은 페이지를 띄울 때 소리가 겹치지 않게, 메인 화면에서만 소리가 나고 보조 화면은 모든 소리(효과음·배경음악·영상)가 꺼짐 */
+const SUB = /[?&]sub=1/.test(location.search); if (SUB) on = false;
 let limNode = null, bgmMute = null, ctx = null, master = null, mGain = null, mOsc1 = null, mOsc2 = null, mFilter = null, mTrem = null, mLfo = null, mNoise = null, lastMotor = -1e9, lastExpr = -1e9, lastBounce = -1e9;
 const VOL = 2.1;                                                        // 전체 소리 크기 (리미터가 찢어짐을 막아 줌)
 
@@ -224,7 +226,8 @@ function startBgm() {
     if (!bgmBus) return; const full = !!(document.fullscreenElement || document.webkitFullscreenElement);
     const intro = document.getElementById('intro'), inIntro = !!intro && intro.getBoundingClientRect().bottom > innerHeight * 0.5;      // 맨 앞 인트로(영상) 구간
     const lvl = window.COVE_BGM === 'file' ? BGM_FILE_LEVEL : window.COVE_BGM === 'generated' ? BGM_LEVEL : 0;
-    bgmBase = full || inIntro ? 0 : lvl;                                                                                          // 영상 구간에서는 배경음악 없음, 그 구간을 넘어가면 천천히 켜짐
+    const fb = document.querySelector('.intro__film'), film2 = !!window.COVE_FILM2 && !!fb && (parseFloat(fb.style.opacity) || 0) > 0.6;     // 두 번째 영상(소리 없음)이 보이는 동안은 배경음악을 켬
+    bgmBase = (full || inIntro) && !film2 ? 0 : lvl;                                                                                          // 영상 구간에서는 배경음악 없음, 그 구간을 넘어가면 천천히 켜짐
     if (!duckT) bgmBus.gain.setTargetAtTime(bgmBase, ctx.currentTime, 1.1);
   }, 500);
 }
@@ -242,16 +245,16 @@ function type() {
   const c = ctx, t = c.currentTime;
   if (!noiseBuf) { noiseBuf = c.createBuffer(1, Math.floor(c.sampleRate * 0.05), c.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length); }
   const n = c.createBufferSource(); n.buffer = noiseBuf; const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 800 + Math.random() * 500; bp.Q.value = 0.9;
-  const g = c.createGain(); g.gain.setValueAtTime(1.5, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+  const g = c.createGain(); g.gain.setValueAtTime(0.85, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
   n.connect(bp); bp.connect(g); g.connect(master); n.start(t);                    // 딸깍 하는 바삭한 소리
-  pluck(880 + Math.random() * 150, 0.07, 0.12);                                   // 맑은 톡
-  pluck(200 + Math.random() * 40, 0.08, 0.14);                                    // 낮은 '탁' (소리가 더 또렷하게 들리도록)
+  pluck(880 + Math.random() * 150, 0.07, 0.07);                                   // 맑은 톡
+  pluck(200 + Math.random() * 40, 0.08, 0.08);                                   // 낮은 '탁' (소리가 더 또렷하게 들리도록)
 }
 
 /* 켜기/끄기 버튼 (우측 하단) */
-const ICON_ON = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>';
-const ICON_OFF = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>';
-function mount() {
+const ICON_ON = '<span class="snd__dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="snd__t">sound on</span>';      // 점으로 된 이퀄라이저 + 글자 (Cove 눈 LED 도트 느낌)
+const ICON_OFF = '<span class="snd__dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="snd__t">sound off</span>';function mount() {
+  if (SUB) return;                                                              // 보조 화면에는 소리 버튼도 없음
   if (document.getElementById('snd')) return;
   const b = document.createElement('button'); b.type = 'button'; b.id = 'snd'; b.className = 'snd';
   const paint = () => { b.innerHTML = on ? ICON_ON : ICON_OFF; b.setAttribute('aria-label', on ? '소리 끄기' : '소리 켜기'); b.setAttribute('aria-pressed', String(on)); };
@@ -265,5 +268,14 @@ function mount() {
 }
 if (document.body) mount(); else document.addEventListener('DOMContentLoaded', mount);
 
-export const CoveSound = { motor, expr, event, bite, bounce, type, get on() { return on; }, get running() { return !!ctx && ctx.state === 'running'; }, get bgmLevel() { return bgmBus ? +bgmBus.gain.value.toFixed(3) : -1; } };
+function loader(name) {                                                          // 시작 화면 눈 LED 효과음: 아주 작고 부드러운 뽁 소리
+  if (!on || !ctx || ctx.state !== 'running') return;
+  TR = 0.97 + Math.random() * 0.06;
+  if (name === 'on') { boop(480, 680, 0.18, 0.04); boop(720, 860, 0.16, 0.03, 0.13); }
+  else if (name === 'blink') boop(640, 500, 0.07, 0.028);
+  else if (name === 'look') boop(400, 450, 0.08, 0.02);
+  else if (name === 'happy') { boop(600, 780, 0.13, 0.04); boop(800, 980, 0.16, 0.035, 0.12); }
+  TR = 1;
+}
+export const CoveSound = { loader, motor, expr, event, bite, bounce, type, get on() { return on; }, get running() { return !!ctx && ctx.state === 'running'; }, get bgmLevel() { return bgmBus ? +bgmBus.gain.value.toFixed(3) : -1; } };
 window.CoveSound = CoveSound;

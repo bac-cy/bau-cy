@@ -7,7 +7,7 @@
   --intro-peach: #f3e9df;
   --intro-word: #f2ead8;          /* 배경 속 큰 COVE 글자색 */
   position: relative;
-  height: 215svh;                 /* 한 화면 + 스크롤 거리 60svh (장면 전환 구간 + 마지막 장면 머무름) */
+  height: 185svh;               /* 한 화면 + 스크롤 거리 60svh (장면 전환 구간 + 마지막 장면 머무름) */
   background: #fff;
 }
 .intro__stage {
@@ -137,3 +137,10 @@
 /* 마무리 장면 위쪽: 앞 섹션(Engineering)의 배경이 그대로 비치다가 하얀 무대로 경계 없이 서서히 이어지게 */
 .intro--finale .intro__stage { background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, .55) 22%, #fff 52%); }
 .intro--finale { background: transparent; }
+
+/* 리퀴드 글라스 글자 가볍게(사용자 요청, 움직임이 뚝뚝 끊긴다고): 블러 반경을 14px→7px로 줄이고 채도·밝기 보정은 빼서(GPU가 매 프레임 다시 계산하던 부분) 같은 유리 느낌을 유지하면서 훨씬 가볍게. 흰 막을 조금 더해 밝기를 맞춤 */
+.intro__glass { -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px); }
+.intro__chi { contain: layout style; }
+
+/* 마무리 장면: 빈 구간을 줄이려고 190svh → 160svh, 글자는 장면이 올라오자마자 나옴(js/finale.js) */
+.intro--finale { height: 160svh; }

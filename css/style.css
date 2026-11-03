@@ -60,7 +60,7 @@ body::before {
 }
 
 /* ---------- Shared ---------- */
-.section { padding: clamp(96px, 14vw, 180px) var(--gutter); position: relative; }
+.section { padding: clamp(64px, 8vw, 110px) var(--gutter); position: relative; }
 .section__head { margin-bottom: clamp(48px, 7vw, 96px); }
 
 .label, .eyebrow {
@@ -191,7 +191,7 @@ body::before {
   position: absolute; left: 20px; bottom: 16px;
   font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-soft);
 }
-.design__details { display: grid; gap: clamp(64px, 10vw, 140px); padding-top: 8vh; }
+.design__details { display: grid; gap: clamp(40px, 6vw, 84px); padding-top: 4vh; }
 .detail h3 { font-family: "Jost", "Futura", var(--font-ui); font-weight: 400; letter-spacing: .01em; font-size: clamp(27.2px, 2.89vw, 37.4px); margin-top: 28px; }
 .detail p { color: var(--ink-soft); font-weight: 300; max-width: 30em; margin-top: 8px; }
 
@@ -453,7 +453,7 @@ em.ko { font-family: var(--font-ui); font-style: normal; font-weight: 400; font-
 
 /* 모바일: 카드 사이 간격과 위쪽 여백을 줄여 스크롤 길이를 알맞게 */
 @media (max-width: 760px) {
-  .design__details { gap: 56px; padding-top: 40px; }
+  .design__details { gap: 40px; padding-top: 28px; }
   .design__layout { gap: 36px; }
   .detail h3 { margin-top: 20px; }
 }
@@ -495,3 +495,73 @@ html.lenis, html.lenis body { height: auto; }
 .feat3d { position: absolute; inset: 0; margin: 0; aspect-ratio: auto; background: none; border-radius: 0; box-shadow: none; border: 0; -webkit-backdrop-filter: none; backdrop-filter: none; overflow: visible; pointer-events: none; }
 .feat3d > .slot__scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .feature__art:has(.feat3d.has-scene) > canvas { visibility: hidden; }
+
+/* About 위계 정리(사용자 요청, 위계가 없어 보인다고): 큰 문장 > Concept·Name·Philosophy 본문 > Close·Calm·Kind 키워드 순으로 크기·진하기를 구분 */
+.about__grid { margin-top: clamp(48px, 6vw, 88px); }
+.about__text h3 { font-size: 12px; font-weight: 600; letter-spacing: .2em; color: #6b5bd6; margin-bottom: 14px; padding-top: 14px; border-top: 2px solid #6b5bd6; display: inline-block; min-width: 3.2em; }
+.about__text p { font-size: clamp(15px, 1.2vw, 17.5px); line-height: 1.8; color: #3d3b45; font-weight: 400; }
+.principles { margin-top: clamp(48px, 6vw, 88px); }
+.principles li { padding-top: 24px; font-size: 14.5px; color: #6e6e73; }
+.principles span { font-size: clamp(20px, 1.9vw, 27px); font-weight: 500; letter-spacing: .01em; margin-bottom: 6px; }
+
+/* 우측 하단 버튼 = 평평한 글자+점 라벨(사용자 요청, 둥근 유리 버튼·선 아이콘이 AI 느낌이라고). 그림자·블러 없이 연한 단색 칸, 마우스를 올리면 진하게 반전 */
+.totop, .snd { width: auto; height: 32px; padding: 0 12px 0 11px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; justify-content: flex-start;
+  background: rgba(29, 29, 31, .07); border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; color: #1d1d1f;
+  font-family: "Jost", "Noto Sans KR", system-ui, sans-serif; font-size: 12.5px; font-weight: 500; letter-spacing: .04em; text-transform: lowercase; white-space: nowrap; transition: background .2s, color .2s, opacity .35s ease, transform .35s cubic-bezier(.2, .9, .2, 1); }
+.totop { bottom: calc(clamp(16px, 2.4vw, 32px) + 40px); }
+.totop:hover, .snd:hover { background: #1d1d1f; color: #f5f5f7; transform: none; }
+.totop:active, .snd:active { transform: scale(.97); }
+.totop.is-on:hover { transform: none; }
+.snd[aria-pressed="false"] { color: #8a8590; }
+.snd[aria-pressed="false"]:hover { color: #f5f5f7; }
+.snd__dots { display: inline-flex; align-items: flex-end; gap: 2.5px; height: 12px; }
+.snd__dots i { width: 3px; height: 3px; border-radius: 50%; background: currentColor; display: block; }
+.snd[aria-pressed="true"] .snd__dots i { animation: sndDot 1.1s ease-in-out infinite; }
+.snd[aria-pressed="true"] .snd__dots i:nth-child(2) { animation-delay: .18s; } .snd[aria-pressed="true"] .snd__dots i:nth-child(3) { animation-delay: .36s; } .snd[aria-pressed="true"] .snd__dots i:nth-child(4) { animation-delay: .54s; }
+@keyframes sndDot { 0%, 100% { height: 3px; } 50% { height: 12px; border-radius: 2px; } }
+@media (max-width: 760px) { .totop, .snd { height: 30px; } .totop { bottom: 62px; } .snd { bottom: 18px; } }
+
+/* 작은 라벨 글자 = 전부 대문자 + 넓은 자간이 AI 느낌이라는 요청: 대문자를 풀고 자간을 좁혀 차분하게(너무 달라지지 않도록 글꼴·색·크기는 거의 그대로) */
+.label, .eyebrow, .jobs-tag small, .jobs-press__label, .jobs-spec__label, .engspec__label { text-transform: none; letter-spacing: .04em; }
+.about__text h3, .specs dt, .eng__tip i, .design__visual figcaption, .slot::after, .gallery__expand, .footer__credits { text-transform: none; letter-spacing: .03em; }
+.design__visual figcaption, .slot::after { font-size: 11.5px; }
+.design__visual .sim__ui .sim__views button, .sim__ui button { text-transform: none; letter-spacing: .03em; }
+.design__visual .sim__ui .sim__views button { font-size: 12px; }
+
+/* 푸터 글자 반응(참고 사이트처럼): 한 줄에 마우스를 올리면 그 줄만 또렷하고 나머지는 옅어져 시선이 따라가요 */
+.footer__credits dl div { transition: opacity .35s ease, transform .35s cubic-bezier(.2, .9, .2, 1); }
+.footer__credits dl:hover div { opacity: .35; }
+.footer__credits dl:hover div:hover { opacity: 1; transform: translateX(6px); }
+@media (hover: none) { .footer__credits dl:hover div { opacity: 1; } .footer__credits dl:hover div:hover { transform: none; } }
+
+/* 메뉴로 이동하는 동안(js/smooth.js가 html에 is-jumping 을 붙임): 유리 흐림 효과(블러)를 잠시 꺼서 가볍게. 메뉴 바는 제외 */
+html.is-jumping :not(.nav):not(.nav *) { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+
+/* 우측 하단 자동 스크롤 버튼(소리 버튼 바로 위, js/autoscroll.js): 소리·맨 위 버튼과 같은 평평한 라벨 */
+.autoscr { position: fixed; right: clamp(16px, 2.4vw, 32px); bottom: calc(clamp(16px, 2.4vw, 32px) + 40px); z-index: 60; height: 32px; padding: 0 12px 0 11px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+  background: rgba(29, 29, 31, .07); border: 0; color: #1d1d1f; font-family: "Jost", "Noto Sans KR", system-ui, sans-serif; font-size: 12.5px; font-weight: 500; letter-spacing: .03em; white-space: nowrap; transition: background .2s, color .2s; }
+.autoscr:hover { background: #1d1d1f; color: #f5f5f7; }
+.autoscr[aria-pressed="false"] { color: #8a8590; }
+.autoscr[aria-pressed="false"]:hover { color: #f5f5f7; }
+.totop { bottom: calc(clamp(16px, 2.4vw, 32px) + 80px); }
+@media (max-width: 760px) { .autoscr { height: 30px; bottom: 62px; } .totop { bottom: 106px; } }
+
+/* 자동 스크롤 버튼 아이콘: 켜져 있으면 점 세 개가 위에서 아래로 차례로 켜지며 내려가는 모양(소리 버튼의 점 이퀄라이저처럼 반응), 꺼지면 멈춘 흐린 점 */
+.autoscr__dots { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; height: 14px; justify-content: center; }
+.autoscr__dots i { width: 3px; height: 3px; border-radius: 50%; background: currentColor; display: block; opacity: .35; }
+.autoscr[aria-pressed="true"] .autoscr__dots i { animation: autoDot 1.2s ease-in-out infinite; }
+.autoscr[aria-pressed="true"] .autoscr__dots i:nth-child(2) { animation-delay: .2s; } .autoscr[aria-pressed="true"] .autoscr__dots i:nth-child(3) { animation-delay: .4s; }
+@keyframes autoDot { 0%, 100% { opacity: .3; transform: translateY(-1px) scale(.85); } 35% { opacity: 1; transform: translateY(2px) scale(1.25); } }
+
+/* 우측 하단 버튼 3개를 더 작게(사용자 요청, 너무 크다고): 높이 26px, 글자 11px, 간격 6px */
+.totop, .snd, .autoscr { height: 26px; padding: 0 9px 0 8px; gap: 6px; border-radius: 7px; font-size: 11px; letter-spacing: .02em; }
+.totop svg { width: 11px; height: 11px; }
+.snd__dots { height: 10px; gap: 2px; }
+.snd__dots i { width: 2.5px; height: 2.5px; }
+@keyframes sndDot { 0%, 100% { height: 2.5px; } 50% { height: 10px; border-radius: 2px; } }
+.autoscr__dots { height: 11px; gap: 2px; }
+.autoscr__dots i { width: 2.5px; height: 2.5px; }
+.snd { bottom: clamp(16px, 2.4vw, 32px); }
+.autoscr { bottom: calc(clamp(16px, 2.4vw, 32px) + 32px); }
+.totop { bottom: calc(clamp(16px, 2.4vw, 32px) + 64px); }
+@media (max-width: 760px) { .totop, .snd, .autoscr { height: 26px; } .snd { bottom: 18px; } .autoscr { bottom: 50px; } .totop { bottom: 82px; } }

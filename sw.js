@@ -2,7 +2,7 @@
    · 설치할 때 사이트 파일 전부(precache.json)를 저장하고, 글꼴(구글 폰트)은 처음 쓸 때 저장해요.
    · 저장된 파일을 먼저 보여 주고, 인터넷이 있으면 뒤에서 새 버전으로 갱신해요(다음에 열 때 반영).
    · 영상은 부분 재생(Range)을 저장본에서 잘라서 줘요. */
-const V = 'cove-v2';
+const V = 'cove-v8';
 const norm = (u) => { const x = new URL(u, self.location); return x.origin + x.pathname; };
 self.addEventListener('install', (e) => {
   e.waitUntil((async () => {

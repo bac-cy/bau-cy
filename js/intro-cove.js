@@ -37,7 +37,7 @@ async function init() {
   const scene = new THREE.Scene();
   scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
   scene.add(new THREE.HemisphereLight(0xfff4e8, 0xd8c8c0, 1.5));
-  const key = new THREE.DirectionalLight(0xfff0e0, 1.3); key.position.set(-0.12, 2.6, 1.0);
+  const key = new THREE.DirectionalLight(0xfff0e0, 1.3); key.position.set(-0.05, 2.8, 0.45);   // 키샷 렌더처럼 그림자가 옆으로 길게 늘어지지 않고 바로 아래에 부드럽게 깔리도록 거의 머리 위에서 비춤
   key.castShadow = true; key.shadow.mapSize.set(innerWidth <= 760 ? 1024 : 2048, innerWidth <= 760 ? 1024 : 2048); key.shadow.bias = -0.0006; key.shadow.normalBias = 0.003; key.shadow.radius = 9; key.shadow.blurSamples = 20;
   Object.assign(key.shadow.camera, { left: -0.45, right: 0.45, top: 0.45, bottom: -0.45, near: 0.3, far: 5 }); key.target.position.set(0, 0.12, 0); scene.add(key, key.target);
   const fill = new THREE.DirectionalLight(0xe4dbf5, 0.5); fill.position.set(2, .6, -1); scene.add(fill);
@@ -49,13 +49,15 @@ async function init() {
 
   // 인트로 렌더 이미지와 같은 흰색 무광 재질 + 알루미늄 기둥
   const white = new THREE.MeshStandardMaterial({ color: 0xefe9e1, roughness: 0.55, metalness: 0, envMapIntensity: 1.25 });
+  const steel = new THREE.MeshStandardMaterial({ color: '#dad7e2', roughness: 0.34, metalness: 0.72, envMapIntensity: 1.4 });   // 머리·몸통 가운데 띠 = 스틸 느낌(사용자 요청)
+  const BAND = ['새_헤드_하부판', '새_하부_덮개판'];
   const aluminum = printedMaterial(THREE);
   const BODY = ['새_헤드_상판', '새_쿠션', '새_하부_폼', '새_하부_쉘', '새_헤드_하부판', '새_하부_덮개판', '새_미끄럼방지_고무링', '하부_회전판'], ALU = ['기둥_1', '본체6'];
   const by = {}, matrices = [], shells = [];
   model.traverse(o => {
     by[o.name] = o; if (!o.isMesh) return;
     o.castShadow = true; o.receiveShadow = true;
-    if (FABRIC_NAMES.includes(o.name)) o.material = fabricFor(THREE, o.name, 125); else if (BODY.includes(o.name)) o.material = white; else if (ALU.includes(o.name)) { o.material = aluminum; layerUV(THREE, o); }
+    if (FABRIC_NAMES.includes(o.name)) o.material = fabricFor(THREE, o.name, 125); else if (BAND.includes(o.name)) o.material = steel; else if (BODY.includes(o.name)) o.material = white; else if (ALU.includes(o.name)) { o.material = aluminum; layerUV(THREE, o); }
     if (/KeyStudio-HT16K33-8x8-LED-Matrix/.test(o.name)) { matrices.push(o); o.visible = false; }
     if (['새_헤드_상판', '새_쿠션', '새_헤드_하부판'].includes(o.name)) shells.push(o);
   });
@@ -73,7 +75,7 @@ async function init() {
 
   // 그림자
   const c2 = document.createElement('canvas'); c2.width = c2.height = 128; const g2 = c2.getContext('2d'), gr = g2.createRadialGradient(64, 64, 0, 64, 64, 64);
-  gr.addColorStop(0, 'rgba(110,80,120,.14)'); gr.addColorStop(1, 'rgba(110,80,120,0)'); g2.fillStyle = gr; g2.fillRect(0, 0, 128, 128);
+  gr.addColorStop(0, 'rgba(110,80,120,.24)'); gr.addColorStop(1, 'rgba(110,80,120,0)'); g2.fillStyle = gr; g2.fillRect(0, 0, 128, 128);
   const shadow = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.34), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c2), transparent: true, depthWrite: false }));
   shadow.rotation.x = -Math.PI / 2; shadow.position.y = -0.0069; scene.add(shadow);
   { const g = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShadowMaterial({ color: 0x3a2f4a, opacity: 0.14 })); g.rotation.x = -Math.PI / 2; g.position.y = -0.0067; g.receiveShadow = true; scene.add(g); }   // 바닥에 지는 실제 그림자
@@ -116,12 +118,17 @@ async function init() {
     const n = pokes.length; const name = n >= 6 ? 'upset' : n >= 3 ? 'happy' : kind === 'head' ? 'startle' : 'wink';
     react = { name, t0: tNow }; if (n >= 6) pokes.length = 0;
   }
-  window.addEventListener('pointerdown', (e) => { if (e.button > 0 || !visible() || e.target.closest('a, button, nav')) return; const k = hitKind(e); if (k) poke(k); });
+  // 누르기: 끌지 않고 뗐을 때만 반응(끌면 360° 렌더가 돌아가는 동작이므로 3D 반응을 하지 않음)
+  let down = null;
+  window.addEventListener('pointerdown', (e) => { down = null; if (e.button > 0 || !visible() || (e.target.closest && e.target.closest('a, button, nav'))) return; const k = hitKind(e); if (k) down = { k, x: e.clientX, y: e.clientY }; });
+  window.addEventListener('pointerup', (e) => { if (!down) return; const d = down; down = null; if (figure.classList.contains('is-drag360') || Math.hypot(e.clientX - d.x, e.clientY - d.y) > 8) return; poke(d.k); });
+  window.addEventListener('pointercancel', () => { down = null; });
   let hoverAt = 0;
   window.addEventListener('pointermove', (e) => { if (e.pointerType === 'touch' || performance.now() - hoverAt < 80 || !visible()) return; hoverAt = performance.now(); document.documentElement.style.cursor = hitKind(e) ? 'pointer' : ''; }, { passive: true });
   const pose = { neck: 0, head: 0, tilt: 0, body: 0 }, vel = { neck: { v: 0 }, head: { v: 0 }, tilt: { v: 0 }, body: { v: 0 } };
   let sndEye = '뜬 눈'; let gaze = { x: 0, y: 0 }, tNow = 0, last = performance.now(), shown = false;
-  let autoFrom = 0, autoUntil = -1, autoDone = false;                       // 도착하면 마우스가 없어도 스스로 한 번 일어나 두리번거린다
+  let engUntil = 0;
+  let autoFrom = 0, autoUntil = -1, autoDone = false;                      // 도착하면 마우스가 없어도 스스로 한 번 일어나 두리번거린다
   const visible = () => { const r = figure.getBoundingClientRect(); return +getComputedStyle(figure).opacity > 0.4 && r.bottom > 0 && r.top < innerHeight; };
 
   function frame(now) {
@@ -132,11 +139,17 @@ async function init() {
     const op = +getComputedStyle(figure).opacity;
     if (op < 0.3) autoDone = false;                                              // 장면을 벗어났다 돌아오면 다시
     if (!autoDone && op > 0.97) { autoDone = true; if (!REDUCED) { autoFrom = tNow + 0.5; autoUntil = tNow + 6.8; } }
-    const pAwake = ptr.seen && now - ptr.at < IDLE_MS, aAwake = !pAwake && tNow >= autoFrom && tNow < autoUntil;
+    const r = figure.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height * 0.5;
+    /* 하이브리드: 평소엔 키샷 360° 렌더(.v360)가 보이고, 커서가 Cove 가까이 오거나 눌렀을 때만 3D Cove가 이어받아 움직이다가 같은 자세로 돌아간다 */
+    const hyb = figure.classList.contains('has-360');
+    const nearC = !figure.classList.contains('is-drag360') && ptr.seen && now - ptr.at < 2500 && Math.abs(ptr.x - cx) < innerWidth * 0.3 && Math.abs(ptr.y - cy) < innerHeight * 0.45;
+    const pAwake = hyb ? nearC : ptr.seen && now - ptr.at < IDLE_MS, aAwake = !pAwake && tNow >= autoFrom && tNow < autoUntil;
     const reacting = react && tNow - react.t0 < REACT[react.name].dur;
     if (!reacting) react = null;
     const awake = pAwake || aAwake || reacting;
-    const r = figure.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height * 0.5;
+    if (awake) engUntil = now + 700;
+    const settled = Math.abs(pose.neck - AWAKE.neck) < 1.5 && Math.abs(pose.head - AWAKE.head) < 1.5 && Math.abs(pose.tilt) < 1.5 && Math.abs(pose.body) < 2;
+    figure.classList.toggle('is-act', hyb && (now < engUntil || !settled));
     // 마우스가 Cove 기준 어디에 있는지 (-1 ~ 1)
     let dx = clamp((ptr.x - cx) / (innerWidth * 0.26), -1, 1), dy = clamp((ptr.y - cy) / (innerHeight * 0.3), -1, 1);   // Cove 주변 가까운 범위에서 최대로 반응
     if (aAwake) { const u = tNow - autoFrom; dx = 0.8 * Math.sin(u * 1.25); dy = -0.12 + 0.2 * Math.sin(u * 0.8); }   // 좌우로 천천히 둘러봄
@@ -148,13 +161,14 @@ async function init() {
       goal.body = clamp(gaze.x * 70, -75, 75);                                               // 커서 쪽으로 몸통을 크게 돌림
       const [lo, hi] = tiltRange(goal.head); goal.tilt = clamp(gaze.x * 15, lo, hi);         // 가능한 만큼 갸웃
     }
+    else if (hyb) { goal.neck = AWAKE.neck; goal.head = AWAKE.head; }            // 360° 렌더와 같은 자세로 돌아와서 이어 붙음
     let reactEye = null;
     if (reacting) {                                                          // 반응 중에는 정해진 동작을 그대로
       const R = REACT[react.name], u = tNow - react.t0, s = sampleKeys(R.keys, u);
       goal.neck = s[1]; goal.head = s[2]; const [lo, hi] = tiltRange(goal.head); goal.tilt = clamp(s[3], lo, hi); goal.body = s[4];
       reactEye = R.eyes.filter(e => e[0] <= u).pop()[1];
     }
-    const T = reacting ? { neck: 0.12, head: 0.12, tilt: 0.12, body: 0.14 } : { neck: awake ? 0.45 : 0.9, head: awake ? 0.4 : 0.9, tilt: 0.3, body: awake ? 0.35 : 0.8 };
+    const T = reacting ? { neck: 0.12, head: 0.12, tilt: 0.12, body: 0.14 } : { neck: awake || hyb ? 0.45 : 0.9, head: awake || hyb ? 0.4 : 0.9, tilt: 0.3, body: awake || hyb ? 0.35 : 0.8 };
     const _pp = { neck: pose.neck, head: pose.head, tilt: pose.tilt, body: pose.body };
     for (const j of ['neck', 'head', 'tilt', 'body']) pose[j] = smoothDamp(pose[j], goal[j], vel[j], T[j], dt);
     CoveSound.motor((Math.abs(pose.neck - _pp.neck) + Math.abs(pose.head - _pp.head) + Math.abs(pose.tilt - _pp.tilt) + Math.abs(pose.body - _pp.body)) / Math.max(dt, 0.001) / 110);   // 움직임 → 모터 소리
@@ -168,7 +182,7 @@ async function init() {
     const eyeNow = reactEye || (awake && Math.abs(gaze.x) + Math.abs(gaze.y) > 0.9 ? '반짝 눈' : '뜬 눈');
     if (eyeNow !== sndEye) { sndEye = eyeNow; CoveSound.expr(eyeNow); }                         // 표정이 바뀌면 효과음
     eyes.show(eyeNow, awake ? Math.round(clamp(gaze.x * 2.6, -2, 2)) : gx, gy, tNow);
-    renderer.render(scene, camera);
+    if (!hyb || now < engUntil + 400 || !settled) renderer.render(scene, camera);    // 360° 렌더가 보이는 동안(3D는 투명)에는 그리지 않아 가볍게
     if (!shown) { shown = true; figure.classList.add('is-live'); mark('live'); }
   }
   requestAnimationFrame(frame);

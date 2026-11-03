@@ -10,10 +10,17 @@
   const hint = document.createElement('p'); hint.className = 'cv-load__hint'; hint.textContent = '소리가 들리려면 화면을 한 번 눌러 주세요'; el.appendChild(hint);
   (function chk(n) { const cs = window.CoveSound; if (cs && cs.running) { hint.remove(); return; } if (cs && cs.on) hint.classList.add('is-on'); if (n < 200) setTimeout(() => chk(n + 1), 100); })(0);
   window.addEventListener('cove:sound-on', () => hint.remove(), { once: true });
+  // 눈 모션(켜짐·깜빡임·두리번)에 맞춘 은은한 효과음. 시각 애니메이션(css/loader.css)의 시간과 맞춤.
+  const snd = (name) => { if (el.isConnected && !el.classList.contains('is-done')) { const cs = window.CoveSound; if (cs && cs.loader) cs.loader(name); } };
+  setTimeout(() => snd('on'), 420);
+  for (let k = 0; k < 3; k++) {
+    setTimeout(() => snd('blink'), 1300 + 3800 * k + 3800 * 0.384); setTimeout(() => snd('blink'), 1300 + 3800 * k + 3800 * 0.70);
+    setTimeout(() => snd('look'), 1600 + 4600 * k + 4600 * 0.28); setTimeout(() => snd('look'), 1600 + 4600 * k + 4600 * 0.62);
+  }
   let loaded = document.readyState === 'complete', done = false;
   addEventListener('load', () => { loaded = true; });
   function open() {
-    if (done) return; done = true; el.classList.add('is-done');
+    if (done) return; done = true; { const cs = window.CoveSound; if (cs && cs.loader) cs.loader('happy'); } el.classList.add('is-done');
     setTimeout(() => { el.classList.add('is-open'); window.dispatchEvent(new Event('cove:loader-open')); setTimeout(() => { el.remove(); window.dispatchEvent(new Event('cove:loader-done')); R.style.overflow = ''; R.classList.remove('loader-active'); try { window.__lenis && window.__lenis.start && window.__lenis.start(); } catch (e) {} }, 1400); }, 750);
   }
   (function tick() {

@@ -12,10 +12,20 @@ html.loader-on::before { content: ""; position: fixed; inset: 0; background: #17
 .cv-load__eyes { display: flex; gap: clamp(34px, 7vw, 64px); }
 .cv-load__eyes { transition: transform .7s cubic-bezier(.3, .8, .3, 1); }
 .cv-load.is-done .cv-load__eyes { transform: translateY(-6px) scaleY(.2); }
-.cv-eye { width: clamp(16px, 2.6vw, 26px); height: clamp(40px, 6.4vw, 64px); border-radius: 999px; background: #fff3e6; box-shadow: 0 0 22px 4px rgba(255, 226, 196, .75), 0 0 70px 14px rgba(255, 214, 180, .32); opacity: 0; transform: scaleY(.1); transform-origin: center; animation: cvOn .9s .25s cubic-bezier(.2, .9, .2, 1) forwards, cvBlink 3.4s 1.2s infinite, cvLook 4.6s 1.6s ease-in-out infinite; }
-@keyframes cvOn { to { opacity: 1; transform: scaleY(1); } }
-@keyframes cvBlink { 0%, 38%, 44%, 100% { transform: scaleY(1); } 41% { transform: scaleY(.08); } 70% { transform: scaleY(1); } 73% { transform: scaleY(.08); } 76% { transform: scaleY(1); } }
-@keyframes cvLook { 0%, 100% { translate: 0 0; } 30% { translate: -10px 0; } 62% { translate: 10px 0; } }
+.cv-eye { width: clamp(16px, 2.6vw, 26px); height: clamp(40px, 6.4vw, 64px); border-radius: 999px; background: #fff3e6; box-shadow: 0 0 22px 4px rgba(255, 226, 196, .75), 0 0 70px 14px rgba(255, 214, 180, .32); opacity: 0; transform: scaleY(.1); transform-origin: center; animation: cvOn 1s .25s linear forwards, cvBlink 3.8s 1.3s infinite, cvLook 4.6s 1.6s infinite; }
+/* 쫀득한 젤리 느낌: 켜질 때 살짝 튀어 오르고, 깜빡일 땐 납작하게 눌렸다가(가로로 퍼짐) 통통 튕기며 돌아옴 */
+@keyframes cvOn { 0% { opacity: 0; transform: scale(1, .1); animation-timing-function: cubic-bezier(.2, .9, .3, 1); } 35% { opacity: 1; transform: scale(.9, 1.2); animation-timing-function: ease-in-out; } 60% { transform: scale(1.06, .94); animation-timing-function: ease-in-out; } 80% { transform: scale(.98, 1.03); } 100% { opacity: 1; transform: scale(1, 1); } }
+@keyframes cvBlink {
+  0%, 36% { transform: scale(1, 1); animation-timing-function: cubic-bezier(.5, 0, .9, .6); }
+  38.4% { transform: scale(1.22, .07); animation-timing-function: cubic-bezier(.2, 1.7, .4, 1); }
+  41.6% { transform: scale(.92, 1.1); animation-timing-function: ease-in-out; }
+  44% { transform: scale(1.03, .98); animation-timing-function: ease-out; }
+  46%, 68% { transform: scale(1, 1); animation-timing-function: cubic-bezier(.5, 0, .9, .6); }
+  70% { transform: scale(1.2, .08); animation-timing-function: cubic-bezier(.2, 1.7, .4, 1); }
+  72.6% { transform: scale(.94, 1.08); animation-timing-function: ease-in-out; }
+  75%, 100% { transform: scale(1, 1); }
+}
+@keyframes cvLook { 0%, 100% { translate: 0 0; } 28% { translate: -11px 0; } 40% { translate: -9px 0; } 62% { translate: 11px 0; } 74% { translate: 9px 0; } }
 @keyframes cvHappy { 0% { opacity: 1; } 100% { opacity: 1; transform: scaleY(.16) translateY(-8px); height: clamp(40px, 6.4vw, 64px); } }
 
 /* 소리 안내: 브라우저가 소리를 막고 있을 때만 잠깐 보임 */

@@ -7,7 +7,7 @@ export function printedMaterial(THREE) {
     tex = new THREE.TextureLoader().load(new URL('../assets/fdm-layers.webp', import.meta.url).href);
     tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.anisotropy = 4;
   }
-  return new THREE.MeshStandardMaterial({ color: '#cbbfc2', roughness: 0.5, metalness: 0.12, envMapIntensity: 0.9, bumpMap: tex, bumpScale: 2.5 });
+  return new THREE.MeshStandardMaterial({ color: '#a39c93', roughness: 0.92, metalness: 0, envMapIntensity: 0.45, bumpMap: tex, bumpScale: 1.6 });
 }
 // 모델에 UV가 없어서, 모델 안쪽 높이(y)를 따라 결이 층층이 쌓이도록 UV를 만든다.
 export function layerUV(THREE, mesh) {

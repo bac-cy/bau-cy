@@ -29,7 +29,8 @@ async function init() {
   const D2R = Math.PI / 180, clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.08;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.VSMShadowMap;      // 키샷 렌더처럼 부드러운 그림자
   const pmrem = new THREE.PMREMGenerator(renderer);
   const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
@@ -50,7 +51,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
 { float g1 = vn(vObjPos * 420.0), g2 = vn(vObjPos * 130.0), g3 = vn(vObjPos * 38.0);
   diffuseColor.rgb *= 0.93 + 0.10 * g1 + 0.05 * g2 + 0.04 * g3; }`);
   };
-  const piping = new THREE.MeshStandardMaterial({ color: '#f4f2ee', roughness: 0.55, metalness: 0, envMapIntensity: 0.9 });
+  const piping = new THREE.MeshStandardMaterial({ color: '#dad7e2', roughness: 0.34, metalness: 0.72, envMapIntensity: 1.4 });   // 머리·몸통 가운데 띠 = 스틸 느낌(사용자 요청)
   const aluminum = printedMaterial(THREE);
   const rubber = new THREE.MeshStandardMaterial({ color: '#8d8c8a', roughness: 0.9, metalness: 0 });
   const FABRIC = ['새_헤드_상판', '새_쿠션', '새_하부_폼', '새_하부_쉘'], PIPING = ['새_헤드_하부판', '새_하부_덮개판'], ALU = ['기둥_1', '본체6'], RUBBER = ['새_미끄럼방지_고무링', '하부_회전판'];
@@ -71,12 +72,17 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   const cards = slots.map((slot) => {
     const root3 = gltf.scene.clone(true), scene = new THREE.Scene(); scene.add(root3); scene.environment = envTex;
     scene.add(new THREE.HemisphereLight(0xfff4e8, 0xd8c8c0, 1.5));
-    const key = new THREE.DirectionalLight(0xfff1e2, 0.9); key.position.set(-1.2, 2, 1.5); scene.add(key);
-    const fill = new THREE.DirectionalLight(0xe4dbf5, 0.55); fill.position.set(2, .6, -1); scene.add(fill);
+    const key = new THREE.DirectionalLight(0xfff0e0, 1.3); key.position.set(-0.4, 2.6, 1.2);
+    const SM = innerWidth <= 760 ? 1024 : 2048;
+    key.castShadow = true; key.shadow.mapSize.set(SM, SM); key.shadow.bias = -0.0006; key.shadow.normalBias = 0.003; key.shadow.radius = 9; key.shadow.blurSamples = 20;
+    Object.assign(key.shadow.camera, { left: -0.45, right: 0.45, top: 0.45, bottom: -0.45, near: 0.3, far: 5 }); key.target.position.set(0, 0.12, 0); scene.add(key, key.target);
+    const fill = new THREE.DirectionalLight(0xe4dbf5, 0.5); fill.position.set(2, .6, -1); scene.add(fill);
+    const rim = new THREE.DirectionalLight(0xffe9d6, 0.75); rim.position.set(1.2, 1.2, -1.6); scene.add(rim);            // 가장자리 빛줄기
     const by = {}; root3.traverse(o => { by[o.name] = o; });
     const matrices = [], shells = [];
     root3.traverse(o => {
       if (!o.isMesh) return;
+      o.castShadow = true; o.receiveShadow = true;
       if (FABRIC.includes(o.name)) o.material = fabricFor(THREE, o.name); else if (PIPING.includes(o.name)) o.material = piping; else if (ALU.includes(o.name)) { o.material = aluminum; layerUV(THREE, o); } else if (RUBBER.includes(o.name)) o.material = rubber;
       if (/KeyStudio-HT16K33-8x8-LED-Matrix/.test(o.name)) { matrices.push(o); o.visible = false; return; }
       if (['새_헤드_상판', '새_쿠션', '새_헤드_하부판'].includes(o.name)) shells.push(o);
@@ -99,6 +105,8 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     gr.addColorStop(0, 'rgba(110,80,120,.26)'); gr.addColorStop(1, 'rgba(110,80,120,0)'); g2.fillStyle = gr; g2.fillRect(0, 0, 128, 128);
     const shadow = new THREE.Mesh(new THREE.PlaneGeometry(sphere.radius * 1.9, sphere.radius * 1.9), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c2), transparent: true, depthWrite: false }));
     shadow.rotation.x = -Math.PI / 2; shadow.position.set(center.x, box.min.y - 0.001, center.z); scene.add(shadow);
+    { const g = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShadowMaterial({ color: 0x3a2f4a, opacity: 0.14 })); g.rotation.x = -Math.PI / 2; g.position.set(center.x, box.min.y - 0.0005, center.z); g.receiveShadow = true; scene.add(g); }   // 바닥에 지는 실제 그림자
+    key.target.position.set(center.x, center.y, center.z);
 
     const cv = document.createElement('canvas'); cv.className = 'slot__scene'; cv.setAttribute('role', 'img');
     cv.setAttribute('aria-label', { form: 'Cove의 두 개의 둥근 볼륨', material: 'Cove의 소재가 만나는 이음선', motion: 'Cove가 몸통을 돌리고 갸웃하는 모습', close: '앉아 있던 Cove가 머리를 앞으로 내밀며 다가오는 모습', calm: 'Cove가 고개를 들었다 내리며 폼을 지그시 누르는 모습', kind: 'Cove가 몸통을 돌리고 고개를 갸웃하며 반응하는 모습' }[slot.dataset.scene]);

@@ -65,8 +65,8 @@
   // I'm cove → Cove 렌더 구간
   // 휠 1칸 ≈ 0.067 (HI → I'm cove 가 1.5칸 = 0.10). 구간 길이를 칸 수로 환산해 잡았습니다.
   const TYPE_CPS = 7;                              // I'm cove 입력 속도(초당 글자 수)
-  const OUT_START = 0.62, OUT_SPAN = 0.12;         // I'm cove 사라지기 (I'm cove 가 읽히는 구간을 이전의 약 2배로)
-  const RISE_START = 0.67, RISE_SPAN = 0.34;       // 큰 COVE 글자 + 렌더 올라오기
+  const OUT_START = 0.42, OUT_SPAN = 0.10;         // I'm cove 사라지기 (뒤로 넘어가는 게 느리다는 요청으로 머무는 구간을 줄임: 0.62 → 0.42)
+  const RISE_START = 0.46, RISE_SPAN = 0.28;       // 홍보 영상 나타나기 (0.67/0.34 → 0.46/0.28)
   const P1_TIME = 0.42;                            // HI → I'm cove 가 녹아들듯 넘어가는 시간(초) — 클수록 더 부드럽고 느긋
   const GLIDE_TIME = 0.2;                          // 스크롤을 따라오는 시간(초) — 작을수록 쫀쫀, 클수록 부드러움
 

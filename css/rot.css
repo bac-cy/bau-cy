@@ -1,0 +1,35 @@
+/* 360° 회전 장면 (js/rot.js): 스크롤하면 키샷 360° 렌더가 한 바퀴 돌고, 아래 눈금 다이얼과 규격 글자가 각도에 맞춰 함께 반응해요.
+   되돌리려면 cove.html 에서 이 파일 링크, js/rot.js 줄, <section id="rot"> 블록을 지움 */
+.rot { position: relative; height: 200svh; }
+.rot__sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; display: grid; grid-template-rows: 1fr auto; }
+.rot__tag { position: absolute; left: var(--gutter); top: clamp(76px, 11svh, 120px); margin: 0; font-family: "Jost", "Noto Sans KR", system-ui, sans-serif; font-size: 13px; letter-spacing: .03em; color: #6e6e73; z-index: 2; }
+.rot__view { position: relative; min-height: 0; }
+.rot__cv { position: absolute; left: 50%; top: 4svh; width: min(84vw, 820px); height: calc(100% - 4svh - min(64vw, 540px) * 0.40); translate: -50% 0; display: block; pointer-events: none; }
+/* 눈금 다이얼 */
+.rot__dial { position: absolute; left: 50%; bottom: 0; width: min(64vw, 540px); translate: -50% 1px; pointer-events: none; overflow: visible; }
+.rot__dial .arc { fill: none; stroke: rgba(29, 29, 31, .22); stroke-width: 1; }
+.rot__dial .tk { stroke: rgba(29, 29, 31, .34); stroke-width: 1.2; stroke-linecap: round; }
+.rot__dial .tk.big { stroke-width: 2.2; stroke: rgba(29, 29, 31, .55); }
+.rot__dial .ptr { fill: rgba(29, 29, 31, .75); }
+.rot__dial .hub { fill: var(--bg, #f5f5f7); stroke: rgba(29, 29, 31, .22); stroke-width: 1; }
+.rot__dial .dot { fill: #1d1d1f; }
+.rot__dial text { font-family: "Jost", system-ui, sans-serif; fill: #6e6e73; font-size: 12px; letter-spacing: .04em; text-anchor: middle; }
+.rot__dial .deg { fill: #1d1d1f; font-size: 13px; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+/* 규격 3칸: 지금 각도에 맞는 칸만 진하게 */
+.rot__cols { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid rgba(29, 29, 31, .22); }
+.rot__col { display: grid; justify-items: center; gap: 12px; padding: clamp(22px, 5svh, 52px) 12px clamp(26px, 6svh, 60px); border-left: 1px solid rgba(29, 29, 31, .14); color: #c2c2c8; transition: color .5s ease; }
+.rot__col:first-child { border-left: 0; }
+.rot__col strong { font-family: "Jost", "Noto Sans KR", system-ui, sans-serif; font-weight: 400; font-size: clamp(26px, 3.6vw, 56px); letter-spacing: -.03em; line-height: 1.1; white-space: nowrap; }
+.rot__col span { font-family: "Jost", "Noto Sans KR", system-ui, sans-serif; font-size: clamp(11px, .9vw, 13px); letter-spacing: .04em; color: inherit; }
+.rot__col.is-on { color: #1d1d1f; }
+@media (max-width: 760px) {
+  .rot { height: 170svh; }
+  .rot__tag { top: 70px; } .rot__dial { width: min(92vw, 420px); } .rot__cv { height: calc(100% - 4svh - min(92vw, 420px) * 0.38); }
+  .rot__cols { grid-template-columns: 1fr 1fr 1fr; }
+  .rot__col { padding: 18px 4px 24px; gap: 8px; }
+  .rot__col strong { font-size: clamp(16px, 5vw, 22px); }
+  .rot__col span { font-size: 10px; text-align: center; }
+}
+/* 끌어서 돌리기 */
+.rot__view { touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+.rot__view.is-drag { cursor: grabbing; }
