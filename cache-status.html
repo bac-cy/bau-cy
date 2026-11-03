@@ -1,0 +1,21 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cove 오프라인 준비 확인</title>
+<style>body{font-family:system-ui,"Malgun Gothic",sans-serif;margin:0;padding:40px 24px;background:#f5f5f7;color:#1d1d1f}main{max-width:560px;margin:0 auto}h1{font-size:22px;margin:0 0 18px}.bar{height:10px;border-radius:8px;background:#ddd;overflow:hidden;margin:16px 0}.bar i{display:block;height:100%;width:0;background:#1d1d1f;transition:width .4s}p{line-height:1.7;margin:8px 0;color:#444}.ok{color:#117a3d;font-weight:700}.wait{color:#9a6a00;font-weight:700}a{color:#4b3fb0}</style></head>
+<body><main><h1>Cove 오프라인 준비 확인</h1><div class="bar"><i id="b"></i></div><p id="s">확인 중…</p><p id="d"></p>
+<p>인터넷이 되는 상태에서 이 페이지를 연 채로 잠시 기다리면 파일이 이 컴퓨터에 저장돼요. <b>"준비 완료"</b>가 뜨면 와이파이를 꺼도 <a href="./">홈페이지</a>가 열려요.</p></main>
+<script>
+(async function () {
+  var s = document.getElementById('s'), b = document.getElementById('b'), d = document.getElementById('d');
+  if (!('serviceWorker' in navigator)) { s.textContent = '이 브라우저에서는 오프라인 저장을 쓸 수 없어요. 크롬이나 엣지를 사용해 주세요.'; return; }
+  try { await navigator.serviceWorker.register('sw.js'); } catch (e) { s.textContent = '등록하지 못했어요 (주소가 https:// 로 시작하는지 확인해 주세요).'; return; }
+  var list = await (await fetch('precache.json', { cache: 'no-store' })).json();
+  async function tick() {
+    var c = await caches.open('cove-v1'), n = 0, miss = [];
+    for (var i = 0; i < list.length; i++) { var u = new URL(list[i], location).origin + new URL(list[i], location).pathname; if (await c.match(u)) n++; else miss.push(list[i]); }
+    b.style.width = Math.round(n / list.length * 100) + '%';
+    var fonts = (await c.keys()).filter(function (r) { return /fonts\.g/.test(r.url); }).length;
+    if (n >= list.length) { s.innerHTML = '<span class="ok">준비 완료</span> (' + n + '/' + list.length + '개 저장됨)'; d.textContent = '글꼴 ' + fonts + '개도 저장됨. 이제 와이파이를 꺼도 돼요.'; }
+    else { s.innerHTML = '<span class="wait">저장 중…</span> ' + n + '/' + list.length; d.textContent = miss.slice(0, 3).join(', '); setTimeout(tick, 1500); }
+  }
+  tick();
+})();
+</script></body></html>
