@@ -8,8 +8,10 @@ import { fabricFor } from './fabric-material.js';
    · Motion   — 머리를 숙이고 몸통을 돌리며 갸웃, 눈 표정이 바뀌어요 (반복)
    화면에 보이는 카드만 그려요. 불러오지 못하면 기존 임시 그림이 그대로 남아요.
    ========================================================== */
-const slots = [...document.querySelectorAll('.slot[data-scene]')];
-if (slots.length) {
+let slots = [];
+function boot() {                                                           // 모든 스크립트(압력 시연을 만드는 jobs.js 포함)가 끝난 뒤 장면 칸을 찾음
+  slots = [...document.querySelectorAll('.slot[data-scene]')];
+  if (!slots.length) return;
   const io = new IntersectionObserver((es) => {
     if (!es.some(e => e.isIntersecting)) return;
     io.disconnect();
@@ -17,6 +19,7 @@ if (slots.length) {
   }, { rootMargin: '900px 0px' });
   slots.forEach(s => io.observe(s));
 }
+if (document.readyState === 'complete') boot(); else window.addEventListener('load', boot);
 
 async function init() {
   const [THREE, { GLTFLoader }, { RoomEnvironment }, { MeshoptDecoder }, EYES] = await Promise.all([
@@ -59,6 +62,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   const tourAt = (t) => { let i = 0; while (i < K.length - 2 && t > K[i + 1][0]) i++; const a = K[i], b = K[i + 1], f = ease(clamp((t - a[0]) / (b[0] - a[0]), 0, 1)); return [1, 2, 3, 4].map(c => a[c] + (b[c] - a[c]) * f); };
   const TOUR_EYES = [[0, '뜬 눈'], [1.2, '반짝 눈'], [2.6, '신난 눈'], [5.8, '반짝 눈'], [7.4, '뜬 눈']];
   const TOUR_MSG = [[0, '머리를 살짝 숙여요'], [2.6, '몸을 돌리며 갸웃해요'], [5.8, '눈으로 마음을 전해요']];
+  const pOf = (c, len) => c.slot.dataset.loop ? c.t % len : c.t - (c.t0 || 0);   // 반복 장면(Key Features 카드)은 계속 돌고, 나머지는 한 번 재생
   const last = (list, t) => { let r = list[0]; for (const e of list) if (e[0] <= t + 1e-6) r = e; return r; };
 
   function smoothDamp(cur, target, v, time, dt) { const w = 2 / time, x = w * dt, e = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x), d = cur - target, tmp = (v.v + w * d) * dt; v.v = (v.v - w * tmp) * e; return target + (d + tmp) * e; }
@@ -108,7 +112,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
 
   const vis = new IntersectionObserver((es) => es.forEach(e => { const c = cards.find(k => k.slot === e.target); if (c) { c.visible = e.isIntersecting; if (e.isIntersecting && !c.started) { c.started = true; c.t = 0; } } }), { threshold: 0.15 });
   cards.forEach(c => vis.observe(c.slot));
-  cards.forEach(c => { if (['close', 'calm', 'kind'].includes(c.kind)) { const replay = () => { c.t0 = c.t; }; c.slot.addEventListener('pointerenter', replay); c.slot.addEventListener('pointerdown', replay); } });
+  cards.forEach(c => { if (['close', 'calm', 'kind'].includes(c.kind) && !c.slot.dataset.loop) { const replay = () => { c.t0 = c.t; }; c.slot.addEventListener('pointerenter', replay); c.slot.addEventListener('pointerdown', replay); } });
   const reduced = false;   // 사용자 요청: PC의 '움직임 줄이기' 설정과 상관없이 모든 효과를 보여준다
 
   function say(c, text) { if (c.text === text) return; c.text = text; c.msg.textContent = text; }
@@ -121,15 +125,25 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     } else if (c.kind === 'material') {
       g = { az: 40 + 16 * Math.sin(t * 0.55), el: 8, zoom: 2.5, tx: c.seam.x, ty: c.seam.y, tz: c.seam.z };
       say(c, '소재가 만나는 이음선');
+    } else if (c.kind === 'expr') {                                             // Gentle Expression: 정면에서 눈 LED 표정이 차례로 바뀜 (반복 7.2초)
+      const p = c.t % 7.2; pose = [24, -30, 5 * Math.sin(c.t * 0.9), 0]; eye = last([[0, '뜬 눈'], [1.2, '반짝 눈'], [2.4, '하트 눈'], [3.8, '신난 눈'], [5.2, '윙크'], [6.2, '뜬 눈']], p)[1];
+      g = { az: 0, el: 3, zoom: 1.2, tx: 0, ty: 0, tz: 0 };
+      say(c, '');
+    } else if (c.kind === 'press') {                                            // 압력 시연(스크롤 진행 p로 움직임): 옆에서 머리가 내려와 폼을 지그시 눌렀다 놓음
+      const p = Math.min(1, Math.max(0, parseFloat(c.slot.dataset.p || '0'))), ez = (u) => { u = Math.min(1, Math.max(0, u)); return u * u * (3 - 2 * u); };
+      const pr = ez((p - 0.3) / 0.35) * (1 - ez((p - 0.86) / 0.12));
+      pose = [18 + 10 * (1 - pr) - 14 * pr, -20 - 14 * (1 - pr) + 16 * pr, 0, 0]; eye = pr > 0.45 ? '편안한 눈' : '뜬 눈';
+      g = { az: 78, el: 6, zoom: 1.4, tx: 0, ty: 0.004, tz: 0 }; c.press = pr;
+      say(c, '');
     } else if (c.kind === 'close') {                                            // Close: 앉아 있다가 머리가 천천히 앞으로 나와 다가오고, 잠깐 멈췄다가 다시 앉음 (한 번 4초)
-      const p = c.t - (c.t0 || 0), ez = (u) => { u = Math.min(1, Math.max(0, u)); return u * u * (3 - 2 * u); };
+      const p = pOf(c, 5.2), ez = (u) => { u = Math.min(1, Math.max(0, u)); return u * u * (3 - 2 * u); };
       const out = ez((p - 0.5) / 1.6) * (1 - ez((p - 2.9) / 1.1));              // 0 → 1(다가옴) → 0(다시 앉음)
       pose = [32 * out, -24 * out, 0, 0];
       eye = p < 1.3 || p > 3.8 ? '감은 눈' : p > 3.3 ? '졸린 눈' : '반짝 눈';
       g = { az: 0, el: -3, zoom: 1.0 + 0.16 * out, tx: 0, ty: 0.012 * out, tz: 0 };
       say(c, '');
     } else if (c.kind === 'calm') {                                             // Calm: 고개를 천천히 들었다가 우레탄 폼 위로 아주 천천히 내려와 지그시 누름 (한 번 5.6초)
-      const p = c.t - (c.t0 || 0), ez = (u) => { u = Math.min(1, Math.max(0, u)); return u * u * (3 - 2 * u); };
+      const p = pOf(c, 6.8), ez = (u) => { u = Math.min(1, Math.max(0, u)); return u * u * (3 - 2 * u); };
       const up = ez((p - 0.2) / 1.6) * (1 - ez((p - 2.2) / 1.9));               // 고개 들기 → 천천히 내림
       const touch = ez((p - 3.4) / 0.9) * (1 - ez((p - 4.9) / 0.7)), press = touch;       // 폼에 닿아 누르는 정도
       pose = [18 + 12 * up - 15 * touch, -20 - 18 * up + 18 * touch, 0, 0];
@@ -137,7 +151,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
       g = { az: 78, el: 6, zoom: 1.12, tx: 0, ty: 0, tz: 0 }; c.press = press;
       say(c, '');
     } else if (c.kind === 'kind') {                                             // Kind: 몸통을 보는 사람 쪽으로 돌리고, 머리를 한쪽으로 갸웃했다가 반대쪽으로 갸웃 (한 번 4.2초)
-      const p = c.t - (c.t0 || 0), ez = (u) => { u = Math.min(1, Math.max(0, u)); return u * u * (3 - 2 * u); };
+      const p = pOf(c, 5.6), ez = (u) => { u = Math.min(1, Math.max(0, u)); return u * u * (3 - 2 * u); };
       const turn = 1 - ez(p / 0.9), tilt = 9 * ez((p - 0.9) / 0.5) * (1 - ez((p - 1.9) / 0.4)) - 9 * ez((p - 1.9) / 0.5) * (1 - ez((p - 3.0) / 0.5));
       pose = [24, -30, tilt, -42 * turn];
       eye = p < 1.9 ? '하트 눈' : p < 3.6 ? '신난 눈' : '뜬 눈';
@@ -161,7 +175,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
       if (w !== c.w || h !== c.h) { c.w = w; c.h = h; c.cv.width = Math.round(w * PR); c.cv.height = Math.round(h * PR); c.camera.aspect = w / h; c.camera.updateProjectionMatrix(); }
       c.t += reduced ? 0 : dt;
       const { g, pose, eye } = goal(c);
-      if (c.foam) c.foam.scale.y = c.foam0 * (1 - 0.035 * (c.kind === 'calm' ? (c.press || 0) : 0));          // Calm: 폼이 아주 조금 눌려 보임
+      if (c.foam) c.foam.scale.y = c.foam0 * (1 - 0.035 * (c.kind === 'calm' || c.kind === 'press' ? (c.press || 0) : 0));          // Calm: 폼이 아주 조금 눌려 보임
       for (const k of ['az', 'el', 'zoom', 'tx', 'ty', 'tz']) c.cam[k] = reduced ? g[k] : smoothDamp(c.cam[k], g[k], c.cvel[k], k === 'zoom' ? 0.5 : 0.34, dt);
       const sway = c.kind === 'motion' ? 0 : 1, tt = c.t;
       c.setPose([pose[0] + sway * (0.45 * Math.sin(2 * Math.PI * tt / 3.7)), pose[1] + sway * (0.7 * Math.sin(2 * Math.PI * tt / 4.3 + 0.6)), pose[2], pose[3]]);

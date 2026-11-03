@@ -9,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600&family=Noto+Sans+KR:wght@300;400;500;600;700&family=Jost:wght@200;300;400;500&family=JetBrains+Mono:wght@300;400&family=Fredoka:wdth,wght@125,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20261104s">
-  <link rel="stylesheet" href="css/intro.css?v=20261104s">
-  <link rel="stylesheet" href="css/sim.css?v=20261104s">
+  <link rel="stylesheet" href="css/style.css?v=20261104v">
+  <link rel="stylesheet" href="css/intro.css?v=20261104v">
+  <link rel="stylesheet" href="css/sim.css?v=20261104v">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="alternate icon" href="favicon-32.png" type="image/png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -102,9 +102,9 @@
       </div>
 
       <ul class="principles">
-        <li class="reveal"><span>Close</span>가까이, 손이 닿는 거리에서<figure class="slot principles__img" data-scene="calm"><img src="assets/about-close.webp" alt="" loading="lazy" decoding="async"></figure></li>
-        <li class="reveal"><span>Calm</span>조용하게, 편안한 곁이 되도록<figure class="slot principles__img" data-scene="close"><img src="assets/about-calm.webp" alt="" loading="lazy" decoding="async"></figure></li>
-        <li class="reveal"><span>Kind</span>다정하게, 몸짓으로 반응하며<figure class="slot principles__img" data-scene="kind"><img src="assets/about-kind.webp" alt="" loading="lazy" decoding="async"></figure></li>
+        <li class="reveal"><span>Close</span>가까이, 손이 닿는 거리에서</li>
+        <li class="reveal"><span>Calm</span>조용하게, 편안한 곁이 되도록</li>
+        <li class="reveal"><span>Kind</span>다정하게, 몸짓으로 반응하며</li>
       </ul>
     </section>
 
@@ -118,22 +118,22 @@
 
       <div class="features__grid">
         <article class="feature reveal">
-          <div class="feature__art" data-art="pressure" aria-hidden="true"><canvas></canvas></div>
+          <div class="feature__art" data-art="pressure" aria-hidden="true"><canvas></canvas><div class="slot feat3d" data-scene="calm" data-loop="6.8"></div></div>
           <h3>Pressure for Rest</h3>
           <p>손이나 팔을 올려 기대면 센서가 알아보고, 부드러운 압력으로 지그시 눌러 휴식을 도와요.</p>
         </article>
         <article class="feature reveal">
-          <div class="feature__art" data-art="eyes" aria-hidden="true"><canvas></canvas></div>
+          <div class="feature__art" data-art="eyes" aria-hidden="true"><canvas></canvas><div class="slot feat3d" data-scene="expr" data-loop="7.2"></div></div>
           <h3>Gentle Expression</h3>
           <p>눈 LED의 작은 표정 변화로 지금의 기분을 전해요. 한눈에 마음이 느껴져요.</p>
         </article>
         <article class="feature reveal">
-          <div class="feature__art" data-art="body" aria-hidden="true"><canvas></canvas></div>
+          <div class="feature__art" data-art="body" aria-hidden="true"><canvas></canvas><div class="slot feat3d" data-scene="kind" data-loop="5.6"></div></div>
           <h3>Body Language</h3>
           <p>고개를 갸웃하고 몸을 돌려요. 몸짓만으로 이쪽을 바라보고 마음을 전해요.</p>
         </article>
         <article class="feature reveal">
-          <div class="feature__art" data-art="attention" aria-hidden="true"><canvas></canvas></div>
+          <div class="feature__art" data-art="attention" aria-hidden="true"><canvas></canvas><div class="slot feat3d" data-scene="close" data-loop="5.2"></div></div>
           <h3>Quiet Attention</h3>
           <p>일에 푹 빠진 순간엔 살짝 고개를 돌려 눈길을 끌어요. 작업 사이사이 기분 좋은 환기가 되어 줘요.</p>
         </article>
@@ -288,29 +288,29 @@
   </div>
 
   <script src="assets/vendor/lenis/lenis.min.js"></script>
-  <script src="js/smooth.js?v=20261104s"></script>
-  <script src="js/main.js?v=20261104s"></script>
-  <script src="js/intro.js?v=20261104s"></script>
+  <script src="js/smooth.js?v=20261104v"></script>
+  <script src="js/main.js?v=20261104v"></script>
+  <script src="js/intro.js?v=20261104v"></script>
   <script type="importmap">
     { "imports": {
         "three": "./assets/vendor/three/build/three.module.min.js",
         "three/addons/": "./assets/vendor/three/examples/jsm/"
     } }
   </script>
-  <script type="module" src="js/sim.js?v=20261104s"></script>
-  <script type="module" src="js/cards.js?v=20261104s"></script>
-  <script type="module" src="js/intro-cove.js?v=20261104s"></script>
-  <script type="module" src="js/features.js?v=20261104s"></script>
-  <script type="module" src="js/engineering.js?v=20261104s"></script>
+  <script type="module" src="js/sim.js?v=20261104v"></script>
+  <script type="module" src="js/cards.js?v=20261104v"></script>
+  <script type="module" src="js/intro-cove.js?v=20261104v"></script>
+  <script type="module" src="js/features.js?v=20261104v"></script>
+  <script type="module" src="js/engineering.js?v=20261104v"></script>
   <!-- 디테일 효과: 필름 입자 · 자석 버튼 · 카드 빛/기울기 (되돌리려면 아래 두 줄과 css/fx.css, js/fx.js 를 지우면 됨) -->
-  <link rel="stylesheet" href="css/fx.css?v=20261104s">
-  <script src="js/fx.js?v=20261104s" defer></script>
+  <link rel="stylesheet" href="css/fx.css?v=20261104v">
+  <script src="js/fx.js?v=20261104v" defer></script>
   <!-- 배경 통일 + 유리 카드 (C안, 애플풍). 되돌리려면 아래 두 줄을 지우면 됨 -->
-  <link rel="stylesheet" href="css/bg.css?v=20261104s">
-  <script src="js/bg.js?v=20261104s" defer></script>
+  <link rel="stylesheet" href="css/bg.css?v=20261104v">
+  <script src="js/bg.js?v=20261104v" defer></script>
   <!-- 잡스 제안 4가지(한 줄 약속·압력 시연·큰 숫자 스펙·One more thing). 되돌리려면 아래 두 줄을 지우면 됨 -->
-  <link rel="stylesheet" href="css/jobs.css?v=20261104s">
-  <script src="js/jobs.js?v=20261104s" defer></script>
+  <link rel="stylesheet" href="css/jobs.css?v=20261104v">
+  <script src="js/jobs.js?v=20261104v" defer></script>
   <script type="module" src="js/cove-sound.js"></script>   <!-- 소리: 일찍 불러와 인트로 타이핑 소리에도 씀 -->
   <script src="js/finale.js?v=1"></script>
   <script src="js/loader.js?v=8"></script>   <!-- 시작 화면 (눈 LED가 깜빡이다 열림) -->

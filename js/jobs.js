@@ -9,7 +9,7 @@
   intro && intro.after(tag);
 
   /* 2) 압력 시연: 스크롤을 따라 팔(점선 캡슐)이 내려와 머리를 누르고, 머리와 몸통 사이의 라벤더 패드가 지그시 눌림 */
-  const press = $(`<section class="jobs-press" aria-label="압력으로 쉬는 시연"><div class="jobs-press__stick"><div class="jobs-press__veil"></div><span class="jobs-press__label">Pressure for Rest</span><canvas aria-hidden="true"></canvas><div class="jobs-press__text"><p data-s="0">손이나 팔을 올려 기대면,</p><p data-s="1">Cove가 지그시 눌러 줘요.</p><p data-s="2">그 압력이, 쉬는 순간을 도와요.</p></div></div></section>`);
+  const press = $(`<section class="jobs-press" aria-label="압력으로 쉬는 시연"><div class="jobs-press__stick"><div class="jobs-press__veil"></div><span class="jobs-press__label">Pressure for Rest</span><canvas aria-hidden="true"></canvas><div class="slot press3d" data-scene="press" data-p="0"></div><div class="jobs-press__text"><p data-s="0">손이나 팔을 올려 기대면,</p><p data-s="1">Cove가 지그시 눌러 줘요.</p><p data-s="2">그 압력이, 쉬는 순간을 도와요.</p></div></div></section>`);
   feats && feats.before(press);
   const pc = press.querySelector('canvas'), px = pc.getContext('2d'), veil = press.querySelector('.jobs-press__veil'), lines = [...press.querySelectorAll('.jobs-press__text p')];
   function rr(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
@@ -40,7 +40,8 @@
     if (r.bottom > -50 && r.top < innerHeight + 50) {
       drawPress(p, now / 1000);
       veil.style.opacity = (0.9 * ez((p - 0.45) / 0.3) * (1 - ez((p - 0.86) / 0.12))).toFixed(3);                       // 화면 전체가 천천히 가라앉음
-      pc.style.transform = `scale(${(1 - 0.035 * ez((p - 0.45) / 0.3) * (1 - ez((p - 0.86) / 0.12))).toFixed(4)})`;
+      const s3 = press.querySelector('.press3d'); if (s3) { s3.dataset.p = p.toFixed(4); }
+      pc.style.transform = `scale(${(1 - 0.035 * ez((p - 0.45) / 0.3) * (1 - ez((p - 0.86) / 0.12))).toFixed(4)})`; if (s3) s3.style.transform = pc.style.transform;
       const s = p < 0.3 ? 0 : p < 0.62 ? 1 : p < 0.96 ? 2 : -1; lines.forEach((l, i) => l.classList.toggle('on', i === s));
       if (p < 0.12) lines[0].classList.add('on');
     }
