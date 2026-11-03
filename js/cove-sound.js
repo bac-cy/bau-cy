@@ -176,7 +176,7 @@ function motionHint(level) {
 
 /* 배경음악: assets/bgm.mp3 파일이 있으면 그 곡을 잔잔하게 반복하고, 없으면 코드로 만든 아주 잔잔한 앰비언트(느린 화음 + 가끔 울리는 맑은 종소리)를 깔아요.
    소리가 켜져 있을 때만, 매우 작게. Cove 효과음이 나올 때와 영상을 전체 화면으로 볼 때는 자동으로 줄어들어요. */
-const BGM_LEVEL = 0.55, BGM_FILE_LEVEL = 0.2;                                     // 코드로 만든 반주 / 고른 곡의 음량
+const BGM_LEVEL = 0.3, BGM_FILE_LEVEL = 0.08;                                     // 코드로 만든 반주 / 고른 곡의 음량
 let bgmBus = null, bgmStarted = false, bgmBase = BGM_LEVEL, echoIn = null;
 function bgmSetup() {
   const c = ctx; bgmBus = c.createGain(); bgmBus.gain.value = 0; bgmBus.connect(master);
