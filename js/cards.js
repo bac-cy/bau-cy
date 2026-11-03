@@ -105,7 +105,19 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     const msg = document.createElement('span'); msg.className = 'slot__msg'; msg.setAttribute('aria-live', 'off');
     slot.append(cv, msg);
     const camera = new THREE.PerspectiveCamera(28, 1.6, 0.01, 10);
-    return { slot, kind: slot.dataset.scene, scene, root3, foam: by['새_하부_폼'], foam0: by['새_하부_폼'] ? by['새_하부_폼'].scale.y : 1, camera, cv, msg, ctx: cv.getContext('2d'), setPose, eyes, FRONT, RIGHT, center, sphere, seam,
+    let arm = null;
+    if (slot.dataset.scene === 'press') {                                       // 압력 시연: 사용자의 팔을 부드러운 라벤더 캡슐로 단순하게 표현 (사람 모양 없이)
+      const foam = by['새_하부_폼'] || by['새_쿠션'], r = 0.022;
+      const mat = new THREE.MeshPhysicalMaterial({ color: '#c9bcee', roughness: 0.72, metalness: 0, sheen: 0.6, sheenColor: new THREE.Color('#fff'), envMapIntensity: 0.6 });
+      arm = new THREE.Mesh(new THREE.CapsuleGeometry(r, 0.12, 10, 20), mat);
+      arm.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), FRONT);
+      const bx = new THREE.Vector3(center.x, 0, center.z).addScaledVector(FRONT, 0.075);
+      const rc = new THREE.Raycaster(new THREE.Vector3(bx.x, box.max.y + 0.2, bx.z), new THREE.Vector3(0, -1, 0)), hit = rc.intersectObject(foam, true)[0];
+      const top = hit ? hit.point.y : new THREE.Box3().setFromObject(foam).max.y;                // 폼 윗면 높이(팔이 폼 위에 놓이도록)
+      arm.userData = { r, y0: top + r * 0.8 };
+      arm.position.set(bx.x, arm.userData.y0, bx.z); arm.castShadow = false; scene.add(arm);
+    }
+    return { slot, arm, kind: slot.dataset.scene, scene, root3, foam: by['새_하부_폼'], foam0: by['새_하부_폼'] ? by['새_하부_폼'].scale.y : 1, camera, cv, msg, ctx: cv.getContext('2d'), setPose, eyes, FRONT, RIGHT, center, sphere, seam,
       cam: { az: 35, el: 14, zoom: 1, tx: 0, ty: 0, tz: 0 }, cvel: { az: { v: 0 }, el: { v: 0 }, zoom: { v: 0 }, tx: { v: 0 }, ty: { v: 0 }, tz: { v: 0 } },
       t: 0, rest: 0, visible: false, text: '', w: 0, h: 0 };
   });
@@ -175,6 +187,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
       if (w !== c.w || h !== c.h) { c.w = w; c.h = h; c.cv.width = Math.round(w * PR); c.cv.height = Math.round(h * PR); c.camera.aspect = w / h; c.camera.updateProjectionMatrix(); }
       c.t += reduced ? 0 : dt;
       const { g, pose, eye } = goal(c);
+      if (c.arm) { const pr = c.press || 0; c.arm.scale.set(1 + 0.18 * pr, 1, 1 - 0.34 * pr); c.arm.position.y = c.arm.userData.y0 - c.arm.userData.r * 0.34 * pr * 0.9; }   // 머리에 눌려 살짝 납작해짐
       if (c.foam) c.foam.scale.y = c.foam0 * (1 - 0.035 * (c.kind === 'calm' || c.kind === 'press' ? (c.press || 0) : 0));          // Calm: 폼이 아주 조금 눌려 보임
       for (const k of ['az', 'el', 'zoom', 'tx', 'ty', 'tz']) c.cam[k] = reduced ? g[k] : smoothDamp(c.cam[k], g[k], c.cvel[k], k === 'zoom' ? 0.5 : 0.34, dt);
       const sway = c.kind === 'motion' ? 0 : 1, tt = c.t;
