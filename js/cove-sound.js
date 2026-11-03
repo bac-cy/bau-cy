@@ -8,7 +8,7 @@
    ========================================================== */
 const KEY = 'cove-sound';
 let on = true; try { on = localStorage.getItem(KEY) !== 'off'; } catch (e) { /* 무시 */ }
-let ctx = null, master = null, mGain = null, mOsc1 = null, mOsc2 = null, mFilter = null, mTrem = null, mLfo = null, mNoise = null, lastMotor = -1e9, lastExpr = -1e9, lastBounce = -1e9;
+let limNode = null, bgmMute = null, ctx = null, master = null, mGain = null, mOsc1 = null, mOsc2 = null, mFilter = null, mTrem = null, mLfo = null, mNoise = null, lastMotor = -1e9, lastExpr = -1e9, lastBounce = -1e9;
 const VOL = 1.7;                                                        // 전체 소리 크기 (리미터가 찢어짐을 막아 줌)
 
 function ensure() {
@@ -18,7 +18,7 @@ function ensure() {
   master = ctx.createGain(); master.gain.value = on ? VOL : 0;
   const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -10; lim.knee.value = 8; lim.ratio.value = 10; lim.attack.value = 0.002; lim.release.value = 0.12;   // 커져도 찢어지지 않게 눌러 줌
   const soft = ctx.createBiquadFilter(); soft.type = 'lowpass'; soft.frequency.value = 1700; soft.Q.value = 0.5;     // 날카로운 높은 소리를 깎아 부드럽게
-  master.connect(soft); soft.connect(lim); lim.connect(ctx.destination);
+  master.connect(soft); soft.connect(lim); lim.connect(ctx.destination); limNode = lim;
   // 모터: 낮게 '부르르' 하는 소리가 아니라, 가전 로봇처럼 공기가 스치는 듯한 아주 부드러운 '쉬이' 소리
   const nb = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate), nd = nb.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
   mNoise = ctx.createBufferSource(); mNoise.buffer = nb; mNoise.loop = true;
@@ -176,13 +176,13 @@ function motionHint(level) {
 
 /* 배경음악: assets/bgm.mp3 파일이 있으면 그 곡을 잔잔하게 반복하고, 없으면 코드로 만든 아주 잔잔한 앰비언트(느린 화음 + 가끔 울리는 맑은 종소리)를 깔아요.
    소리가 켜져 있을 때만, 매우 작게. Cove 효과음이 나올 때와 영상을 전체 화면으로 볼 때는 자동으로 줄어들어요. */
-const BGM_LEVEL = 0.55;
+const BGM_LEVEL = 0.55, BGM_FILE_LEVEL = 0.2;                                     // 코드로 만든 반주 / 고른 곡의 음량
 let bgmBus = null, bgmStarted = false, bgmBase = BGM_LEVEL, echoIn = null;
 function bgmSetup() {
   const c = ctx; bgmBus = c.createGain(); bgmBus.gain.value = 0; bgmBus.connect(master);
   echoIn = c.createGain(); const dl = c.createDelay(1.5); dl.delayTime.value = 0.34; const fb = c.createGain(); fb.gain.value = 0.22; const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2400;
   echoIn.connect(dl); dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(bgmBus);                    // 은은한 메아리(공간감)
-  bgmBus.gain.setTargetAtTime(bgmBase, c.currentTime, 2.5);                                                     // 천천히 커짐
+  bgmBus.gain.value = 0;                                                                                          // 처음엔 0, 구간 제어가 알맞은 때 천천히 올림
 }
 /* 코드로 만든 배경음악: 가볍고 경쾌한 뮤직박스풍 반주. 느린 낮은 화음(무서운 느낌)은 쓰지 않고, 밝은 장조(도·라·파·솔)의 통통 튀는 아르페지오 + 아주 작은 셰이커. 낮은 베이스 없이 가볍게. 템포 116. */
 const BPM = 116, STEP = 60 / BPM / 2;                                                                                              // 8분음표 한 칸의 길이(초)
@@ -215,13 +215,17 @@ function bgmSchedule() {
 function startBgm() {
   if (bgmStarted || !ensure() || ctx.state !== 'running') return; bgmStarted = true; bgmSetup();
   fetch('assets/bgm.mp3').then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); }).then(b => ctx.decodeAudioData(b)).then(buf => {         // 음악 파일이 있으면 그 곡을 반복
+    bgmBus.disconnect(); bgmMute = ctx.createGain(); bgmMute.gain.value = on ? 1 : 0; bgmBus.connect(bgmMute); bgmMute.connect(limNode); bgmBus.gain.cancelScheduledValues(0); bgmBus.gain.value = 0; bgmBase = BGM_FILE_LEVEL;   // 고른 곡은 소리를 깎는 필터를 거치지 않고 원음 그대로(작게)
     const s = ctx.createBufferSource(); s.buffer = buf; s.loop = true; s.connect(bgmBus); s.start(); window.COVE_BGM = 'file';
   }).catch(() => {                                                                                                                  // 없으면 코드로 만든 잔잔한 소리
     window.COVE_BGM = 'generated'; setInterval(bgmSchedule, 100);
   });
   setInterval(() => {                                                                                                               // 영상 전체 화면에서는 배경음악을 끔
     if (!bgmBus) return; const full = !!(document.fullscreenElement || document.webkitFullscreenElement);
-    bgmBase = full ? 0 : BGM_LEVEL; if (!duckT) bgmBus.gain.setTargetAtTime(bgmBase, ctx.currentTime, 0.4);
+    const intro = document.getElementById('intro'), inIntro = !!intro && intro.getBoundingClientRect().bottom > innerHeight * 0.5;      // 맨 앞 인트로(영상) 구간
+    const lvl = window.COVE_BGM === 'file' ? BGM_FILE_LEVEL : window.COVE_BGM === 'generated' ? BGM_LEVEL : 0;
+    bgmBase = full || inIntro ? 0 : lvl;                                                                                          // 영상 구간에서는 배경음악 없음, 그 구간을 넘어가면 천천히 켜짐
+    if (!duckT) bgmBus.gain.setTargetAtTime(bgmBase, ctx.currentTime, 1.1);
   }, 500);
 }
 let duckT = 0;
@@ -253,12 +257,12 @@ function mount() {
   paint();
   b.addEventListener('click', () => {
     on = !on; try { localStorage.setItem(KEY, on ? 'on' : 'off'); } catch (e) { /* 무시 */ }
-    if (ensure()) { master.gain.setTargetAtTime(on ? VOL : 0, ctx.currentTime, 0.03); }
+    if (ensure()) { master.gain.setTargetAtTime(on ? VOL : 0, ctx.currentTime, 0.03); if (bgmMute) bgmMute.gain.setTargetAtTime(on ? 1 : 0, ctx.currentTime, 0.05); }
     paint(); if (on) resume();
   });
   document.body.appendChild(b);
 }
 if (document.body) mount(); else document.addEventListener('DOMContentLoaded', mount);
 
-export const CoveSound = { motor, expr, event, bite, bounce, type, get on() { return on; }, get running() { return !!ctx && ctx.state === 'running'; } };
+export const CoveSound = { motor, expr, event, bite, bounce, type, get on() { return on; }, get running() { return !!ctx && ctx.state === 'running'; }, get bgmLevel() { return bgmBus ? +bgmBus.gain.value.toFixed(3) : -1; } };
 window.CoveSound = CoveSound;
