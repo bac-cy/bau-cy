@@ -59,6 +59,7 @@
 "js/intro.js",
 "js/jobs.js",
 "js/loader.js",
+"js/autoscroll.js",
 "js/main.js",
 "js/print-material.js",
 "js/sim.js",

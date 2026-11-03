@@ -2,7 +2,7 @@
    · 설치할 때 사이트 파일 전부(precache.json)를 저장하고, 글꼴(구글 폰트)은 처음 쓸 때 저장해요.
    · 저장된 파일을 먼저 보여 주고, 인터넷이 있으면 뒤에서 새 버전으로 갱신해요(다음에 열 때 반영).
    · 영상은 부분 재생(Range)을 저장본에서 잘라서 줘요. */
-const V = 'cove-v1';
+const V = 'cove-v2';
 const norm = (u) => { const x = new URL(u, self.location); return x.origin + x.pathname; };
 self.addEventListener('install', (e) => {
   e.waitUntil((async () => {
@@ -25,7 +25,7 @@ async function handle(req) {
   let hit = await cache.match(key);
   if (!hit && req.mode === 'navigate') hit = await cache.match(norm('index.html')) || await cache.match(norm('./'));
   if (req.headers.has('range')) { if (hit) return rangeResp(req, hit); try { return await fetch(req); } catch (_) { return new Response('', { status: 504 }); } }
-  if (hit) { fetch(req).then((r) => { if (r && r.ok && r.status === 200) cache.put(key, r.clone()); }).catch(() => {}); return hit; }      // 저장본 먼저, 뒤에서 갱신
+  if (hit) { fetch(req, { cache: 'no-cache' }).then((r) => { if (r && r.ok && r.status === 200) cache.put(key, r.clone()); }).catch(() => {}); return hit; }      // 저장본 먼저, 뒤에서 갱신
   try { const r = await fetch(req); if (r && r.ok) cache.put(key, r.clone()); return r; } catch (_) { return new Response('offline', { status: 503 }); }
 }
 async function runtime(req) {   // 구글 폰트: 한 번 받으면 저장해 두고 이후엔 저장본 사용
