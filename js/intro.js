@@ -32,11 +32,12 @@
   }
   const IM_TEXT = lineIm.dataset.type, imOut = lineIm.querySelector('.intro__typed'), imCaret = lineIm.querySelector('.intro__caret');
   let hiStarted = false, imShown = -1;
-  const startHi = () => { if (hiStarted) return; hiStarted = true; setTimeout(() => typeInto(lineHi, 650), 1900); };   // 시작 화면이 거의 사라진 뒤(열린 지 1.9초)에 시작해서, 글자가 하나씩 찍히는 모습이 분명히 보이게
+  const startHi = () => { if (hiStarted) return; hiStarted = true; setTimeout(() => typeInto(lineHi, 650), 800); };   // 시작 화면이 거의 사라진 뒤(완전히 걷힌 뒤 0.8초)에 시작해서, 글자가 하나씩 찍히는 모습이 분명히 보이게
   // 시작 화면(눈 LED)이 열리기 시작할 때 HI 타이핑을 시작해서, 타이핑이 시작 화면 뒤에서 끝나 버리지 않고 눈앞에서 보이게 함
   const R = document.documentElement, loading = () => R.classList.contains('loader-on') || R.classList.contains('loader-active');
   const go = () => (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(startHi);
-  if (loading()) { window.addEventListener('cove:loader-open', go, { once: true }); setTimeout(go, 9000); } else { go(); setTimeout(startHi, 1500); }
+  if (loading()) { window.addEventListener('cove:loader-done', go, { once: true }); setTimeout(go, 12000); } else {   // 시작 화면(눈 LED)이 완전히 걷힌 뒤에 시작
+    go(); setTimeout(startHi, 1500); }
 
   /* ---------- 반응형 그라디언트 (마우스를 따라가고, 가만히 있으면 천천히 흐름) ---------- */
   const pointer = { x: .55, y: .45, active: false, t: 0 };

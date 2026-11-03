@@ -48,7 +48,7 @@
 .intro__line--hi { top: 50%; translate: 0 -50%; font-weight: 200; color: #111; }
 .intro__line--im { top: 54%; translate: 0 -50%; font-weight: 300; color: #111; opacity: 0; }
 .intro__caret {
-  display: inline-block; width: 1px; height: .95em; margin-left: 3px; vertical-align: -0.12em;
+  display: inline-block; width: 2px; height: .95em; margin-left: 3px; vertical-align: -0.12em;
   background: currentColor; animation: caret .9s steps(1) infinite; transition: opacity .6s;
 }
 .intro__caret.is-done { opacity: 0; animation: none; }
