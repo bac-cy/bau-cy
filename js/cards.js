@@ -105,18 +105,7 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     const msg = document.createElement('span'); msg.className = 'slot__msg'; msg.setAttribute('aria-live', 'off');
     slot.append(cv, msg);
     const camera = new THREE.PerspectiveCamera(28, 1.6, 0.01, 10);
-    let arm = null;
-    if (slot.dataset.scene === 'press') {                                       // 압력 시연: 사용자의 팔을 부드러운 라벤더 캡슐로 단순하게 표현 (사람 모양 없이)
-      const foam = by['새_하부_폼'] || by['새_쿠션'], r = 0.022;
-      const mat = new THREE.MeshPhysicalMaterial({ color: '#c9bcee', roughness: 0.72, metalness: 0, sheen: 0.6, sheenColor: new THREE.Color('#fff'), envMapIntensity: 0.6 });
-      arm = new THREE.Mesh(new THREE.CapsuleGeometry(r, 0.12, 10, 20), mat);
-      arm.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), FRONT);
-      const bx = new THREE.Vector3(center.x, 0, center.z).addScaledVector(FRONT, 0.075);
-      const rc = new THREE.Raycaster(new THREE.Vector3(bx.x, box.max.y + 0.2, bx.z), new THREE.Vector3(0, -1, 0)), hit = rc.intersectObject(foam, true)[0];
-      const top = hit ? hit.point.y : new THREE.Box3().setFromObject(foam).max.y;                // 폼 윗면 높이(팔이 폼 위에 놓이도록)
-      arm.userData = { r, y0: top + r * 0.8 };
-      arm.position.set(bx.x, arm.userData.y0, bx.z); arm.castShadow = false; scene.add(arm);
-    }
+    const arm = null;                                                          // (팔 캡슐은 사용자 요청으로 없앰)
     return { slot, arm, kind: slot.dataset.scene, scene, root3, foam: by['새_하부_폼'], foam0: by['새_하부_폼'] ? by['새_하부_폼'].scale.y : 1, camera, cv, msg, ctx: cv.getContext('2d'), setPose, eyes, FRONT, RIGHT, center, sphere, seam,
       cam: { az: 35, el: 14, zoom: 1, tx: 0, ty: 0, tz: 0 }, cvel: { az: { v: 0 }, el: { v: 0 }, zoom: { v: 0 }, tx: { v: 0 }, ty: { v: 0 }, tz: { v: 0 } },
       t: 0, rest: 0, visible: false, text: '', w: 0, h: 0 };
@@ -143,9 +132,10 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
       say(c, '');
     } else if (c.kind === 'press') {                                            // 압력 시연(스크롤 진행 p로 움직임): 옆에서 머리가 내려와 폼을 지그시 눌렀다 놓음
       const p = Math.min(1, Math.max(0, parseFloat(c.slot.dataset.p || '0'))), ez = (u) => { u = Math.min(1, Math.max(0, u)); return u * u * (3 - 2 * u); };
-      const pr = ez((p - 0.3) / 0.35) * (1 - ez((p - 0.86) / 0.12));
-      pose = [18 + 10 * (1 - pr) - 14 * pr, -20 - 14 * (1 - pr) + 16 * pr, 0, 0]; eye = pr > 0.45 ? '편안한 눈' : '뜬 눈';
-      g = { az: 78, el: 6, zoom: 1.4, tx: 0, ty: 0.004, tz: 0 }; c.press = pr;
+      const up = ez((p - 0.04) / 0.3) * (1 - ez((p - 0.32) / 0.3));            // 고개를 들었다가
+      const pr = ez((p - 0.5) / 0.28) * (1 - ez((p - 0.86) / 0.12));           // 폼 위로 내려와 지그시 눌렀다 놓음
+      pose = [18 + 12 * up - 15 * pr, -20 - 18 * up + 18 * pr, 0, 0]; eye = pr > 0.45 ? '편안한 눈' : '뜬 눈';
+      g = { az: 78, el: 6, zoom: 1.12, tx: 0, ty: 0, tz: 0 }; c.press = pr;
       say(c, '');
     } else if (c.kind === 'close') {                                            // Close: 앉아 있다가 머리가 천천히 앞으로 나와 다가오고, 잠깐 멈췄다가 다시 앉음 (한 번 4초)
       const p = pOf(c, 5.2), ez = (u) => { u = Math.min(1, Math.max(0, u)); return u * u * (3 - 2 * u); };
