@@ -23,7 +23,7 @@ const SHELL = new Set(['head_top', 'head_low', 'body_top']);                    
 if (root) {
   const cv = root.querySelector('canvas'), tip = root.querySelector('.eng__tip'), hint = root.querySelector('.eng__hint');
   const reduced = false, touch = window.matchMedia('(hover: none)').matches;
-  if (hint) hint.textContent = touch ? '부품을 눌러 보세요 · 끌어서 돌려 보세요' : '부품을 눌러 보세요 · 끌어서 돌려 보세요 · 휠로 분해 ↔ 조립';
+  if (hint) hint.textContent = touch ? '부품을 눌러 보세요 · 끌어서 돌려 보세요' : '부품을 눌러 보세요 · 끌어서 돌려 보세요 · 스크롤이나 아래 바로 합치기·펼치기';
   let started = false;
   new IntersectionObserver(([e]) => { if (e.isIntersecting && !started) { started = true; init().catch(err => console.warn('Engineering view unavailable:', err)); } }, { rootMargin: '900px 0px' }).observe(root);
 
@@ -75,16 +75,9 @@ if (root) {
     new ResizeObserver(fit).observe(cv); fit();
     new IntersectionObserver(([en]) => { visible = en.isIntersecting; dirty = true; }).observe(root);
 
-    // 마우스를 올리기 전: 카드가 화면 아래에서 올라올 때 분해 → 가운데에 오면 조립
-    function scrollGoal() { const r = root.getBoundingClientRect(), vh = window.innerHeight, c = r.top + r.height / 2; return 1 - clamp((vh * 1.0 - c) / (vh * 0.55), 0, 1); }
-    // 카드 위에서 마우스 휠: 아래로 = 조립, 위로 = 분해. 끝까지 가면 페이지 스크롤이 이어진다.
-    root.addEventListener('wheel', (ev) => {
-      if (ev.ctrlKey) return;
-      if (!usingWheel) { usingWheel = true; wheelE = e; }
-      const next = clamp(wheelE - ev.deltaY * 0.0014, 0, 1);
-      if ((ev.deltaY > 0 && wheelE <= 0.001) || (ev.deltaY < 0 && wheelE >= 0.999)) return;   // 이미 끝이면 페이지가 스크롤되게 둔다
-      wheelE = next; dirty = true; ev.preventDefault();
-    }, { passive: false });
+    // 스크롤로 조립: 카드는 화면에 고정돼 있고, 오른쪽 내용을 따라 스크롤하는 동안 분해 → 조립이 이어짐 (그룹을 지나가는 진행도 사용)
+    const grid = document.querySelector('.engspec__grid') || root;
+    function scrollGoal() { const g = grid.getBoundingClientRect(), vh = window.innerHeight; const p = clamp((vh * 0.15 - g.top) / Math.max(1, g.height - vh * 0.8), 0, 1);  return 1 - smooth(clamp(p / 0.92, 0, 1)); }
     root.addEventListener('pointermove', (ev) => {
       if (!drag && e < 0.4) { root.style.cursor = hitLayer(ev) ? 'pointer' : 'grab'; }
       if (drag) { baseYaw = drag.yaw + (ev.clientX - drag.x) * 0.009; baseEl = clamp(drag.el + (ev.clientY - drag.y) * 0.006, -0.25, 1.35); dirty = true; return; }   // 끄는 동안: 돌려 보기
@@ -116,9 +109,9 @@ if (root) {
     }
 
     // 아래 슬라이더: 좌우로 밀어서 부품을 합치거나 펼침 (왼쪽 = 합치기, 오른쪽 = 펼치기). 스크롤·휠로 움직일 때는 슬라이더도 따라감
-    const slider = document.querySelector('.eng__slider input'); let sliding = false;
+    const slider = document.querySelector('.eng__slider input'); let sliding = false, slideY = 0;
     if (slider) {
-      const set = () => { usingWheel = true; wheelE = clamp(+slider.value / 100, 0, 1); dirty = true; };
+      const set = () => { usingWheel = true; wheelE = clamp(+slider.value / 100, 0, 1); slideY = window.scrollY; dirty = true; };
       slider.addEventListener('input', set);
       slider.addEventListener('pointerdown', () => { sliding = true; set(); }); addEventListener('pointerup', () => { sliding = false; });
       slider.addEventListener('keydown', () => { sliding = true; setTimeout(() => { sliding = false; }, 400); });
@@ -128,7 +121,8 @@ if (root) {
       requestAnimationFrame(loop);
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
       if (!visible) return;
-      eGoal = reduced ? 0 : usingWheel ? wheelE : smooth(scrollGoal());
+      if (usingWheel && !sliding && Math.abs(window.scrollY - slideY) > 60) usingWheel = false;     // 슬라이더로 맞춘 뒤 스크롤을 움직이면 다시 스크롤 연동
+      eGoal = reduced ? 0 : usingWheel ? wheelE : scrollGoal();
       const ne = e + (eGoal - e) * Math.min(1, dt * 5);                       // 천천히 흐르듯 따라감
       if (Math.abs(ne - e) > 0.0004) { e = ne; dirty = true; }
       if (slider && !sliding) { const sv = Math.round((usingWheel ? wheelE : e) * 100); if (+slider.value !== sv) slider.value = sv; slider.style.setProperty('--p', sv + '%'); }

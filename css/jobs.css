@@ -78,3 +78,13 @@
 .eng__slider input::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 1px solid rgba(0, 0, 0, .12); box-shadow: 0 6px 16px -6px rgba(60, 40, 90, .5); }
 .eng__slider input:active::-webkit-slider-thumb { transform: scale(1.12); }
 .eng__slider input:focus-visible { outline: 2px solid var(--lavender); outline-offset: 4px; border-radius: 8px; }
+
+/* Engineering 조작하기 편하게: 분해도 카드와 슬라이더는 화면에 붙어 있고(PC), 오른쪽 내용이 스크롤되는 동안 분해 → 조립이 이어짐.
+   카드 높이는 화면(슬라이더까지)에 한 번에 들어오도록 맞춤. */
+.slot--eng { aspect-ratio: auto; height: min(calc(100svh - 210px), 720px); min-height: 360px; }
+@media (min-width: 901px) {
+  .engspec__grid { align-items: start; }
+  .engspec__eng { position: sticky; top: max(72px, calc((100svh - min(calc(100svh - 210px), 720px) - 96px) / 2)); }
+  .engspec__side { position: static; padding-bottom: 60svh; }
+}
+@media (max-width: 900px) { .slot--eng { height: min(54svh, 470px); } }
