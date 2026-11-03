@@ -180,13 +180,27 @@ updateNavSpy();
   document.addEventListener('keydown', (e) => { if (!track.contains(document.activeElement)) return; if (e.key === 'ArrowRight') go(idx() + 1); if (e.key === 'ArrowLeft') go(idx() - 1); });
 
   /* 영상 재생·전체 화면 */
+  let gestureDone = false, gestureOrAuto = true;                                // gestureOrAuto: 먼저 소리로 시도해 보고 막히면 소리 없이 재생
   figs.forEach((fig) => {
     const v = fig.querySelector('video'); if (!v) return;
     const isFull = () => document.fullscreenElement === fig || document.webkitFullscreenElement === fig || v.webkitDisplayingFullscreen;
+    // 인트로 영상 소리: 전체 화면으로 바꾸지 않아도, 화면에 보이는 동안 소리와 함께 재생 (브라우저가 막으면 소리 없이 시작했다가 처음 클릭·키 입력 때 바로 켜짐)
+    const filmBox = fig.closest('.intro__film'); let vis = false;
+    const soundOn = () => { try { return localStorage.getItem('cove-sound') !== 'off'; } catch (e) { return true; } };
+    const opac = () => { const o = filmBox ? parseFloat(filmBox.style.opacity) : 1; return isNaN(o) ? 1 : o; };   // 영상이 서서히 사라지는 동안 소리도 함께 작아짐
+    const applyAudio = () => { if (isFull()) return; const want = soundOn() && opac() > 0.05; v.volume = Math.max(0, Math.min(1, opac() * 0.9)); if (want && v.muted && gestureDone) v.muted = false; if (!want && !v.muted) v.muted = true; };
+    const startPlay = () => {
+      v.muted = !(soundOn() && gestureOrAuto); applyAudio();
+      const p = v.play();
+      if (p && p.catch) p.catch(() => { if (!v.muted) { v.muted = true; const q = v.play(); if (q && q.catch) q.catch(() => {}); } });       // 소리 재생이 막히면 소리 없이 시작
+    };
     new IntersectionObserver(([en]) => {
       if (reduce || isFull()) return;
-      if (en.intersectionRatio >= 0.5) { const p = v.play(); if (p && p.catch) p.catch(() => {}); } else v.pause();
+      vis = en.intersectionRatio >= 0.5;
+      if (vis) startPlay(); else v.pause();
     }, { threshold: [0, 0.5] }).observe(v);
+    setInterval(() => { if (vis && !isFull()) { applyAudio(); if (opac() <= 0.05) { if (!v.paused) v.pause(); } else if (v.paused && !reduce) startPlay(); } }, 250);
+    ['pointerdown', 'keydown', 'touchend'].forEach(t => addEventListener(t, () => { gestureDone = true; if (vis && !isFull()) applyAudio(); }, { capture: true, passive: true }));
     let hideT = 0;
     const showBar = () => { if (!isFull()) return; v.controls = true; fig.style.cursor = ''; clearTimeout(hideT); hideT = setTimeout(hideBar, 1500); };
     const hideBar = () => { if (!isFull() || v.paused) return; v.controls = false; fig.style.cursor = 'none'; };
@@ -198,7 +212,7 @@ updateNavSpy();
       else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen();                  // iPhone Safari
       const p = v.play(); if (p && p.catch) p.catch(() => {});
     };
-    const exitUI = () => { clearTimeout(hideT); fig.style.cursor = ''; fig.classList.remove('is-full'); v.muted = true; v.controls = reduce; const p = v.play(); if (p && p.catch && !reduce) p.catch(() => {}); };
+    const exitUI = () => { clearTimeout(hideT); fig.style.cursor = ''; fig.classList.remove('is-full'); v.muted = !(soundOn() && gestureDone); v.controls = reduce; const p = v.play(); if (p && p.catch && !reduce) p.catch(() => {}); };
     // 영상을 더블클릭하면 전체 화면, 전체 화면에서 한 번 더 더블클릭하면 나옴 (한 번 클릭만으로는 아무 일도 없음)
     fig.addEventListener('dblclick', (e) => {
       if (isFull()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }

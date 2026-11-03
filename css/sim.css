@@ -128,3 +128,6 @@
 .sim__toy[data-kind="snack"] svg { width: 74px; height: 74px; filter: drop-shadow(0 8px 8px rgba(80, 50, 25, .35)); }
 @media (max-width: 760px) { .sim__toy[data-kind="snack"] { width: 70px; height: 70px; } .sim__toy[data-kind="snack"] svg { width: 64px; height: 64px; } }
 .sim__crumb { position: absolute; z-index: 6; border-radius: 40% 60% 50% 50%; pointer-events: none; }
+
+/* Form 카드: 이미지의 흰 배경이 카드 배경(Material·Motion과 같은 은은한 그라데이션)과 하나로 이어지도록 곱하기 합성 */
+.slot--photo > img[src*="form"] { mix-blend-mode: multiply; }

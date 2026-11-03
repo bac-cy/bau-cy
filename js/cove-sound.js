@@ -9,7 +9,7 @@
 const KEY = 'cove-sound';
 let on = true; try { on = localStorage.getItem(KEY) !== 'off'; } catch (e) { /* 무시 */ }
 let limNode = null, bgmMute = null, ctx = null, master = null, mGain = null, mOsc1 = null, mOsc2 = null, mFilter = null, mTrem = null, mLfo = null, mNoise = null, lastMotor = -1e9, lastExpr = -1e9, lastBounce = -1e9;
-const VOL = 1.7;                                                        // 전체 소리 크기 (리미터가 찢어짐을 막아 줌)
+const VOL = 2.1;                                                        // 전체 소리 크기 (리미터가 찢어짐을 막아 줌)
 
 function ensure() {
   if (ctx) return ctx;
@@ -61,7 +61,7 @@ function vibrato(f, dur, rate, depth, vol) {                                    
 /* LG 가전·로봇 같은 부드러운 '띠링' 소리: 둥근 사인파 종소리, 살짝 부드럽게 시작해서 길게 울리다 사라짐, 도·미·솔 같은 편안한 음계 */
 function pluck(f, dur = 0.5, vol = 0.2, delay = 0, glideTo = 0) {
   const c = ctx; if (!c) return;
-  const t = c.currentTime + delay, g = c.createGain(), v = vol * 4.2;
+  const t = c.currentTime + delay, g = c.createGain(), v = vol * 3.0;
   g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.025); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   g.connect(master);
   [[1, 1], [2, 0.05]].forEach(([m, a]) => {
@@ -73,7 +73,7 @@ function pluck(f, dur = 0.5, vol = 0.2, delay = 0, glideTo = 0) {
 /* 루나(Loona) 같은 전자 펫의 '찍·끼익' 소리: 높은 음역(700Hz 이상)에서 빠르게 올라갔다 내려가는 짧은 울음. 떨림·낮은 소리는 쓰지 않음 */
 function squeak(pts, dur = 0.14, vol = 0.18, delay = 0) {
   const c = ctx; if (!c) return;
-  const t = c.currentTime + delay, o = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain(), g2 = c.createGain(), v = vol * 4.2;
+  const t = c.currentTime + delay, o = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain(), g2 = c.createGain(), v = vol * 3.0;
   o.type = 'sine'; o2.type = 'sine';
   pts.forEach(([u, f], i) => { const tt = t + u * dur; if (i === 0) { o.frequency.setValueAtTime(f, tt); o2.frequency.setValueAtTime(f * 2, tt); } else { o.frequency.exponentialRampToValueAtTime(f, tt); o2.frequency.exponentialRampToValueAtTime(f * 2, tt); } });
   g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + Math.min(0.015, dur * 0.25)); g.gain.setValueAtTime(v, t + dur * 0.6); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
@@ -97,7 +97,7 @@ const EXPR_CHIME = {                                                            
 let TR = 1;                                                                     // 소리를 낼 때마다 살짝 다른 높이로 (같은 소리가 반복되지 않게)
 function boop(f0, f1, dur = 0.1, vol = 0.18, delay = 0) {
   const c = ctx; if (!c) return; f0 *= TR; f1 *= TR;
-  const t = c.currentTime + delay, g = c.createGain(), bp = c.createBiquadFilter(), v = vol * 4.2;
+  const t = c.currentTime + delay, g = c.createGain(), bp = c.createBiquadFilter(), v = vol * 3.0;
   bp.type = 'bandpass'; bp.Q.value = 0.9; bp.frequency.setValueAtTime(Math.max(700, f0 * 1.1), t); bp.frequency.exponentialRampToValueAtTime(Math.max(700, f1 * 1.1), t + dur);
   g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + Math.min(0.03, dur * 0.35)); g.gain.setValueAtTime(v, t + dur * 0.55); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   [['sine', 1, 1], ['sine', 2, 0.06]].forEach(([type, m, a]) => {
@@ -176,7 +176,7 @@ function motionHint(level) {
 
 /* 배경음악: assets/bgm.mp3 파일이 있으면 그 곡을 잔잔하게 반복하고, 없으면 코드로 만든 아주 잔잔한 앰비언트(느린 화음 + 가끔 울리는 맑은 종소리)를 깔아요.
    소리가 켜져 있을 때만, 매우 작게. Cove 효과음이 나올 때와 영상을 전체 화면으로 볼 때는 자동으로 줄어들어요. */
-const BGM_LEVEL = 0.3, BGM_FILE_LEVEL = 0.08;                                     // 코드로 만든 반주 / 고른 곡의 음량
+const BGM_LEVEL = 0.4, BGM_FILE_LEVEL = 0.16;                                     // 코드로 만든 반주 / 고른 곡의 음량
 let bgmBus = null, bgmStarted = false, bgmBase = BGM_LEVEL, echoIn = null;
 function bgmSetup() {
   const c = ctx; bgmBus = c.createGain(); bgmBus.gain.value = 0; bgmBus.connect(master);
