@@ -241,10 +241,11 @@ function type() {
   if (!on || !ensure() || ctx.state !== 'running') return;
   const c = ctx, t = c.currentTime;
   if (!noiseBuf) { noiseBuf = c.createBuffer(1, Math.floor(c.sampleRate * 0.05), c.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length); }
-  const n = c.createBufferSource(); n.buffer = noiseBuf; const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1300 + Math.random() * 700; bp.Q.value = 0.8;
-  const g = c.createGain(); g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+  const n = c.createBufferSource(); n.buffer = noiseBuf; const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 800 + Math.random() * 500; bp.Q.value = 0.9;
+  const g = c.createGain(); g.gain.setValueAtTime(1.5, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
   n.connect(bp); bp.connect(g); g.connect(master); n.start(t);                    // 딸깍 하는 바삭한 소리
-  pluck(880 + Math.random() * 150, 0.07, 0.08);                                   // 맑은 톡
+  pluck(880 + Math.random() * 150, 0.07, 0.12);                                   // 맑은 톡
+  pluck(200 + Math.random() * 40, 0.08, 0.14);                                    // 낮은 '탁' (소리가 더 또렷하게 들리도록)
 }
 
 /* 켜기/끄기 버튼 (우측 하단) */
