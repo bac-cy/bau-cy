@@ -123,7 +123,10 @@ if (root) {
       if (!visible) return;
       if (usingWheel && !sliding && Math.abs(window.scrollY - slideY) > 60) usingWheel = false;     // 슬라이더로 맞춘 뒤 스크롤을 움직이면 다시 스크롤 연동
       eGoal = reduced ? 0 : usingWheel ? wheelE : scrollGoal();
-      const ne = e + (eGoal - e) * Math.min(1, dt * 5);                       // 천천히 흐르듯 따라감
+      /* 스크롤로 분해↔조립할 때는 훨씬 천천히, 일정한 속도(전체 약 4초)로 부드럽게 따라감. 슬라이더를 직접 끌 때는 빠르게 */
+      const k = usingWheel ? 6 : 1.6, cap = usingWheel ? 2 : 0.26;
+      const step = Math.max(-cap * dt, Math.min(cap * dt, (eGoal - e) * Math.min(1, dt * k)));
+      const ne = e + step;
       if (Math.abs(ne - e) > 0.0004) { e = ne; dirty = true; }
       if (slider && !sliding) { const sv = Math.round((usingWheel ? wheelE : e) * 100); if (+slider.value !== sv) slider.value = sv; slider.style.setProperty('--p', sv + '%'); }
       const yawGoal = baseYaw, elGoal = baseEl;

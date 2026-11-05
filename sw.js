@@ -1,8 +1,8 @@
-/* Cove 오프라인 서비스 워커: 인터넷이 되는 곳에서 한 번 열어 두면, 이후 와이파이 없이도 같은 주소가 열려요.
-   · 설치할 때 사이트 파일 전부(precache.json)를 저장하고, 글꼴(구글 폰트)은 처음 쓸 때 저장해요.
-   · 저장된 파일을 먼저 보여 주고, 인터넷이 있으면 뒤에서 새 버전으로 갱신해요(다음에 열 때 반영).
-   · 영상은 부분 재생(Range)을 저장본에서 잘라서 줘요. */
-const V = 'cove-v8';
+/* Cove ?ㅽ봽?쇱씤 ?쒕퉬???뚯빱: ?명꽣?룹씠 ?섎뒗 怨녹뿉????踰??댁뼱 ?먮㈃, ?댄썑 ??댄뙆???놁씠??媛숈? 二쇱냼媛 ?대젮??
+   쨌 ?ㅼ튂?????ъ씠???뚯씪 ?꾨?(precache.json)瑜???ν븯怨? 湲瑗?援ш? ?고듃)? 泥섏쓬 ??????ν빐??
+   쨌 ??λ맂 ?뚯씪??癒쇱? 蹂댁뿬 二쇨퀬, ?명꽣?룹씠 ?덉쑝硫??ㅼ뿉????踰꾩쟾?쇰줈 媛깆떊?댁슂(?ㅼ쓬??????諛섏쁺).
+   쨌 ?곸긽? 遺遺??ъ깮(Range)????λ낯?먯꽌 ?섎씪??以섏슂. */
+const V = 'cove-v15';
 const norm = (u) => { const x = new URL(u, self.location); return x.origin + x.pathname; };
 self.addEventListener('install', (e) => {
   e.waitUntil((async () => {
@@ -25,10 +25,10 @@ async function handle(req) {
   let hit = await cache.match(key);
   if (!hit && req.mode === 'navigate') hit = await cache.match(norm('index.html')) || await cache.match(norm('./'));
   if (req.headers.has('range')) { if (hit) return rangeResp(req, hit); try { return await fetch(req); } catch (_) { return new Response('', { status: 504 }); } }
-  if (hit) { fetch(req, { cache: 'no-cache' }).then((r) => { if (r && r.ok && r.status === 200) cache.put(key, r.clone()); }).catch(() => {}); return hit; }      // 저장본 먼저, 뒤에서 갱신
+  if (hit) { fetch(req, { cache: 'no-cache' }).then((r) => { if (r && r.ok && r.status === 200) cache.put(key, r.clone()); }).catch(() => {}); return hit; }      // ??λ낯 癒쇱?, ?ㅼ뿉??媛깆떊
   try { const r = await fetch(req); if (r && r.ok) cache.put(key, r.clone()); return r; } catch (_) { return new Response('offline', { status: 503 }); }
 }
-async function runtime(req) {   // 구글 폰트: 한 번 받으면 저장해 두고 이후엔 저장본 사용
+async function runtime(req) {   // 援ш? ?고듃: ??踰?諛쏆쑝硫???ν빐 ?먭퀬 ?댄썑????λ낯 ?ъ슜
   const cache = await caches.open(V), hit = await cache.match(req);
   if (hit) return hit;
   try { const r = await fetch(req); if (r && (r.ok || r.type === 'opaque')) cache.put(req, r.clone()); return r; } catch (_) { return new Response('', { status: 504 }); }

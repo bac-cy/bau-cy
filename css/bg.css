@@ -30,3 +30,16 @@ html.bg-c, html.bg-c body { background-color: #f5f5f7; }
 .bgfx-on.bg-c .sim__motions button, .bgfx-on.bg-c .sim__views button { background: rgba(255, 255, 255, .72); box-shadow: 0 0 0 .5px rgba(0, 0, 0, .1), 0 2px 8px -2px rgba(0, 0, 0, .08); }
 .bgfx-on.bg-c .sim__ui button[aria-pressed="true"] { background: #1d1d1f; color: #fff; }
 .bgfx-on.bg-c .statement em, .bgfx-on.bg-c em { color: #6b5bd6; }
+
+/* 전시장 컴퓨터에서 버벅이지 않도록 가볍게(사용자 요청): 큰 유리 카드의 블러를 줄이고, 시뮬레이터 칸은 블러 대신 불투명도로, 배경 빛 번짐 블러도 줄임 */
+.bgfx-on.bg-c .feature, .bgfx-on.bg-c .gallery__film, .bgfx-on.bg-c .principles__img, .bgfx-on.bg-c .design__details .slot { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.bgfx-on.bg-c .design__visual { -webkit-backdrop-filter: none; backdrop-filter: none; background-color: rgba(255, 255, 255, .8); }
+.bgfx-on.bg-c .nav.is-scrolled { -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.bgfx-on.bg-c { --bgblur: 46px; }
+.fx-grain { display: none !important; }
+
+/* 가벼운 모드(?lite=1, start-lite.bat): 느린 전시 컴퓨터용. 유리 블러·배경 빛 번짐·물결을 끄고 3D는 그림자 없이 1배 해상도로 그려요 */
+html.lite * { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+html.lite .bgfx { display: none !important; }
+html.lite .intro__ripple, html.lite .intro__blob, html.lite .intro__burst { display: none !important; }
+html.lite .design__visual, html.lite .feature, html.lite .design__details .slot { background-color: rgba(255, 255, 255, .86) !important; }

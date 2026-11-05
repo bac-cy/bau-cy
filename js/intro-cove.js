@@ -32,13 +32,13 @@ async function init() {
   const D2R = Math.PI / 180, clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.08;
-  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.VSMShadowMap;      // 렌더 이미지처럼 부드러운 그림자
+  renderer.shadowMap.enabled = !window.COVE_LITE; renderer.shadowMap.type = THREE.VSMShadowMap;      // 렌더 이미지처럼 부드러운 그림자
   const cv = renderer.domElement; cv.className = 'intro__live'; cv.setAttribute('aria-hidden', 'true');
   const scene = new THREE.Scene();
   scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
   scene.add(new THREE.HemisphereLight(0xfff4e8, 0xd8c8c0, 1.5));
   const key = new THREE.DirectionalLight(0xfff0e0, 1.3); key.position.set(-0.05, 2.8, 0.45);   // 키샷 렌더처럼 그림자가 옆으로 길게 늘어지지 않고 바로 아래에 부드럽게 깔리도록 거의 머리 위에서 비춤
-  key.castShadow = true; key.shadow.mapSize.set(innerWidth <= 760 ? 1024 : 2048, innerWidth <= 760 ? 1024 : 2048); key.shadow.bias = -0.0006; key.shadow.normalBias = 0.003; key.shadow.radius = 9; key.shadow.blurSamples = 20;
+  key.castShadow = true; key.shadow.mapSize.set(1024, 1024); key.shadow.bias = -0.0006; key.shadow.normalBias = 0.003; key.shadow.radius = 7; key.shadow.blurSamples = 12;
   Object.assign(key.shadow.camera, { left: -0.45, right: 0.45, top: 0.45, bottom: -0.45, near: 0.3, far: 5 }); key.target.position.set(0, 0.12, 0); scene.add(key, key.target);
   const fill = new THREE.DirectionalLight(0xe4dbf5, 0.5); fill.position.set(2, .6, -1); scene.add(fill);
   const rim = new THREE.DirectionalLight(0xffe9d6, 0.75); rim.position.set(1.2, 1.2, -1.6); scene.add(rim);            // 가장자리 빛줄기
@@ -90,7 +90,7 @@ async function init() {
   figure.appendChild(cv);
   function resize() {
     const w = figure.clientWidth; if (!w) return;
-    const S = Math.round(w * SCALE), dpr = Math.min(window.devicePixelRatio, 2);
+    const S = Math.round(w * SCALE), dpr = window.COVE_LITE ? 1 : Math.min(window.devicePixelRatio, 2);
     renderer.setPixelRatio(dpr); renderer.setSize(S, S, false);
     cv.style.cssText = `position:absolute;left:50%;width:${S}px;height:${S}px;margin-left:${-S / 2}px;bottom:${-Math.round(S * 0.026 / visibleH * 1) - 0}px;pointer-events:none;`;
   }
@@ -131,10 +131,12 @@ async function init() {
   let autoFrom = 0, autoUntil = -1, autoDone = false;                      // 도착하면 마우스가 없어도 스스로 한 번 일어나 두리번거린다
   const visible = () => { const r = figure.getBoundingClientRect(); return +getComputedStyle(figure).opacity > 0.4 && r.bottom > 0 && r.top < innerHeight; };
 
+  let warm = 6;
   function frame(now) {
     requestAnimationFrame(frame);
+    if (window.COVE_LITE && now - last < 30) return;                  // 가벼운 모드: 초당 약 30번만 그림
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
-    if (!visible()) return;
+    if (!visible()) { if (warm > 0) { warm--; renderer.render(scene, camera); } return; }   // 처음 몇 프레임은 안 보여도 한 번 그려 둠(셰이더·그림자 준비 → 나타날 때 '툭' 끊김 방지)
     tNow += dt;
     const op = +getComputedStyle(figure).opacity;
     if (op < 0.3) autoDone = false;                                              // 장면을 벗어났다 돌아오면 다시

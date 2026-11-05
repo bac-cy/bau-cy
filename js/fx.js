@@ -1,5 +1,6 @@
 /* 디테일 효과 (사용자 요청으로 적용): 필름 입자 · 자석 버튼 · 카드 빛/기울기 */
 (() => {
+  if (window.COVE_LITE) return;                       // 가벼운 모드: 입자·기울기·자석 효과 없음
   const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   document.documentElement.classList.add('fx');
   // 1) 필름 입자

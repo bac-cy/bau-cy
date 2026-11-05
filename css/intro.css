@@ -144,3 +144,8 @@
 
 /* 마무리 장면: 빈 구간을 줄이려고 190svh → 160svh, 글자는 장면이 올라오자마자 나옴(js/finale.js) */
 .intro--finale { height: 160svh; }
+
+/* 가벼운 모드: 마무리 장면의 글자 그림자 블러(큰 반경)·가운데 빛 번짐을 빼고, 글자 안쪽 3D 회전 대신 평면으로 */
+html.lite .intro__ch::before { display: none; }
+html.lite .intro__chi { will-change: auto; }
+html.lite .intro__burst { display: none !important; }

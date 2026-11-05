@@ -37,12 +37,15 @@
   const pointer = { x: .55, y: .45, active: false, t: 0 }, cur = { x: .55, y: .45 };
   window.addEventListener('pointermove', e => { pointer.x = e.clientX / innerWidth; pointer.y = e.clientY / innerHeight; pointer.active = true; pointer.t = performance.now(); }, { passive: true });
 
+  const LITE = !!window.COVE_LITE;
   let ss = 0, last = performance.now(); const vss = { v: 0 };
   function frame(now) {
     requestAnimationFrame(frame);
+    if (LITE && now - last < 30) return;                                // 가벼운 모드: 초당 약 30번만
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     const r = root.getBoundingClientRect();
     if (r.bottom < -50 || r.top > innerHeight + 50) return;
+    const rects = LITE ? null : chars.map(el => el.getBoundingClientRect());           // 스타일을 쓰기 전에 먼저 읽어서(강제 레이아웃 방지) 끊김을 줄임
     const W = innerWidth, H = innerHeight;
     // 장면이 화면 아래에서 절반쯤 올라왔을 때부터 글자가 나오기 시작해서, 화면에 꽉 차면 Cove가 올라옴
     const raw = -r.top / H + 0.8, tgt = clamp(raw, 0, (r.height - H) / H + 0.8);
@@ -67,11 +70,10 @@
       const q = clamp(bl * 1.55 - i * 0.17), e = backOut(q);
       el.style.opacity = clamp(q * 2.6);
       el.style.transform = `translate3d(0, ${((1 - e) * H * 0.42).toFixed(1)}px, 0)`;
-      el.style.filter = q < 0.98 ? `blur(${((1 - q) * 12).toFixed(1)}px)` : 'none';
+      if (!LITE) el.style.filter = q < 0.98 ? `blur(${((1 - q) * 12).toFixed(1)}px)` : 'none';   // 가벼운 모드에선 블러 없이 투명도만
     });
     // 글자 위치를 먼저 한꺼번에 읽고(레이아웃 계산 1번) 나서 스타일을 씀 → 글자마다 읽고 쓰기를 번갈아 하면 매 프레임 끊김
-    const rects = b > 0.02 ? chars.map(el => el.getBoundingClientRect()) : null;
-    if (b > 0.02) chars.forEach((el, i) => {
+    if (!LITE && b > 0.02) chars.forEach((el, i) => {      // 가벼운 모드: 마우스 따라 기울기·출렁임 없이 등장 움직임만(매 프레임 다시 그리는 부분 제거)
       const inner = el.firstChild, rr = rects[i]; if (!rr.width) return;
       const ccx = rr.left + rr.width / 2, ccy = rr.top + rr.height / 2, dx = ax - ccx, dy = ay - ccy, dist = Math.hypot(dx, dy);
       const st = inner._s || (inner._s = { tx: 0, ty: 0, rx: 0, ry: 0, sc: 1, hx: 50, hy: 30 });
@@ -84,8 +86,8 @@
       st.hx += ((clamp((ax - rr.left) / rr.width, -.2, 1.2) * 100) - st.hx) * k; st.hy += ((clamp((ay - rr.top) / rr.height, -.2, 1.2) * 100) - st.hy) * k;
       inner.style.setProperty('--hx', st.hx.toFixed(1) + '%'); inner.style.setProperty('--hy', st.hy.toFixed(1) + '%'); inner.style.setProperty('--hp', (0.35 + 0.55 * prox).toFixed(3));
     });
-    rx.clearRect(0, 0, rw, rh);
-    if (bl > 0.5 && rings.length) {
+    if (!LITE) rx.clearRect(0, 0, rw, rh);
+    if (!LITE && bl > 0.5 && rings.length) {
       rx.globalCompositeOperation = 'screen';
       for (let i = rings.length - 1; i >= 0; i--) {
         const g = rings[i]; g.t += dt / 1.9; if (g.t >= 1) { rings.splice(i, 1); continue; }

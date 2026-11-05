@@ -1,6 +1,26 @@
 <!doctype html>
 <html lang="ko">
 <head>
+  <script>var _ss = ''; try { _ss = sessionStorage.getItem('cove-lite') || ''; } catch (e) {}
+    if (/[?&]lite=1/.test(location.search) || _ss === '1') { document.documentElement.classList.add('lite'); window.COVE_LITE = true; }
+    /* 자동 가벼운 모드: 켜진 직후 8~28초 사이에 화면이 초당 28번 미만으로 그려지면(버벅임) 가벼운 모드로 한 번 다시 열어요 */
+    if (!window.COVE_LITE && !/[?&]lite=0/.test(location.search)) (function () {
+      var n = 0, t0 = 0, born = performance.now(), tries = 0, lastT = 0, longF = 0;
+      function tick(now) {
+        if (window.COVE_LITE) return;
+        if (document.hidden || now - born < 8000) { n = 0; t0 = 0; lastT = now; return requestAnimationFrame(tick); }
+        if (!t0) { t0 = now; n = 0; longF = 0; } n++;
+        if (now - lastT > 70) longF++;                      // 한 프레임이 0.07초 넘게 걸리면 '뚝' 끊긴 것
+        lastT = now;
+        if (now - t0 >= 4000) {
+          var fps = n / ((now - t0) / 1000);
+          if (fps < 45 || longF >= 4) { try { sessionStorage.setItem('cove-lite', '1'); } catch (e) {} location.reload(); return; }
+          if (++tries >= 3 || now - born > 28000) return; t0 = 0;
+        }
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    })();</script>   <!-- 가벼운 모드(?lite=1): 느린 컴퓨터용 -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cove | Desktop Home Robot</title>
@@ -10,9 +30,8 @@
   <link rel="stylesheet" href="fonts/fonts.css">
   <script src="js/offline-fetch.js"></script>
   <link rel="stylesheet" href="css/style.css?v=20261106c">
-  <link rel="stylesheet" href="css/intro.css?v=20261106b">
+  <link rel="stylesheet" href="css/intro.css?v=20261107b">
   <link rel="stylesheet" href="css/sim.css?v=20261104z">
-  <link rel="stylesheet" href="css/cove360.css?v=8">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="alternate icon" href="favicon-32.png" type="image/png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -61,7 +80,7 @@
         <div class="gallery__carousel intro__film" aria-roledescription="carousel" aria-label="Cove 영상">
         <div class="gallery__track">
           <figure class="gallery__film">
-            <video src="assets/cove-film.mp4?v=2" poster="assets/cove-film-poster.jpg?v=2" muted loop playsinline preload="metadata" aria-label="Cove 홍보 영상"></video>
+            <video src="assets/cove-film.mp4?v=3" poster="assets/cove-film-poster.jpg?v=2" muted loop playsinline preload="metadata" aria-label="Cove 홍보 영상"></video>
             <span class="gallery__expand" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></span>
           </figure>
           <figure class="gallery__film">
@@ -151,8 +170,6 @@
         <!-- 큰 제품 이미지 (스크롤 시 고정) -->
         <figure class="design__visual">
           <div class="cove-art" data-cove></div>
-          <!-- 고화질 360° 렌더(js/cove360.js): 평소엔 이 렌더가 보이고(끌어서 회전·각도·확대 버튼), 동작 버튼을 누르면 3D 시뮬레이터가 이어받아 움직인 뒤 다시 돌아옴 -->
-          <div class="v360" data-v360="drag" data-auto="off" data-start="11.94,11.1" role="img" aria-label="Cove 360도 보기, 끌어서 돌릴 수 있어요"></div>
           <!-- 움직여 볼 수 있는 Cove 시뮬레이터 (불러오지 못하면 위의 임시 이미지가 그대로 보임) -->
           <div class="cove-3d" data-model="assets/cove-rig.glb"></div>
           <div class="sim__ui" hidden>
@@ -170,7 +187,6 @@
             <div class="sim__toy" data-mode="snack" data-kind="snack" hidden role="button" aria-label="간식, Cove에게 끌어다 주세요" style="top:40%"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="#f2c79a"/><circle cx="24" cy="24" r="19" fill="none" stroke="#d9a574" stroke-width="2"/><circle cx="17" cy="19" r="2.4" fill="#8a5a3c"/><circle cx="29" cy="17" r="2.2" fill="#8a5a3c"/><circle cx="31" cy="29" r="2.6" fill="#8a5a3c"/><circle cx="19" cy="31" r="2.2" fill="#8a5a3c"/><circle cx="25" cy="24" r="1.8" fill="#8a5a3c"/></svg></div>
             <div class="sim__bottom">
               <p class="sim__status" aria-live="polite"></p>
-              <p class="sim__status v360__hint" aria-hidden="true">끌어서 돌려 보고, 아래 동작을 눌러 보세요</p>
               <div class="sim__motions" role="group" aria-label="동작">
                 <button type="button" data-motion="greet" aria-pressed="false">인사하기</button>
                 <button type="button" data-motion="pet" aria-pressed="false">쓰다듬기</button>
@@ -302,23 +318,22 @@
         "three/addons/": "./assets/vendor/three/examples/jsm/"
     } }
   </script>
-  <script src="js/cove360.js?v=6" defer></script>
-  <script type="module" src="js/sim.js?v=20261106g"></script>
-  <script type="module" src="js/cards.js?v=20261106d"></script>
-  <script type="module" src="js/intro-cove.js?v=20261106d"></script>
+  <script type="module" src="js/sim.js?v=20261107b"></script>
+  <script type="module" src="js/cards.js?v=20261107a"></script>
+  <script type="module" src="js/intro-cove.js?v=20261107b"></script>
   <script type="module" src="js/features.js?v=20261104z"></script>
-  <script type="module" src="js/engineering.js?v=20261104z"></script>
+  <script type="module" src="js/engineering.js?v=20261107a"></script>
   <!-- 디테일 효과: 필름 입자 · 자석 버튼 · 카드 빛/기울기 (되돌리려면 아래 두 줄과 css/fx.css, js/fx.js 를 지우면 됨) -->
   <link rel="stylesheet" href="css/fx.css?v=20261104z">
-  <script src="js/fx.js?v=20261104z" defer></script>
+  <script src="js/fx.js?v=20261107a" defer></script>
   <!-- 배경 통일 + 유리 카드 (C안, 애플풍). 되돌리려면 아래 두 줄을 지우면 됨 -->
-  <link rel="stylesheet" href="css/bg.css?v=20261104z">
-  <script src="js/bg.js?v=20261104z" defer></script>
+  <link rel="stylesheet" href="css/bg.css?v=20261106q">
+  <script src="js/bg.js?v=20261107a" defer></script>
   <!-- 잡스 제안 4가지(한 줄 약속·압력 시연·큰 숫자 스펙·One more thing). 되돌리려면 아래 두 줄을 지우면 됨 -->
   <link rel="stylesheet" href="css/jobs.css?v=20261106a">
   <script src="js/jobs.js?v=20261105s" defer></script>
   <script type="module" src="js/cove-sound.js"></script>   <!-- 소리: 일찍 불러와 인트로 타이핑 소리에도 씀 -->
-  <script src="js/finale.js?v=2"></script>
+  <script src="js/finale.js?v=4"></script>
   <script src="js/scramble.js?v=1" defer></script>
   <script src="js/loader.js?v=8"></script>   <!-- 시작 화면 (눈 LED가 깜빡이다 열림) -->
   <script>

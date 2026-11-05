@@ -42,16 +42,16 @@ async function init(host) {
 
   /* ───────── 장면 ───────── */
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(Math.max(window.devicePixelRatio || 1, 2) * 1.25, 3));          // 2.5배 크게 그려 줄여 보여 줌(슈퍼샘플링): 윤곽이 매끈하고 패브릭 결이 또렷해짐
+  renderer.setPixelRatio(window.COVE_LITE ? 1 : Math.min(Math.max(window.devicePixelRatio || 1, 1.5), 2));          // 2.5배 크게 그려 줄여 보여 줌(슈퍼샘플링): 윤곽이 매끈하고 패브릭 결이 또렷해짐
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.12;
-  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.VSMShadowMap;      // 머리가 몸통에 드리우는 부드러운 그림자 — 렌더 이미지 같은 입체감
+  renderer.shadowMap.enabled = !window.COVE_LITE; renderer.shadowMap.type = THREE.VSMShadowMap;      // 머리가 몸통에 드리우는 부드러운 그림자 — 렌더 이미지 같은 입체감
   host.appendChild(renderer.domElement);
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   scene.add(new THREE.HemisphereLight(0xfff4e8, 0xd8c8c0, 1.1));
   const key = new THREE.DirectionalLight(0xfff0e0, 1.8); key.position.set(-0.45, 2.5, 0.95);
-  key.castShadow = true; key.shadow.mapSize.set(innerWidth <= 760 ? 2048 : 4096, innerWidth <= 760 ? 2048 : 4096); key.shadow.bias = -0.0005; key.shadow.normalBias = 0.0025; key.shadow.radius = 11; key.shadow.blurSamples = 25;
+  key.castShadow = true; key.shadow.mapSize.set(innerWidth <= 760 ? 1024 : 2048, innerWidth <= 760 ? 1024 : 2048); key.shadow.bias = -0.0005; key.shadow.normalBias = 0.0025; key.shadow.radius = 8; key.shadow.blurSamples = 14;
   Object.assign(key.shadow.camera, { left: -0.45, right: 0.45, top: 0.45, bottom: -0.45, near: 0.3, far: 5 }); key.target.position.set(0, 0.12, 0); scene.add(key, key.target);
   const fill = new THREE.DirectionalLight(0xe4dbf5, 0.5); fill.position.set(2, .6, -1); scene.add(fill);
   const rim = new THREE.DirectionalLight(0xffe9d6, 0.7); rim.position.set(1.2, 1.2, -1.6); scene.add(rim);            // 가장자리에 은은한 빛줄기(윤곽이 또렷해짐)
@@ -580,9 +580,11 @@ float vn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   let lastG = -1;
   function pickGesture() { let i; do { i = Math.floor(Math.random() * GESTS.length); } while (i === lastG); lastG = i; return { ...GESTS[i], t: 0 }; }
 
+  let warm = 6;
   function frame(now) {
     requestAnimationFrame(frame);
-    if (!visible) return;
+    if (!visible) { if (warm > 0) { warm--; renderer.render(scene, camera); } return; }   // 처음 몇 프레임은 안 보여도 한 번 그려 둠(나타날 때 끊김 방지)
+    if (window.COVE_LITE && now - last < 30) return;                  // 가벼운 모드: 초당 약 30번만 그림(일정하게 끊김 없이)
     const dt = Math.min(0.05, (now - last) / 1000); last = now; tNow += dt;
     // 동작 재생
     if (clip) {

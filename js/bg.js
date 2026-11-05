@@ -1,5 +1,6 @@
 /* 배경 통일(기본 C안 · 애플풍; 주소 끝에 ?bg=a / ?bg=b 를 붙이면 다른 안): 라일락·복숭아 빛이 섹션마다 아주 천천히 색을 바꾸며 이어짐 (?bg=a 은은하게 / ?bg=b 또렷하게) */
 (() => {
+  if (window.COVE_LITE) return;                       // 가벼운 모드: 배경 빛 효과를 아예 만들지 않음(끊김 방지)
   const mode = /[?&]bg=a/.test(location.search) ? 'a' : /[?&]bg=b/.test(location.search) ? 'b' : 'c', K = mode === 'a' ? 0.55 : mode === 'c' ? 0.75 : 1;       // 색 진하기
   document.documentElement.classList.add('bgfx-on'); document.body.classList.add('bg-' + mode); document.documentElement.classList.add('bg-' + mode);
   const bg = document.createElement('div'); bg.className = 'bgfx'; bg.innerHTML = '<i></i><i></i><i></i>'; document.body.prepend(bg);
@@ -24,18 +25,27 @@
   const mix = (a, b, t) => a.map((v, k) => v + (b[k] - v) * t);
   const rgba = (c) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${(c[3] * K).toFixed(3)})`;
   const smooth = (t) => t * t * (3 - 2 * t);
-  let cur = null;
+  let cur = null, lastKey = '', fr = 0;
+  /* 성능: 섹션 위치는 크기가 바뀔 때만 한 번 재서 기억해 두고(매 프레임 레이아웃을 다시 계산하지 않음),
+     색은 눈에 보이게 바뀔 때만 :root 에 써서(매 프레임 쓰면 문서 전체 스타일이 다시 계산됨) 전시장 컴퓨터에서 덜 끊기게 함 */
+  const list = [...els.map((e, i) => [ids[i], e]), ['footer', foot]];
+  let tops = list.map(() => 1e9);
+  const measure = () => { const sy = scrollY; tops = list.map(([, e]) => e ? e.getBoundingClientRect().top + sy : 1e9); };
+  measure(); addEventListener('load', measure); addEventListener('resize', measure);
+  if (window.ResizeObserver) new ResizeObserver(measure).observe(document.body);
   function update(now) {
     requestAnimationFrame(update);
-    const mid = innerHeight * 0.6; let a = 'about', b = 'about', t = 0;
-    const list = [...els.map((e, i) => [ids[i], e]), ['footer', foot]];
+    if (document.hidden) return;
+    const sy = scrollY, mid = innerHeight * 0.6; let a = 'about', b = 'about', t = 0;
     for (let i = 0; i < list.length; i++) {
-      const top = list[i][1] ? list[i][1].getBoundingClientRect().top : 1e9;
-      if (top <= mid) { a = list[i][0]; b = list[i + 1] ? list[i + 1][0] : a; const nt = list[i + 1] && list[i + 1][1] ? list[i + 1][1].getBoundingClientRect().top : 1e9; t = list[i + 1] ? smooth(Math.min(1, Math.max(0, (mid - top) / Math.max(1, (mid - top) + (nt - mid))))) : 0; }
+      const top = tops[i] - sy;
+      if (top <= mid) { a = list[i][0]; b = list[i + 1] ? list[i + 1][0] : a; const nt = list[i + 1] ? tops[i + 1] - sy : 1e9; t = list[i + 1] ? smooth(Math.min(1, Math.max(0, (mid - top) / Math.max(1, (mid - top) + (nt - mid))))) : 0; }
     }
     const c = [0, 1, 2].map(k => mix(P[a][k], P[b][k], t));
     cur = cur ? cur.map((cc, k) => cc.map((v, m) => v + (c[k][m] - v) * 0.06)) : c;      // 부드럽게 따라감
-    const r = document.documentElement.style; r.setProperty('--c1', rgba(cur[0])); r.setProperty('--c2', rgba(cur[1])); r.setProperty('--c3', rgba(cur[2]));
+    const s1 = rgba(cur[0]), s2 = rgba(cur[1]), s3 = rgba(cur[2]), key = s1 + s2 + s3;
+    if (key !== lastKey) { lastKey = key; const r = document.documentElement.style; r.setProperty('--c1', s1); r.setProperty('--c2', s2); r.setProperty('--c3', s3); }
+    if ((++fr & 1) === 0) return;                                                           // 빛 덩어리는 아주 느리게 떠다니므로 2프레임에 한 번만 움직임
     const s = now / 1000, k = bg.children;                                                   // 빛 덩어리가 아주 천천히 떠다님
     k[0].style.transform = `translate(${Math.sin(s / 7) * 4}vw, ${Math.cos(s / 9) * 4}vh)`;
     k[1].style.transform = `translate(${Math.cos(s / 8) * -4}vw, ${Math.sin(s / 6) * 4}vh)`;
